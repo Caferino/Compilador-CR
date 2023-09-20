@@ -1,0 +1,17 @@
+int num = 0;
+
+int fibonacci(int n) {
+    if (n < 2){
+        return n;
+    }
+    else{
+        return fibonacci(n - 1) + fibonacci(n - 2);
+    }
+}
+
+int numTerms = 5;
+
+while(numTerms > 0){
+    print(numTerms);
+    numTerms = numTerms - 1;
+}

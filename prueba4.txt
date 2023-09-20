@@ -1,0 +1,18 @@
+bool booleanoT = 1;
+bool booleanoF = False;
+
+if(booleanoF){
+    print(0);
+}
+else{
+    print(((500 / 5) - 50) * 2); // Este debe transformarse a FLOAT
+}
+if(booleanoT){
+    print(((50 + 25) + 20) + 5);
+}
+else{
+    print(0);
+}
+
+// ! TODO - Arreglar impresión de strings... los añadí (y quité) 
+// de var_cte en parser.py, pero algo faltó
