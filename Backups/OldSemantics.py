@@ -23,12 +23,6 @@ class Rules:
     def __init__(self):
         # Temporales
         self.type = ''
-        self.id = ''
-        
-        
-        
-        # -- Old
-        
         self.varName = ''
         self.varDimensions = []
         self.scope = 'global'
@@ -46,23 +40,10 @@ class Rules:
         self.openList = False
 
 
-    # ------------------------------------- TYPES
+    # ------ TYPES ------ #
     def p_insertType(self, p):
         self.type = p[1]
-        
-    # ------------------------------------- ID
-    def p_insertID(self, p):
-        self.id = p[1]
-        
-    # ------------------------------------- ID
-
-
-
-
-
-
-
-
+        self.allTypes.append(p[1])
 
 
 
@@ -110,7 +91,7 @@ class Rules:
 
 
     # ------ VARIABLES / IDs ------ #
-    def p_oldInsertID(self, p, isFunction):
+    def p_insertID(self, p, isFunction):
         # El ID siempre tendrá que ser el primer TOKEN de p, lo buscamos
         for row in p:
             # Condicional respetando estructura de "p_vars" y "p_extra_vars" en Parser.py
