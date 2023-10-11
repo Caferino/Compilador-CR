@@ -1,4 +1,4 @@
-int a = 3, baka = 69, caca, nice[4] = {0, 8, 9, -10}, ohNice[5][4][1] = {0,0,0};
+int a = 3, baka = 69, caca, nice[4] = {0, 8, 9, -10}, ohNice[5][4] = {0,0,0};
 int listaI1, listaI2[6] <- {1,2,3,4,5};
 // Una matriz de 3 filas y 3 columnas
 float listota[4] <- {1.5, 1.3, 2.3, -5.6};
