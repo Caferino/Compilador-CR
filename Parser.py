@@ -4,7 +4,7 @@
     Abril 15 2023
     Compilador para lenguaje al estilo R/C++.
 
-    --- Parser / Sintáxis ---
+    CR++, El Cristiano Ronaldo de los Lenguajes de Programación.
 """
 
 # ======================== Sintáxis ======================== #
@@ -22,7 +22,8 @@ def p_program(p):
 
 
 def p_block(p):
-    '''block : statement block
+    '''block : vars block
+                | statement block
                 | empty'''
 
 
@@ -75,40 +76,42 @@ def p_array_vars(p):
 
 
 def p_statement(p):
-    '''statement : vars
-                 | function
+    '''statement : function
                  | assignment_block
                  | expression
                  | function_call
                  | loop
                  | condition
                  | writing
-                 | sort
-                 | return
                  | empty'''
     rules.p_saveToOpStack(p)
 
 
 def p_function(p):
-    '''function : function_type function_id LEFTPAREN function_type_and_id '''
+    '''function : type ID LEFTPAREN function_parameters RIGHTPAREN LEFTCORCH block RIGHTCORCH
+                | empty'''
+    rules.p_insertScope('global')
+    rules.p_registerLocalVariables(p)
+    rules.p_insertID(p, True)
+
+    # ! Insert into DirFunc the current quadruple counter (CONT), **to establish where the function start
 
 
-def p_function_type(p):
-    '''function_type : '''
+def p_function_parameters(p):
+    '''function_parameters : type ID function_extra_parameters
+                | empty'''
+    rules.p_insertScope('local')
+    rules.p_saveLocalVariable(p)
+    rules.p_insertID(p, False)
 
 
-def p_return(p):
-    '''return : RETURN expression SEMICOLON
-                | RETURN SEMICOLON'''
+def p_function_extra_parameters(p):
+    '''function_extra_parameters : COMMA function_parameters
+                | empty'''
 
 
 def p_assignment_block(p):
-    '''assignment_block : nodoassign'''
-    rules.values = []
-
-
-def p_nodoassign(p):
-    '''nodoassign : ID ASSIGNL expression SEMICOLON
+    '''assignment_block : ID ASSIGNL expression SEMICOLON
                 | ID EQUALS expression SEMICOLON'''
     quadsConstructor.insertAssignmentID(p[1])
     quadsConstructor.insertAssignmentSign(p[2])
@@ -120,26 +123,16 @@ def p_assignment(p):
                  | EQUALS'''
     
 
+
 def p_function_call(p):
-    '''function_call : function_call_id expression function_call_expressions RIGHTPAREN'''
+    '''function_call : ID LEFTPAREN expression function_call_expressions RIGHTPAREN'''
     # ! NODOS
-
-
-def p_function_call_id(p):
-    '''function_call_id : ID LEFTPAREN'''
-    quadsConstructor.nodoFunctionCallUno(p[1])
-    # ! quadsConstructor.nodoFunctionCallDos(p[1])
 
 
 def p_function_call_expressions(p):
-    '''function_call_expressions : COMMA expression function_call_expressions
+    '''function_call_expressions : COMMA function_call_expressions
                  | empty'''
     # ! NODOS
-
-
-def p_sort(p):
-    '''sort : ID PERIOD SORT LEFTPAREN RIGHTPAREN SEMICOLON'''
-    rules.sortMatrix(p)
 
 
 def p_loop(p):
@@ -161,7 +154,6 @@ def p_nodowhile2(p):
 def p_condition(p):
     '''condition : IF LEFTPAREN expression nodocond LEFTCORCH block RIGHTCORCH else_condition'''
     quadsConstructor.nodoCondicionalDos()
-
 
 def p_nodocond(p):
     '''nodocond : RIGHTPAREN'''
@@ -241,13 +233,11 @@ def p_operator(p):
     '''operator : PLUS term operator
                 | MINUS term operator
                 | empty'''
-    # ! quadsConstructor.verifySignPlusOrMinus() ## ! CREO ESTO ARREGLA EXPRESIONES LINEALES O ROMPE MAS
     if p[1] != None : quadsConstructor.insertSign(p[1])
 
 
 def p_term_operator(p):
-    '''term_operator : EXPONENTIAL fact term_operator
-                     | TIMES fact term_operator
+    '''term_operator : TIMES fact term_operator
                      | DIVIDE fact term_operator
                      | MODULUS fact term_operator
                      | empty'''
@@ -261,7 +251,7 @@ def p_fact(p):
 
 
 
-# # ======================== Reglas de Errores ======================== # #
+# # ======================== Reglas de Errores ======================== #
 
 def p_error(p):
     # raise TypeError("Syntax error in input! - {} ".format(p)) # Para detener la compilación
@@ -275,7 +265,7 @@ def p_empty(p):
 
 
 
-# # # = = = = = = = = = = = = = Main - Lector de Archivos = = = = = = = = = = = = = # # #
+# = = = = = = = = = = = = = Main - Lector de Archivos = = = = = = = = = = = = = #
 
 import sys
 import ply.yacc as yacc
