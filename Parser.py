@@ -14,9 +14,9 @@ from Quadruples import quadsConstructor
 
 rules = Rules()
 
-# ╭───────────────────────────╮
-# │          Program          │
-# ╰───────────────────────────╯
+# ╭──────────────────────────────────────────────────────────────╮
+# │                           PROGRAM                            │
+# ╰──────────────────────────────────────────────────────────────╯
 
 def p_program(p):
     '''program : block'''
@@ -36,14 +36,14 @@ def p_block(p):
 # ╰───────────────────────────╯
 
 def p_vars(p):
-    '''vars : type vars_id vars_equals semicolon
-            | type vars_id leftbracket var_ctei rightbracket vars_equals semicolon
-            | type vars_id leftbracket var_ctei rightbracket leftbracket var_ctei rightbracket vars_equals semicolon'''
+    '''vars : type id vars_equals semicolon
+            | type id leftbracket var_ctei rightbracket vars_equals semicolon
+            | type id leftbracket var_ctei rightbracket leftbracket var_ctei rightbracket vars_equals semicolon'''
             # ! What if I declare a int array with float elements in it? Clean that
-            
+
             
 def p_extra_vars(p):
-    '''extra_vars : vars_comma vars_id vars_equals
+    '''extra_vars : comma vars_id vars_equals
                 | empty'''
                 
                 
@@ -53,7 +53,7 @@ def p_vars_equals_array(p):
 
 
 def p_array_vars(p):
-    '''array_vars : vars_comma expression array_vars
+    '''array_vars : comma expression array_vars
                 | empty'''
                 
                 
@@ -65,8 +65,16 @@ def p_vars_equals(p):
 
 
 def p_assignment(p):
-    '''assignment : ASSIGNL
-                 | EQUALS'''
+    '''assignment : assignl
+                 | equals'''
+                 
+                 
+def p_assignl(p):
+    '''assignl : ASSIGNL'''
+    
+    
+def p_equals(p):
+    '''equals : EQUALS'''
 
 
 def p_type(p):
@@ -77,13 +85,13 @@ def p_type(p):
     rules.p_insertType(p)
 
 
-def p_vars_id(p):
-    '''vars_id : ID'''
+def p_id(p):
+    '''id : ID'''
     rules.p_insertID(p)
 
-    
-def p_vars_comma(p):
-    '''vars_comma : COMMA'''
+
+def p_comma(p):
+    '''comma : COMMA'''
 
                 
 def p_leftcorch(p):
@@ -162,7 +170,7 @@ def p_modulus(p):
 def p_var_cte(p):
     '''var_cte : var_ctei
                | var_ctef
-               | var_id'''
+               | id'''
                
                
 def p_var_ctei(p):
@@ -171,58 +179,62 @@ def p_var_ctei(p):
     
 def p_var_ctef(p):
     '''var_ctef : CTEF'''
-    
-    
-def p_var_id(p):
-    '''var_id : ID'''
 
 
-
-
-
-
-# ======== PART 2 WIP ========= #
-
-
-
+# ╭───────────────────────────╮
+# │       Comparators         │
+# ╰───────────────────────────╯
 
 def p_comparation(p):
-    '''comparation : AND exp
-                 | OR exp
-                 | GREATER exp
-                 | LESS exp
-                 | NOTEQUAL exp
-                 | NOTEQUALNUM exp
+    '''comparation : and exp
+                 | or exp
+                 | greater exp
+                 | less exp
+                 | notequal exp
+                 | notequalnum exp
                  | empty'''
-    if p[1] != None : quadsConstructor.insertSign(p[1])
 
 
+def p_and(p):
+    '''and : AND'''
+
+    
+def p_or(p):
+    '''or : OR'''
 
 
+def p_greater(p):
+    '''greater : GREATER'''
+
+
+def p_less(p):
+    '''less : LESS'''
+
+
+def p_notequal(p):
+    '''notequal : NOTEQUAL'''
+
+
+def p_notequalnum(p):
+    '''notequalnum : NOTEQUALNUM'''
+
+
+# ╭───────────────────────────╮
+# │        Operators          │
+# ╰───────────────────────────╯
 
 def p_operator(p):
-    '''operator : PLUS term operator
-                | MINUS term operator
+    '''operator : plus term operator
+                | minus term operator
                 | empty'''
-    if p[1] != None : quadsConstructor.insertSign(p[1])
 
 
+def p_plus(p):
+    '''plus : PLUS'''
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+def p_minus(p):
+    '''minus : MINUS'''
 
 
 # ╭───────────────────────────╮
@@ -238,10 +250,7 @@ def p_statement(p):
                  | condition
                  | writing
                  | empty'''
-    rules.p_saveToOpStack(p)
-
-
-
+    # ! rules.p_saveToOpStack(p) DELETED TONS OF THESE, ONLY LEFT THIS TO REMIND YOU
 
 
 # ╭───────────────────────────╮
@@ -249,51 +258,32 @@ def p_statement(p):
 # ╰───────────────────────────╯
 
 def p_function(p):
-    '''function : type ID LEFTPAREN function_parameters RIGHTPAREN LEFTCORCH block RIGHTCORCH
+    '''function : type id leftparen function_parameters rightparen leftcorch block rightcorch
                 | empty'''
-    rules.p_insertScope('global')
-    rules.p_registerLocalVariables(p)
-    rules.p_insertID(p, True)
-
-    # ! Insert into DirFunc the current quadruple counter (CONT), **to establish where the function start
 
 
 def p_function_parameters(p):
-    '''function_parameters : type ID function_extra_parameters
+    '''function_parameters : type id function_extra_parameters
                 | empty'''
-    rules.p_insertScope('local')
-    rules.p_saveLocalVariable(p)
-    rules.p_insertID(p, False)
 
 
 def p_function_extra_parameters(p):
-    '''function_extra_parameters : COMMA function_parameters
+    '''function_extra_parameters : comma function_parameters
                 | empty'''
 
 
 def p_assignment_block(p):
-    '''assignment_block : ID ASSIGNL expression SEMICOLON
-                | ID EQUALS expression SEMICOLON'''
-    quadsConstructor.insertAssignmentID(p[1])
-    quadsConstructor.insertAssignmentSign(p[2])
-    quadsConstructor.verifyAssignment()
-
-
-
-    
+    '''assignment_block : id assignl expression semicolon
+                | id equals expression semicolon'''
 
 
 def p_function_call(p):
-    '''function_call : ID LEFTPAREN expression function_call_expressions RIGHTPAREN'''
-    # ! NODOS
+    '''function_call : id leftparen expression function_call_expressions rightparen'''
 
 
 def p_function_call_expressions(p):
-    '''function_call_expressions : COMMA function_call_expressions
+    '''function_call_expressions : comma function_call_expressions
                  | empty'''
-    # ! NODOS
-
-
 
 
 # ╭───────────────────────────╮
@@ -301,21 +291,34 @@ def p_function_call_expressions(p):
 # ╰───────────────────────────╯
 
 def p_loop(p):
-    '''loop : nodowhile LEFTPAREN expression nodowhile2 LEFTCORCH block RIGHTCORCH
+    '''loop : nodowhile1 LEFTPAREN expression nodowhile2 leftcorch block rightcorch
                  | empty'''
-    quadsConstructor.nodoWhileTres()
+    # ! quadsConstructor.nodoWhileTres()
 
 
-def p_nodowhile(p):
-    '''nodowhile : WHILE'''
-    quadsConstructor.nodoWhileUno()
+def p_nodowhile1(p):
+    '''nodowhile1 : WHILE'''
+    # ! quadsConstructor.nodoWhileUno()
 
 
 def p_nodowhile2(p):
     '''nodowhile2 : RIGHTPAREN'''
-    quadsConstructor.nodoWhileDos()
+    # ! quadsConstructor.nodoWhileDos()
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+# ============ WIP ============ #
 
 # ╭───────────────────────────╮
 # │         If / Else         │
@@ -323,11 +326,11 @@ def p_nodowhile2(p):
 
 def p_condition(p):
     '''condition : IF LEFTPAREN expression nodocond LEFTCORCH block RIGHTCORCH else_condition'''
-    quadsConstructor.nodoCondicionalDos()
+    # ! quadsConstructor.nodoCondicionalDos()
 
 def p_nodocond(p):
     '''nodocond : RIGHTPAREN'''
-    quadsConstructor.nodoCondicionalUno()
+    # ! quadsConstructor.nodoCondicionalUno()
 
 
 def p_else_condition(p):
@@ -336,7 +339,7 @@ def p_else_condition(p):
 
 def p_nodoelse(p):
     '''nodoelse : ELSE'''
-    quadsConstructor.nodoCondicionalTres()
+    # ! quadsConstructor.nodoCondicionalTres()
 
 
 
@@ -347,12 +350,12 @@ def p_nodoelse(p):
 def p_writing(p):
     '''writing : writingprint LEFTPAREN print_val RIGHTPAREN SEMICOLON'''
     # TODO - Lógica de meter el token PRINT a los quads, o qué?
-    quadsConstructor.verifyPrint()
+    # ! quadsConstructor.verifyPrint()
 
 
 def p_writingprint(p):
     '''writingprint : PRINT'''
-    quadsConstructor.insertPrint(p[1])
+    # ! quadsConstructor.insertPrint(p[1])
 
 
 def p_print_val(p):
@@ -376,7 +379,9 @@ def p_print_exp(p):
 
 
 
-# # ======================== Reglas de Errores ======================== #
+# ╭──────────────────────────────────────────────────────────────╮
+# │                            ERRORS                            │
+# ╰──────────────────────────────────────────────────────────────╯
 
 def p_error(p):
     # raise TypeError("Syntax error in input! - {} ".format(p)) # Para detener la compilación
@@ -390,7 +395,9 @@ def p_empty(p):
 
 
 
-# = = = = = = = = = = = = = Main - Lector de Archivos = = = = = = = = = = = = = #
+# ╭──────────────────────────────────────────────────────────────╮
+# │                            READER                            │
+# ╰──────────────────────────────────────────────────────────────╯
 
 import sys
 import ply.yacc as yacc
