@@ -24,12 +24,13 @@ class Rules:
         # Temporales
         self.type = ''
         self.id = ''
+        self.varName = ''
         
         
         
         # -- Old
         
-        self.varName = ''
+        
         self.varDimensions = []
         self.scope = 'global'
         self.isFunction = False
@@ -50,25 +51,97 @@ class Rules:
     def p_insertType(self, p):
         self.type = p[1]
         
-    # ------------------------------------- ID
-    def p_insertID(self, p):
-        self.id = p[1]
         
     # ------------------------------------- ID
-
-
-
-
-
-
-
-
-
-
-
-    # ------ SCOPE ------ #
+    def p_insertID(self, p):
+        varName = p[1]
+        
+        # Si tiene brackets pegados, es una matriz
+        if "[" in varName:
+            # Separamos el nombre de las dimensiones
+            indices = re.findall(r'\[(.*?)\]', varName)
+            indices = [int(index) for index in indices]
+            self.varDimensions = indices
+            varNameIndex = varName.index('[')
+            varName = varName[:varNameIndex]
+            
+        self.varName = varName
+        
+        
+    # ------------------------------------- SCOPE
     def p_insertScope(self, scope):
         self.scope = scope
+        
+        
+    # ------------------------------------- IS FUNCTION
+    def p_isFunction(self):
+        self.isFunction = True
+        
+        
+    # ------------------------------------- FUNCTION ID
+    def p_insertFunction(self):
+        memory.insertRow( (self.type, self.varName, self.varDimensions, self.scope, self.isFunction, self.parentFunction, self.varValues) )
+        self.parentFunction = self.varName
+        
+        # === RESET ===
+        self.isFunction = False
+        
+
+    # ------------------------------------- SAVE VALUE
+    def p_saveValue(self, p):
+        # Si estamos en una lista, guardar cada elemento temporalmente
+        if '{' not in str(p[1]) and '}' not in str(p[1]):
+            self.values.append(p[1])
+
+        # Si ya se va a cerrar la lista, cerramos este loop
+        if len(p) > 2:
+            if '}' in str(p[3]):
+                self.values.append(p[3])
+
+
+    # ------------------------------------- SAVE COMMA
+    def p_saveComma(self, p):
+        self.values.append(p[1])
+
+
+    # ------------------------------------- SAVE SIGN
+    def p_saveSign(self, p):
+        if p[1] == '-':
+            self.values.append(p[1])
+            
+    
+    # ------------------------------------- SAVE TO OP STACK   
+    def p_saveToOpStack(self, p):
+        if p[1] != None : self.opStack.append(p[1])
+        else : self.opStack.append(';')
+    
+    
+    # ===================================== UPDATE SYMBOLTABLE
+    def p_updateSymbolTable(self):
+        # self.type, self.id, self.varDimensions, self.scope, isFunction, self.parentFunction, self.varValues
+        memory.insertRow( (self.type, self.varName, self.varDimensions, self.scope, self.isFunction, self.parentFunction, self.varValues) )
+        # ! quadsConstructor.updateSymbolTable(memory.symbolTable) ## ! IMPORTANTE, permite dinamismo
+        
+        # === New SymbolTable Row ===
+        self.varValues = []
+        self.varDimensions = []
+        self.isFunction = False
+
+
+
+
+
+
+
+
+
+
+
+
+
+    # ---------------------------------------------------------- OLD DELETE ALL THIS MESS BELOW AT THE END --------------------------- #
+
+    
 
 
 
@@ -223,25 +296,25 @@ class Rules:
 
     # ------ VALUES ------ #
     # Comas para separar los valores/listas de valores de cada variables
-    def p_saveComma(self, p):
+    def p_OLDsaveComma(self, p):
         self.values.append(p[1])
 
 
     # Si es un signo primero
-    def p_saveSign(self, p):
+    def p_OLDsaveSign(self, p):
         if p[1] == '-':
             self.values.append(p[1])
 
 
     # La super pila Operadores que guardará todos los tokens necesarios del programa
     # para las operaciones de los cuádruplos
-    def p_saveToOpStack(self, p):
+    def p_OLDsaveToOpStack(self, p):
         if p[1] != None : self.opStack.append(p[1])
         else : self.opStack.append(';')
 
 
     # Si es un valor numérico o lista de
-    def p_saveValue(self, p):
+    def p_oldsaveValue(self, p):
         # Si estamos en una lista, guardar cada elemento temporalmente
         if '{' not in str(p[1]) and '}' not in str(p[1]):
             self.values.append(p[1])

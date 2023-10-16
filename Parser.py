@@ -39,17 +39,23 @@ def p_vars(p):
     '''vars : type id vars_equals semicolon
             | type id leftbracket var_ctei rightbracket vars_equals semicolon
             | type id leftbracket var_ctei rightbracket leftbracket var_ctei rightbracket vars_equals semicolon'''
-            # ! What if I declare a int array with float elements in it? Clean that
 
             
 def p_extra_vars(p):
-    '''extra_vars : comma vars_id vars_equals
+    '''extra_vars : extra_var_comma id vars_equals
                 | empty'''
+    
+    
+def p_extra_var_comma(p):
+    '''extra_var_comma : COMMA'''
+    rules.p_saveComma(p)
+    rules.p_updateSymbolTable()
                 
                 
 def p_vars_equals_array(p):
     '''vars_equals_array : leftcorch expression array_vars rightcorch
                 | leftcorch empty rightcorch'''
+    rules.p_saveValue(p)
 
 
 def p_array_vars(p):
@@ -65,8 +71,8 @@ def p_vars_equals(p):
 
 
 def p_assignment(p):
-    '''assignment : assignl
-                 | equals'''
+    '''assignment : equals
+                 | assignl'''
                  
                  
 def p_assignl(p):
@@ -112,6 +118,7 @@ def p_rightbracket(p):
     
 def p_semicolon(p):
     '''semicolon : SEMICOLON'''
+    rules.p_updateSymbolTable()
 
 
 # ╭───────────────────────────╮
@@ -170,7 +177,11 @@ def p_modulus(p):
 def p_var_cte(p):
     '''var_cte : var_ctei
                | var_ctef
-               | id'''
+               | var_id'''
+               
+               
+def p_var_id(p):
+    '''var_id : ID'''
                
                
 def p_var_ctei(p):
@@ -250,7 +261,7 @@ def p_statement(p):
                  | condition
                  | writing
                  | empty'''
-    # ! rules.p_saveToOpStack(p) DELETED TONS OF THESE, ONLY LEFT THIS TO REMIND YOU
+    rules.p_saveToOpStack(p) # ! DELETED TONS OF THESE, ONLY LEFT THIS TO REMIND YOU
 
 
 # ╭───────────────────────────╮
@@ -258,13 +269,35 @@ def p_statement(p):
 # ╰───────────────────────────╯
 
 def p_function(p):
-    '''function : type id leftparen function_parameters rightparen leftcorch block rightcorch
+    '''function : type function_id leftparen function_local_variables
                 | empty'''
+
+    
+def p_function_id(p):
+    '''function_id : ID'''
+    rules.p_insertID(p)
+    rules.p_isFunction()
+    rules.p_insertFunction()
+    
+    
+def p_function_local_variables(p):
+    '''function_local_variables : function_parameters rightparen leftcorch function_block'''
+    
+    
+def p_function_block(p):
+    '''function_block : block rightcorch'''
+    rules.p_insertScope('global')
+    rules.parentFunction = None
 
 
 def p_function_parameters(p):
-    '''function_parameters : type id function_extra_parameters
+    '''function_parameters : function_param function_extra_parameters
                 | empty'''
+       
+                
+def p_function_param(p):
+    '''function_param : type id'''
+    rules.p_insertScope('local')
 
 
 def p_function_extra_parameters(p):
@@ -306,20 +339,6 @@ def p_nodowhile2(p):
     # ! quadsConstructor.nodoWhileDos()
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-# ============ WIP ============ #
-
 # ╭───────────────────────────╮
 # │         If / Else         │
 # ╰───────────────────────────╯
@@ -334,13 +353,12 @@ def p_nodocond(p):
 
 
 def p_else_condition(p):
-    '''else_condition : nodoelse LEFTCORCH block RIGHTCORCH
+    '''else_condition : else LEFTCORCH block RIGHTCORCH
                       | empty'''
 
-def p_nodoelse(p):
-    '''nodoelse : ELSE'''
+def p_else(p):
+    '''else : ELSE'''
     # ! quadsConstructor.nodoCondicionalTres()
-
 
 
 # ╭───────────────────────────╮
@@ -367,15 +385,6 @@ def p_print_val(p):
 def p_print_exp(p):
     '''print_exp : COMMA print_val
                  | empty'''
-                 
-
-
-
-
-
-
-
-
 
 
 
@@ -391,7 +400,6 @@ def p_error(p):
 def p_empty(p):
     '''empty :'''
     pass
-
 
 
 

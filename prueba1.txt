@@ -25,6 +25,7 @@ void uno(int p, int q, int m){
 
 void dos(float pastor, bool salsa){
     // print("Me hice caca en el pantalón II.");
+    float varAdentroDeDos = 55;
 }
 
 void tres() {
@@ -33,7 +34,7 @@ void tres() {
 
 int ultimaVar, Cassius = 49, Draegan <- 33, Daniel[5][5] = {1,2,3}, Cacoide;
 
-int x = 5, y = 3, z = 8;
+int x = 5, y = 3, z = 8, d = 3, ll = 22;
 while(x + y > z - 4){
     x = x - 1;
 }

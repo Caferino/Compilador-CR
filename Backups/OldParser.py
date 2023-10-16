@@ -90,11 +90,27 @@ def p_statement(p):
 
 
 def p_function(p):
-    '''function : function_type function_id LEFTPAREN function_type_and_id '''
+    '''function : type ID LEFTPAREN function_parameters RIGHTPAREN LEFTCORCH block RIGHTCORCH
+                | empty'''
+    rules.p_insertScope('global')
+    rules.p_registerLocalVariables(p)
+    rules.p_insertID(p, True)
+
+    # ! quadsConstructor.nodoFunctionDos()
 
 
-def p_function_type(p):
-    '''function_type : '''
+def p_function_parameters(p):
+    '''function_parameters : type ID function_extra_parameters
+                | empty'''
+    rules.p_insertScope('local')
+    rules.p_saveLocalVariable(p)
+    rules.p_insertID(p, False)
+
+
+def p_function_extra_parameters(p):
+    '''function_extra_parameters : COMMA function_parameters
+                | empty'''
+    if(len(p) < 2) : quadsConstructor.nodoFunctionUno()
 
 
 def p_return(p):
