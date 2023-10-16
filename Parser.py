@@ -48,14 +48,14 @@ def p_extra_vars(p):
     
 def p_extra_var_comma(p):
     '''extra_var_comma : COMMA'''
-    rules.p_saveComma(p)
+    # rules.p_saveComma(p)
+    # print(rules.values)
     rules.p_updateSymbolTable()
                 
                 
 def p_vars_equals_array(p):
     '''vars_equals_array : leftcorch expression array_vars rightcorch
                 | leftcorch empty rightcorch'''
-    rules.p_saveValue(p)
 
 
 def p_array_vars(p):
@@ -182,14 +182,20 @@ def p_var_cte(p):
                
 def p_var_id(p):
     '''var_id : ID'''
+    rules.p_saveValue(p)
+    rules.p_saveToOpStack(p)
                
                
 def p_var_ctei(p):
     '''var_ctei : CTEI'''
+    rules.p_saveValue(p)
+    rules.p_saveToOpStack(p)
     
     
 def p_var_ctef(p):
     '''var_ctef : CTEF'''
+    rules.p_saveValue(p)
+    rules.p_saveToOpStack(p)
 
 
 # ╭───────────────────────────╮
@@ -261,7 +267,7 @@ def p_statement(p):
                  | condition
                  | writing
                  | empty'''
-    rules.p_saveToOpStack(p) # ! DELETED TONS OF THESE, ONLY LEFT THIS TO REMIND YOU
+    rules.p_saveToOpStack(p) # ! Might be useless, who knows
 
 
 # ╭───────────────────────────╮
@@ -301,13 +307,23 @@ def p_function_param(p):
 
 
 def p_function_extra_parameters(p):
-    '''function_extra_parameters : comma function_parameters
+    '''function_extra_parameters : function_extra_parameters_comma function_parameters
                 | empty'''
+    rules.p_updateSymbolTable()
+                
+                
+def p_function_extra_parameters_comma(p):
+    '''function_extra_parameters_comma : COMMA'''
+    rules.p_updateSymbolTable()
 
 
 def p_assignment_block(p):
-    '''assignment_block : id assignl expression semicolon
-                | id equals expression semicolon'''
+    '''assignment_block : ID ASSIGNL expression SEMICOLON
+                | ID EQUALS expression SEMICOLON'''
+    rules.values = []  # Por usar una regla compartida (expression), debemos limpiar esto
+    # ! quadsConstructor.insertAssignmentID(p[1])
+    # ! quadsConstructor.insertAssignmentSign(p[2])
+    # ! quadsConstructor.verifyAssignment()
 
 
 def p_function_call(p):

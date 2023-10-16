@@ -23,7 +23,6 @@ class Rules:
     def __init__(self):
         # Temporales
         self.type = ''
-        self.id = ''
         self.varName = ''
         
         
@@ -64,8 +63,11 @@ class Rules:
             self.varDimensions = indices
             varNameIndex = varName.index('[')
             varName = varName[:varNameIndex]
-            
+        
+        # SI YA EXISTE varName EN LA symbolTable, QUEBRAR PROGRAMA
+        self.verifyVariableExistence(varName)
         self.varName = varName
+        
         
         
     # ------------------------------------- SCOPE
@@ -116,9 +118,17 @@ class Rules:
         else : self.opStack.append(';')
     
     
-    # ===================================== UPDATE SYMBOLTABLE
+    # ========================================================================================================
+    # * ======================================= UPDATE SYMBOLTABLE ========================================= *
+    # ========================================================================================================
     def p_updateSymbolTable(self):
-        # self.type, self.id, self.varDimensions, self.scope, isFunction, self.parentFunction, self.varValues
+        # Separamos las variables en self.values con sus respectivas variables
+        self.p_extractVarValues()
+        
+        # Verificmos que sea una matriz con tamaño válido, si no romper programa
+        self.p_verifyMatrix()
+            
+        # self.type, self.varName, self.varDimensions, self.scope, isFunction, self.parentFunction, self.varValues
         memory.insertRow( (self.type, self.varName, self.varDimensions, self.scope, self.isFunction, self.parentFunction, self.varValues) )
         # ! quadsConstructor.updateSymbolTable(memory.symbolTable) ## ! IMPORTANTE, permite dinamismo
         
@@ -126,8 +136,56 @@ class Rules:
         self.varValues = []
         self.varDimensions = []
         self.isFunction = False
+        topValue = None
 
 
+    # ------------------------------------- EXTRACT VAR VALUES
+    def p_extractVarValues(self):
+        if self.values : topValue = self.values.pop()
+        else : topValue = ','
+        while topValue != ',' and topValue != '}' :
+            # Si es un signo de menos, juntarlo con el siguiente valor
+            if topValue == '-' : topValue = float(self.varValues.pop()) * -1
+
+            self.varValues.append(topValue)
+            if self.values : topValue = self.values.pop()
+            else : break
+        
+        # Antes de meter los values, conviene transformar sus elementos al type apropiado
+        if self.type == 'int':
+            self.varValues = [int(num) for num in self.varValues if num is not None and not isinstance(num, str)]
+            
+        # Por leerse de derecha a izquierda, ocupamos girarlos...
+        self.varValues.reverse()
+            
+        # TODO : If array of bools, change to 1 or 0s or True or False
+        
+    
+    # ------------------------------------- VERIFY VAR EXISTENCE
+    # TODO - Mejorar con actualizar el value solo y solo si el scope es el mismo.
+    def verifyVariableExistence(self, varName):
+        for each_tuple in memory.symbolTable :
+            if varName == each_tuple[1] :
+                raise TypeError("Variable", varName, "already exists.")
+                break
+            
+            
+    # ------------------------------------- VERIFY MATRIX SIZE AND FILL EMPTY SPOTS
+    def p_verifyMatrix(self):
+        matrixSize = reduce(operator.mul, self.varDimensions, 1)
+        ## Condicional para validar el tamaño de matriz
+        print("Variable:", self.varName)
+        print("varValues:", self.varValues)
+        print("varDimensions:", self.varDimensions)
+        if len(self.varValues) > matrixSize : raise TypeError("Matrix", self.varName, "too large.")
+
+        # Ahora sabemos que la matriz tiene un tamaño correcto, pero está llena?
+        # Si el usuario no llenó todos los espacios, llenarlos con 'None'
+        length_difference = matrixSize - len(self.varValues)
+        if length_difference > 0 : 
+            desired_value = None
+            self.varValues = self.varValues + [desired_value] * length_difference
+            # raise TypeError("Rellenar Matrix", self.varName, "con", length_difference, "Nones") # ! DEBUG
 
 
 
@@ -334,26 +392,14 @@ class Rules:
 
     # ------ Verify Variable Existence (I decided to hang the program if so) ------ #
     # TODO - Mejorar con actualizar el value solo y solo si el scope es el mismo.
-    def verifyVariableExistence(self, varName):
+    def OLDverifyVariableExistence(self, varName):
         for each_tuple in memory.symbolTable :
             if varName == each_tuple[1] :
                 raise TypeError("Variable", varName, "already exists.")
                 break
 
 
-    # ------ Verify Matrix Size and Fill Empty Spots ------ #
-    def verifyMatrix(self):
-        matrixSize = reduce(operator.mul, self.varDimensions, 1)
-        ## Condicional para validar el tamaño de matriz
-        if len(self.varValues) > matrixSize : raise TypeError("Matrix", self.varName, "too large.")
-
-        # Ahora sabemos que la matriz tiene un tamaño correcto, pero está llena?
-        # Si el usuario no llenó todos los espacios, llenarlos con 'None'
-        length_difference = matrixSize - len(self.varValues)
-        if length_difference > 0 : 
-            desired_value = None
-            self.varValues = self.varValues + [desired_value] * length_difference
-            # raise TypeError("Rellenar Matrix", self.varName, "con", length_difference, "Nones") # ! DEBUG
+    
         
 
     def sortMatrix(self, p):
