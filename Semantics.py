@@ -23,12 +23,6 @@ class Rules:
     def __init__(self):
         # Temporales
         self.type = ''
-        self.id = ''
-        
-        
-        
-        # -- Old
-        
         self.varName = ''
         self.varDimensions = []
         self.scope = 'global'
@@ -36,7 +30,13 @@ class Rules:
         self.values = []
         self.varValues = []
         self.parentFunction = None
+        self.localVariables = []
+        self.localVarCounters = {'int': 0, 'float': 0, 'bool': 0, 'string': 0}
 
+
+        
+        
+        # -- Old
         # Auxiliares
         self.currentFunctionParams = []
         self.tuplesToModify = []
@@ -50,32 +50,248 @@ class Rules:
     def p_insertType(self, p):
         self.type = p[1]
         
-    # ------------------------------------- ID
-    def p_insertID(self, p):
-        self.id = p[1]
         
     # ------------------------------------- ID
-
-
-
-
-
-
-
-
-
-
-
-    # ------ SCOPE ------ #
+    def p_insertID(self, p):
+        varName = p[1]
+        
+        # Si tiene brackets pegados, es una matriz
+        if "[" in varName:
+            # Separamos el nombre de las dimensiones
+            indices = re.findall(r'\[(.*?)\]', varName)
+            indices = [int(index) for index in indices]
+            self.varDimensions = indices
+            varNameIndex = varName.index('[')
+            varName = varName[:varNameIndex]
+        
+        # SI YA EXISTE varName EN LA symbolTable, QUEBRAR PROGRAMA
+        self.verifyVariableExistence(varName)
+        self.varName = varName
+        
+        
+        
+    # ------------------------------------- SCOPE
     def p_insertScope(self, scope):
         self.scope = scope
+        
+        
+    # ------------------------------------- IS FUNCTION
+    def p_isFunction(self):
+        self.isFunction = True
+        
+
+    # ------------------------------------- SAVE VALUE
+    def p_saveValue(self, p):
+        # Si estamos en una lista, guardar cada elemento temporalmente
+        if '{' not in str(p[1]) and '}' not in str(p[1]):
+            self.values.append(p[1])
+
+        # Si ya se va a cerrar la lista, cerramos este loop
+        if len(p) > 2:
+            if '}' in str(p[3]):
+                self.values.append(p[3])
 
 
+    # ------------------------------------- SAVE COMMA
+    def p_saveComma(self, p):
+        self.values.append(p[1])
+
+
+    # ------------------------------------- SAVE SIGN
+    def p_saveSign(self, p):
+        if p[1] == '-':
+            self.values.append(p[1])
+            
+    
+    # ------------------------------------- SAVE TO OP STACK   
+    def p_saveToOpStack(self, p):
+        if p[1] != None : self.opStack.append(p[1])
+        else : self.opStack.append(';')
+        
+        
+    # ------------------------------------- SAVE LOCAL VARIABLE  
+    def p_saveLocalVariable(self):
+        self.localVariables.append(self.type)
+        
+        
+    # ------------------------------------- REGISTER LOCAL VARIABLES
+    def p_registerLocalVariables(self):
+        while self.localVariables :
+            currentVar = self.localVariables.pop()
+            
+            if currentVar == 'int':
+                self.localVarCounters['int'] += 1
+            elif currentVar == 'float':
+                self.localVarCounters['float'] += 1
+            elif currentVar == 'bool':
+                self.localVarCounters['bool'] += 1
+            elif currentVar == 'string':
+                self.localVarCounters['string'] += 1
+                
+        # Find the index of the tuple for parentFunction in the list
+        index = -1
+        for i, item in enumerate(memory.symbolTable):
+            if item[1] == self.parentFunction:
+                index = i
+                break
+            
+        if index != -1:
+            updated_tuple = (*memory.symbolTable[index][:6], self.localVarCounters)
+            memory.symbolTable[index] = updated_tuple
+            
+        self.localVarCounters = {'int': 0, 'float': 0, 'bool': 0, 'string': 0}
+        
+    
+    
+    # ========================================================================================================
+    # * ======================================= UPDATE SYMBOLTABLE ========================================= *
+    # ========================================================================================================
+    def p_updateSymbolTable(self):
+        # Separamos las variables en self.values con sus respectivas variables
+        self.p_extractVarValues()
+        
+        # Verificmos que sea una matriz con tamaño válido, si no romper programa
+        self.p_verifyMatrix()
+            
+        # self.type, self.varName, self.varDimensions, self.scope, isFunction, self.parentFunction, self.varValues
+        memory.insertRow( (self.type, self.varName, self.varDimensions, self.scope, self.isFunction, self.parentFunction, self.varValues) )
+        # ! quadsConstructor.updateSymbolTable(memory.symbolTable) ## ! IMPORTANTE, permite dinamismo
+        
+        # === New SymbolTable Row ===
+        self.varValues = []
+        self.varDimensions = []
+        self.isFunction = False
+        topValue = None
+        
+        
+    # ------------------------------------- FUNCTION ID
+    def p_insertFunction(self):
+        memory.insertRow( (self.type, self.varName, self.varDimensions, self.scope, self.isFunction, self.parentFunction, self.varValues) )
+        self.parentFunction = self.varName
+        
+        # === RESET ===
+        self.isFunction = False
+
+
+    # ------------------------------------- EXTRACT VAR VALUES
+    def p_extractVarValues(self):
+        if self.values : topValue = self.values.pop()
+        else : topValue = ','
+        while topValue != ',' and topValue != '}' :
+            # Si es un signo de menos, juntarlo con el siguiente valor
+            if topValue == '-' : topValue = float(self.varValues.pop()) * -1
+
+            self.varValues.append(topValue)
+            if self.values : topValue = self.values.pop()
+            else : break
+        
+        # Antes de meter los values, conviene transformar sus elementos al type apropiado
+        if self.type == 'int':
+            self.varValues = [int(num) for num in self.varValues if num is not None and not isinstance(num, str)]
+            
+        # Por leerse de derecha a izquierda, ocupamos girarlos...
+        self.varValues.reverse()
+            
+        # TODO : If array of bools, change to 1 or 0s or True or False ! Might be useless, I think 0 = False, and >0 = True in my VM
+        
+    
+    # ------------------------------------- VERIFY VAR EXISTENCE
+    # TODO - Mejorar con actualizar el value solo y solo si el scope es el mismo.
+    def verifyVariableExistence(self, varName):
+        for each_tuple in memory.symbolTable :
+            if varName == each_tuple[1] :
+                raise TypeError("Variable", varName, "already exists.")
+                break
+            
+            
+    # ------------------------------------- VERIFY MATRIX SIZE AND FILL EMPTY SPOTS
+    def p_verifyMatrix(self):
+        matrixSize = reduce(operator.mul, self.varDimensions, 1)
+        ## Condicional para validar el tamaño de matriz
+        print("Variable:", self.varName)
+        print("varValues:", self.varValues)
+        print("varDimensions:", self.varDimensions)
+        if len(self.varValues) > matrixSize : raise TypeError("Matrix", self.varName, "too large.")
+
+        # Ahora sabemos que la matriz tiene un tamaño correcto, pero está llena?
+        # Si el usuario no llenó todos los espacios, llenarlos con 'None'
+        length_difference = matrixSize - len(self.varValues)
+        if length_difference > 0 : 
+            desired_value = None
+            self.varValues = self.varValues + [desired_value] * length_difference
+            # raise TypeError("Rellenar Matrix", self.varName, "con", length_difference, "Nones") # ! DEBUG
+            
+          
+    # ------------------------------------- SORT MATRIX 
+    def sortMatrix(self, p):
+        # Si no, lo buscamos como tal
+        i = 0   # I missed you, baby
+        for tuple in memory.symbolTable:
+            if p[1] == tuple[1]:
+                sortedValues = sorted(tuple[6], key=lambda x: (x is None, x))
+                # print(sortedValues)
+
+                # Sacamos la fila del symbol table con la variable por actualizar
+                currentRow = tuple
+                # Actualizamos la columna "value"
+                index_to_change = 6
+                currentRow = currentRow[:index_to_change] + (sortedValues,)
+                # Ponemos la nueva fila de vuelta
+                memory.symbolTable[i] = currentRow
+                # pprint.pprint(memory.symbolTable) # ! DEBUG
+                break
+
+            # Si llegamos a la última tupla y aún no existe la variable...
+            if i == len(memory.symbolTable) - 1:
+                raise TypeError('Variable ', p[1], ' not declared!')
+            
+            i += 1
+
+
+    # ========================================================================================================
+    # ! =========================================== END PROGRAM ============================================ ! 
+    # ========================================================================================================
+    def p_end_program(self):
+        # Creo que con esta actualización nos aseguramos de tener las
+        # asignaciones que le hayan cambiado el valor a una variable
+        quadsConstructor.updateSymbolTable(memory.symbolTable)
+        
+        print("Final Symbol Table: ") # ! DEBUGGER
+        pprint.pprint(memory.symbolTable) # ! DEBUGGER
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    # ---------------------------------------------------------- OLD DELETE ALL THIS MESS BELOW AT THE END --------------------------- #
 
     # ------ FUNCTION PARAMETER ------ #
     # Esta función mete la variable parámetro en una pila para después
     # asociarlas con el nombre de la función, la cual llega al final
-    def p_saveLocalVariable(self, p):
+    def p_OLDsaveLocalVariable(self, p):
         if len(p) > 2 : self.currentFunctionParams.append(p[2])
 
 
@@ -83,7 +299,7 @@ class Rules:
     # ------ REGISTER FUNCTION PARAMETER ------ #
     # Esta función vaciará la pila con todas las variables locales de la
     # función a la vez que las registra como tal
-    def p_registerLocalVariables(self, p):
+    def p_OLDregisterLocalVariables(self, p):
         if len(p) > 2:
             functionName = p[2] ## functionParent
             # Empezamos el escaneo de la Symbol Table desde las variables
@@ -223,25 +439,25 @@ class Rules:
 
     # ------ VALUES ------ #
     # Comas para separar los valores/listas de valores de cada variables
-    def p_saveComma(self, p):
+    def p_OLDsaveComma(self, p):
         self.values.append(p[1])
 
 
     # Si es un signo primero
-    def p_saveSign(self, p):
+    def p_OLDsaveSign(self, p):
         if p[1] == '-':
             self.values.append(p[1])
 
 
     # La super pila Operadores que guardará todos los tokens necesarios del programa
     # para las operaciones de los cuádruplos
-    def p_saveToOpStack(self, p):
+    def p_OLDsaveToOpStack(self, p):
         if p[1] != None : self.opStack.append(p[1])
         else : self.opStack.append(';')
 
 
     # Si es un valor numérico o lista de
-    def p_saveValue(self, p):
+    def p_oldsaveValue(self, p):
         # Si estamos en una lista, guardar cada elemento temporalmente
         if '{' not in str(p[1]) and '}' not in str(p[1]):
             self.values.append(p[1])
@@ -261,58 +477,8 @@ class Rules:
 
     # ------ Verify Variable Existence (I decided to hang the program if so) ------ #
     # TODO - Mejorar con actualizar el value solo y solo si el scope es el mismo.
-    def verifyVariableExistence(self, varName):
+    def OLDverifyVariableExistence(self, varName):
         for each_tuple in memory.symbolTable :
             if varName == each_tuple[1] :
                 raise TypeError("Variable", varName, "already exists.")
                 break
-
-
-    # ------ Verify Matrix Size and Fill Empty Spots ------ #
-    def verifyMatrix(self):
-        matrixSize = reduce(operator.mul, self.varDimensions, 1)
-        ## Condicional para validar el tamaño de matriz
-        if len(self.varValues) > matrixSize : raise TypeError("Matrix", self.varName, "too large.")
-
-        # Ahora sabemos que la matriz tiene un tamaño correcto, pero está llena?
-        # Si el usuario no llenó todos los espacios, llenarlos con 'None'
-        length_difference = matrixSize - len(self.varValues)
-        if length_difference > 0 : 
-            desired_value = None
-            self.varValues = self.varValues + [desired_value] * length_difference
-            # raise TypeError("Rellenar Matrix", self.varName, "con", length_difference, "Nones") # ! DEBUG
-        
-
-    def sortMatrix(self, p):
-        # Si no, lo buscamos como tal
-        i = 0   # I missed you, baby
-        for tuple in memory.symbolTable:
-            if p[1] == tuple[1]:
-                sortedValues = sorted(tuple[6], key=lambda x: (x is None, x))
-                # print(sortedValues)
-
-                # Sacamos la fila del symbol table con la variable por actualizar
-                currentRow = tuple
-                # Actualizamos la columna "value"
-                index_to_change = 6
-                currentRow = currentRow[:index_to_change] + (sortedValues,)
-                # Ponemos la nueva fila de vuelta
-                memory.symbolTable[i] = currentRow
-                # pprint.pprint(memory.symbolTable) # ! DEBUG
-                break
-
-            # Si llegamos a la última tupla y aún no existe la variable...
-            if i == len(memory.symbolTable) - 1:
-                raise TypeError('Variable ', p[1], ' not declared!')
-            
-            i += 1
-
-
-    # ------ END PROGRAM ------ #
-    def p_end_program(self):
-        # Creo que con esta actualización nos aseguramos de tener las
-        # asignaciones que le hayan cambiado el valor a una variable
-        quadsConstructor.updateSymbolTable(memory.symbolTable)
-        
-        print("Final Symbol Table: ") # ! DEBUGGER
-        pprint.pprint(memory.symbolTable) # ! DEBUGGER
