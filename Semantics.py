@@ -24,19 +24,19 @@ class Rules:
         # Temporales
         self.type = ''
         self.varName = ''
-        
-        
-        
-        # -- Old
-        
-        
         self.varDimensions = []
         self.scope = 'global'
         self.isFunction = False
         self.values = []
         self.varValues = []
         self.parentFunction = None
+        self.localVariables = []
+        self.localVarCounters = {'int': 0, 'float': 0, 'bool': 0, 'string': 0}
 
+
+        
+        
+        # -- Old
         # Auxiliares
         self.currentFunctionParams = []
         self.tuplesToModify = []
@@ -79,15 +79,6 @@ class Rules:
     def p_isFunction(self):
         self.isFunction = True
         
-        
-    # ------------------------------------- FUNCTION ID
-    def p_insertFunction(self):
-        memory.insertRow( (self.type, self.varName, self.varDimensions, self.scope, self.isFunction, self.parentFunction, self.varValues) )
-        self.parentFunction = self.varName
-        
-        # === RESET ===
-        self.isFunction = False
-        
 
     # ------------------------------------- SAVE VALUE
     def p_saveValue(self, p):
@@ -116,6 +107,40 @@ class Rules:
     def p_saveToOpStack(self, p):
         if p[1] != None : self.opStack.append(p[1])
         else : self.opStack.append(';')
+        
+        
+    # ------------------------------------- SAVE LOCAL VARIABLE  
+    def p_saveLocalVariable(self):
+        self.localVariables.append(self.type)
+        
+        
+    # ------------------------------------- REGISTER LOCAL VARIABLES
+    def p_registerLocalVariables(self):
+        while self.localVariables :
+            currentVar = self.localVariables.pop()
+            
+            if currentVar == 'int':
+                self.localVarCounters['int'] += 1
+            elif currentVar == 'float':
+                self.localVarCounters['float'] += 1
+            elif currentVar == 'bool':
+                self.localVarCounters['bool'] += 1
+            elif currentVar == 'string':
+                self.localVarCounters['string'] += 1
+                
+        # Find the index of the tuple for parentFunction in the list
+        index = -1
+        for i, item in enumerate(memory.symbolTable):
+            if item[1] == self.parentFunction:
+                index = i
+                break
+            
+        if index != -1:
+            updated_tuple = (*memory.symbolTable[index][:6], self.localVarCounters)
+            memory.symbolTable[index] = updated_tuple
+            
+        self.localVarCounters = {'int': 0, 'float': 0, 'bool': 0, 'string': 0}
+        
     
     
     # ========================================================================================================
@@ -137,6 +162,15 @@ class Rules:
         self.varDimensions = []
         self.isFunction = False
         topValue = None
+        
+        
+    # ------------------------------------- FUNCTION ID
+    def p_insertFunction(self):
+        memory.insertRow( (self.type, self.varName, self.varDimensions, self.scope, self.isFunction, self.parentFunction, self.varValues) )
+        self.parentFunction = self.varName
+        
+        # === RESET ===
+        self.isFunction = False
 
 
     # ------------------------------------- EXTRACT VAR VALUES
@@ -158,7 +192,7 @@ class Rules:
         # Por leerse de derecha a izquierda, ocupamos girarlos...
         self.varValues.reverse()
             
-        # TODO : If array of bools, change to 1 or 0s or True or False
+        # TODO : If array of bools, change to 1 or 0s or True or False ! Might be useless, I think 0 = False, and >0 = True in my VM
         
     
     # ------------------------------------- VERIFY VAR EXISTENCE
@@ -186,6 +220,61 @@ class Rules:
             desired_value = None
             self.varValues = self.varValues + [desired_value] * length_difference
             # raise TypeError("Rellenar Matrix", self.varName, "con", length_difference, "Nones") # ! DEBUG
+            
+          
+    # ------------------------------------- SORT MATRIX 
+    def sortMatrix(self, p):
+        # Si no, lo buscamos como tal
+        i = 0   # I missed you, baby
+        for tuple in memory.symbolTable:
+            if p[1] == tuple[1]:
+                sortedValues = sorted(tuple[6], key=lambda x: (x is None, x))
+                # print(sortedValues)
+
+                # Sacamos la fila del symbol table con la variable por actualizar
+                currentRow = tuple
+                # Actualizamos la columna "value"
+                index_to_change = 6
+                currentRow = currentRow[:index_to_change] + (sortedValues,)
+                # Ponemos la nueva fila de vuelta
+                memory.symbolTable[i] = currentRow
+                # pprint.pprint(memory.symbolTable) # ! DEBUG
+                break
+
+            # Si llegamos a la última tupla y aún no existe la variable...
+            if i == len(memory.symbolTable) - 1:
+                raise TypeError('Variable ', p[1], ' not declared!')
+            
+            i += 1
+
+
+    # ========================================================================================================
+    # ! =========================================== END PROGRAM ============================================ ! 
+    # ========================================================================================================
+    def p_end_program(self):
+        # Creo que con esta actualización nos aseguramos de tener las
+        # asignaciones que le hayan cambiado el valor a una variable
+        quadsConstructor.updateSymbolTable(memory.symbolTable)
+        
+        print("Final Symbol Table: ") # ! DEBUGGER
+        pprint.pprint(memory.symbolTable) # ! DEBUGGER
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -199,14 +288,10 @@ class Rules:
 
     # ---------------------------------------------------------- OLD DELETE ALL THIS MESS BELOW AT THE END --------------------------- #
 
-    
-
-
-
     # ------ FUNCTION PARAMETER ------ #
     # Esta función mete la variable parámetro en una pila para después
     # asociarlas con el nombre de la función, la cual llega al final
-    def p_saveLocalVariable(self, p):
+    def p_OLDsaveLocalVariable(self, p):
         if len(p) > 2 : self.currentFunctionParams.append(p[2])
 
 
@@ -214,7 +299,7 @@ class Rules:
     # ------ REGISTER FUNCTION PARAMETER ------ #
     # Esta función vaciará la pila con todas las variables locales de la
     # función a la vez que las registra como tal
-    def p_registerLocalVariables(self, p):
+    def p_OLDregisterLocalVariables(self, p):
         if len(p) > 2:
             functionName = p[2] ## functionParent
             # Empezamos el escaneo de la Symbol Table desde las variables
@@ -397,41 +482,3 @@ class Rules:
             if varName == each_tuple[1] :
                 raise TypeError("Variable", varName, "already exists.")
                 break
-
-
-    
-        
-
-    def sortMatrix(self, p):
-        # Si no, lo buscamos como tal
-        i = 0   # I missed you, baby
-        for tuple in memory.symbolTable:
-            if p[1] == tuple[1]:
-                sortedValues = sorted(tuple[6], key=lambda x: (x is None, x))
-                # print(sortedValues)
-
-                # Sacamos la fila del symbol table con la variable por actualizar
-                currentRow = tuple
-                # Actualizamos la columna "value"
-                index_to_change = 6
-                currentRow = currentRow[:index_to_change] + (sortedValues,)
-                # Ponemos la nueva fila de vuelta
-                memory.symbolTable[i] = currentRow
-                # pprint.pprint(memory.symbolTable) # ! DEBUG
-                break
-
-            # Si llegamos a la última tupla y aún no existe la variable...
-            if i == len(memory.symbolTable) - 1:
-                raise TypeError('Variable ', p[1], ' not declared!')
-            
-            i += 1
-
-
-    # ------ END PROGRAM ------ #
-    def p_end_program(self):
-        # Creo que con esta actualización nos aseguramos de tener las
-        # asignaciones que le hayan cambiado el valor a una variable
-        quadsConstructor.updateSymbolTable(memory.symbolTable)
-        
-        print("Final Symbol Table: ") # ! DEBUGGER
-        pprint.pprint(memory.symbolTable) # ! DEBUGGER

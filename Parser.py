@@ -26,9 +26,27 @@ def p_program(p):
 
 
 def p_block(p):
-    '''block : vars block
-                | statement block
-                | empty'''
+    '''block : statement block
+             | empty'''
+                
+                
+# ╭───────────────────────────╮
+# │         Statements        │
+# ╰───────────────────────────╯
+
+def p_statement(p):
+    '''statement : vars
+                 | function
+                 | assignment_block
+                 | expression
+                 | function_call
+                 | loop
+                 | condition
+                 | writing
+                 | sort
+                 | return
+                 | empty'''
+    rules.p_saveToOpStack(p) # ! Might be useless, who knows
 
 
 # ╭───────────────────────────╮
@@ -43,36 +61,34 @@ def p_vars(p):
             
 def p_extra_vars(p):
     '''extra_vars : extra_var_comma id vars_equals
-                | empty'''
+                  | empty'''
     
     
 def p_extra_var_comma(p):
     '''extra_var_comma : COMMA'''
-    # rules.p_saveComma(p)
-    # print(rules.values)
     rules.p_updateSymbolTable()
                 
                 
 def p_vars_equals_array(p):
     '''vars_equals_array : leftcorch expression array_vars rightcorch
-                | leftcorch empty rightcorch'''
+                         | leftcorch empty rightcorch'''
 
 
 def p_array_vars(p):
     '''array_vars : comma expression array_vars
-                | empty'''
+                  | empty'''
                 
                 
 def p_vars_equals(p):
     '''vars_equals : assignment vars_equals_array extra_vars
-                | assignment expression extra_vars
-                | extra_vars
-                | empty'''
+                   | assignment expression extra_vars
+                   | extra_vars
+                   | empty'''
 
 
 def p_assignment(p):
     '''assignment : equals
-                 | assignl'''
+                  | assignl'''
                  
                  
 def p_assignl(p):
@@ -140,7 +156,7 @@ def p_term(p):
 
 def p_fact(p):
     '''fact : leftparen expression rightparen
-              | var_cte'''
+            | var_cte'''
 
 
 def p_leftparen(p):
@@ -152,10 +168,14 @@ def p_rightparen(p):
 
     
 def p_term_operator(p):
-    '''term_operator : times fact term_operator
+    '''term_operator : exponential fact term_operator
+                     | times fact term_operator
                      | divide fact term_operator
                      | modulus fact term_operator
                      | empty'''
+
+def p_exponential(p):
+    '''exponential : EXPONENTIAL'''
 
 
 def p_times(p):
@@ -204,12 +224,12 @@ def p_var_ctef(p):
 
 def p_comparation(p):
     '''comparation : and exp
-                 | or exp
-                 | greater exp
-                 | less exp
-                 | notequal exp
-                 | notequalnum exp
-                 | empty'''
+                   | or exp
+                   | greater exp
+                   | less exp
+                   | notequal exp
+                   | notequalnum exp
+                   | empty'''
 
 
 def p_and(p):
@@ -255,22 +275,6 @@ def p_minus(p):
 
 
 # ╭───────────────────────────╮
-# │         Statements        │
-# ╰───────────────────────────╯
-
-def p_statement(p):
-    '''statement : function
-                 | assignment_block
-                 | expression
-                 | function_call
-                 | loop
-                 | condition
-                 | writing
-                 | empty'''
-    rules.p_saveToOpStack(p) # ! Might be useless, who knows
-
-
-# ╭───────────────────────────╮
 # │         Functions         │
 # ╰───────────────────────────╯
 
@@ -287,7 +291,12 @@ def p_function_id(p):
     
     
 def p_function_local_variables(p):
-    '''function_local_variables : function_parameters rightparen leftcorch function_block'''
+    '''function_local_variables : function_parameters nodoregistervars rightparen leftcorch function_block'''
+    
+    
+def p_nodoregistervars(p):
+    '''nodoregistervars : empty'''
+    rules.p_registerLocalVariables()
     
     
 def p_function_block(p):
@@ -298,17 +307,19 @@ def p_function_block(p):
 
 def p_function_parameters(p):
     '''function_parameters : function_param function_extra_parameters
-                | empty'''
+                           | empty'''
+    # ! rules.p_registerLocalVariables()
        
                 
 def p_function_param(p):
     '''function_param : type id'''
     rules.p_insertScope('local')
+    rules.p_saveLocalVariable()
 
 
 def p_function_extra_parameters(p):
     '''function_extra_parameters : function_extra_parameters_comma function_parameters
-                | empty'''
+                                 | empty'''
     rules.p_updateSymbolTable()
                 
                 
@@ -319,7 +330,7 @@ def p_function_extra_parameters_comma(p):
 
 def p_assignment_block(p):
     '''assignment_block : ID ASSIGNL expression SEMICOLON
-                | ID EQUALS expression SEMICOLON'''
+                        | ID EQUALS expression SEMICOLON'''
     rules.values = []  # Por usar una regla compartida (expression), debemos limpiar esto
     # ! quadsConstructor.insertAssignmentID(p[1])
     # ! quadsConstructor.insertAssignmentSign(p[2])
@@ -332,7 +343,7 @@ def p_function_call(p):
 
 def p_function_call_expressions(p):
     '''function_call_expressions : comma function_call_expressions
-                 | empty'''
+                                 | empty'''
 
 
 # ╭───────────────────────────╮
@@ -341,7 +352,7 @@ def p_function_call_expressions(p):
 
 def p_loop(p):
     '''loop : nodowhile1 LEFTPAREN expression nodowhile2 leftcorch block rightcorch
-                 | empty'''
+            | empty'''
     # ! quadsConstructor.nodoWhileTres()
 
 
@@ -400,6 +411,33 @@ def p_print_val(p):
 
 def p_print_exp(p):
     '''print_exp : COMMA print_val
+                 | empty'''
+                 
+                 
+# ╭───────────────────────────╮
+# │          Extras           │
+# ╰───────────────────────────╯
+
+def p_sort(p):
+    '''sort : ID PERIOD SORT LEFTPAREN RIGHTPAREN SEMICOLON'''
+    rules.sortMatrix(p)
+    
+
+def p_return(p):
+    '''return : RETURN recursion SEMICOLON
+              | RETURN ID SEMICOLON
+              | RETURN SEMICOLON'''
+              
+              
+# ! TODO ARREGLAR RECURSION
+def p_recursion(p):
+    '''recursion : LEFTPAREN recursion RIGHTPAREN
+                 | ID LEFTPAREN recursion RIGHTPAREN recursion
+                 | PLUS recursion
+                 | MINUS recursion
+                 | var_cte PLUS var_cte
+                 | var_cte MINUS var_cte
+                 | var_cte
                  | empty'''
 
 
