@@ -1,10 +1,10 @@
-int a = 3, baka = 69, caca, nice[4] = {0, 8, 9, -10}, ohNice[5][4] = {0,0,0};
+int a = 3, baka = 69, caca, nice[4] = {0, 8, 9, -10}, ohNice[3][1] = {0,0,0};
 int listaI1, listaI2[6] <- {1,2,3,4,5};
 // Una matriz de 3 filas y 3 columnas
 float listota[4] <- {1.5, 1.3, 2.3, -5.6};
 int valor <- 50;
-int matriz[6][6] = {1,1,1,1,1,1,1,1,1};
-float cubote[1][2][3][4] = {};
+int matriz[3][3] = {1,1,1,1,1,1,1,1,1};
+float cubote[1][2][1][1] = {};
 int w = 3;
 bool booleanoT = True, booleanoF = False;
 
@@ -32,7 +32,7 @@ void tres() {
     // Caca
 }
 
-int ultimaVar, Cassius = 49, Draegan <- 33, Daniel[5][5] = {1,2,3}, Cacoide;
+int ultimaVar, Cassius = 49, Draegan <- 33, Daniel[2][2] = {1,2,3}, Cacoide;
 
 int x = 5, y = 3, z = 8, d = 3, ll = 22;
 while(x + y > z - 5){

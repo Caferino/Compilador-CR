@@ -123,9 +123,6 @@ class Quadruples:
                     raise TypeError('Variable ', token, ' not declared!')
                 
                 i += 1
-
-
-            
         
         # ! TODO : Si es un ID, que saque su tipo real, valor también tal vez, etc.
         # ! Espérate al error del Semantic Cube
