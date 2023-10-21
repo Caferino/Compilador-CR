@@ -16,7 +16,7 @@ int z = 50;
 z = z + 50;
 
 int expo = 2;
-expo = 2 ** 2;
+expo = 2 ** 3;
 
 int c = 1;
 c = c / 1;

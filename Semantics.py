@@ -155,7 +155,7 @@ class Rules:
             
         # self.type, self.varName, self.varDimensions, self.scope, isFunction, self.parentFunction, self.varValues
         memory.insertRow( (self.type, self.varName, self.varDimensions, self.scope, self.isFunction, self.parentFunction, self.varValues) )
-        # ! quadsConstructor.updateSymbolTable(memory.symbolTable) ## ! IMPORTANTE, permite dinamismo
+        quadsConstructor.updateSymbolTable(memory.symbolTable) ## ! IMPORTANTE, permite dinamismo
         
         # === New SymbolTable Row ===
         self.varValues = []
@@ -256,6 +256,8 @@ class Rules:
         # asignaciones que le hayan cambiado el valor a una variable
         quadsConstructor.updateSymbolTable(memory.symbolTable)
         
+        print("Final Quadruples: ") # ! DEBUGGER
+        pprint.pprint(quadsConstructor.quadruples) # ! DEBUGGER
         print("Final Symbol Table: ") # ! DEBUGGER
         pprint.pprint(memory.symbolTable) # ! DEBUGGER
 

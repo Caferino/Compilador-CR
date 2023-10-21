@@ -46,7 +46,7 @@ def p_statement(p):
                  | sort
                  | return
                  | empty'''
-    rules.p_saveToOpStack(p) # ! Might be useless, who knows
+    # ! rules.p_saveToOpStack(p) # ! Might be useless, who knows
 
 
 # ╭───────────────────────────╮
@@ -143,15 +143,17 @@ def p_semicolon(p):
 
 def p_expression(p):
     '''expression : exp comparation'''
-    # ! quadsConstructor.verifyConditionals() - DONT FORGET TO CHECK THESE QUADSCONSTRUCTORS IN OLDPARSER
+    quadsConstructor.verifyConditionals() # If POper.top == '<' or '>' ...
 
 
 def p_exp(p):
     '''exp : term operator'''
+    quadsConstructor.verifySignPlusOrMinus() # If POper.top == '+' or '-' ...
 
 
 def p_term(p):
     '''term : fact term_operator'''
+    quadsConstructor.verifySignTimesOrDivide()
 
 
 def p_fact(p):
@@ -176,18 +178,22 @@ def p_term_operator(p):
 
 def p_exponential(p):
     '''exponential : EXPONENTIAL'''
+    quadsConstructor.insertSign(p[1])
 
 
 def p_times(p):
     '''times : TIMES'''
+    quadsConstructor.insertSign(p[1])
     
     
 def p_divide(p):
     '''divide : DIVIDE'''
+    quadsConstructor.insertSign(p[1])
     
     
 def p_modulus(p):
     '''modulus : MODULUS'''
+    quadsConstructor.insertSign(p[1])
 
 
 # ╭───────────────────────────╮
@@ -204,6 +210,7 @@ def p_var_id(p):
     '''var_id : ID'''
     rules.p_saveValue(p)
     rules.p_saveToOpStack(p)
+    quadsConstructor.insertTypeAndID(p[1]) # Nuestro lexer lidia con los números # ! ERROR, AQUI NO VA ESTE, POR SER DECLARACION DE VARS
                
                
 def p_var_ctei(p):
@@ -234,26 +241,32 @@ def p_comparation(p):
 
 def p_and(p):
     '''and : AND'''
+    quadsConstructor.insertSign(p[1])
 
     
 def p_or(p):
     '''or : OR'''
+    quadsConstructor.insertSign(p[1])
 
 
 def p_greater(p):
     '''greater : GREATER'''
+    quadsConstructor.insertSign(p[1])
 
 
 def p_less(p):
     '''less : LESS'''
+    quadsConstructor.insertSign(p[1])
 
 
 def p_notequal(p):
     '''notequal : NOTEQUAL'''
+    quadsConstructor.insertSign(p[1])
 
 
 def p_notequalnum(p):
     '''notequalnum : NOTEQUALNUM'''
+    quadsConstructor.insertSign(p[1])
 
 
 # ╭───────────────────────────╮
@@ -264,14 +277,17 @@ def p_operator(p):
     '''operator : plus term operator
                 | minus term operator
                 | empty'''
+    # ! quadsConstructor.verifySignPlusOrMinus() ## ! CREO ESTO ARREGLA EXPRESIONES LINEALES O ROMPE MAS
 
 
 def p_plus(p):
     '''plus : PLUS'''
+    quadsConstructor.insertSign(p[1])
 
 
 def p_minus(p):
     '''minus : MINUS'''
+    quadsConstructor.insertSign(p[1])
 
 
 # ╭───────────────────────────╮
@@ -308,7 +324,7 @@ def p_function_block(p):
 def p_function_parameters(p):
     '''function_parameters : function_param function_extra_parameters
                            | empty'''
-    # ! rules.p_registerLocalVariables()
+    # ! rules.p_registerLocalVariables() # ! BORRAR CREO
        
                 
 def p_function_param(p):
@@ -332,9 +348,9 @@ def p_assignment_block(p):
     '''assignment_block : ID ASSIGNL expression SEMICOLON
                         | ID EQUALS expression SEMICOLON'''
     rules.values = []  # Por usar una regla compartida (expression), debemos limpiar esto
-    # ! quadsConstructor.insertAssignmentID(p[1])
-    # ! quadsConstructor.insertAssignmentSign(p[2])
-    # ! quadsConstructor.verifyAssignment()
+    quadsConstructor.insertAssignmentID(p[1])
+    quadsConstructor.insertAssignmentSign(p[2])
+    quadsConstructor.verifyAssignment()
 
 
 def p_function_call(p):
@@ -353,17 +369,17 @@ def p_function_call_expressions(p):
 def p_loop(p):
     '''loop : nodowhile1 LEFTPAREN expression nodowhile2 leftcorch block rightcorch
             | empty'''
-    # ! quadsConstructor.nodoWhileTres()
+    quadsConstructor.nodoWhileTres()
 
 
 def p_nodowhile1(p):
     '''nodowhile1 : WHILE'''
-    # ! quadsConstructor.nodoWhileUno()
+    quadsConstructor.nodoWhileUno()
 
 
 def p_nodowhile2(p):
     '''nodowhile2 : RIGHTPAREN'''
-    # ! quadsConstructor.nodoWhileDos()
+    quadsConstructor.nodoWhileDos()
 
 
 # ╭───────────────────────────╮
@@ -372,11 +388,11 @@ def p_nodowhile2(p):
 
 def p_condition(p):
     '''condition : IF LEFTPAREN expression nodocond LEFTCORCH block RIGHTCORCH else_condition'''
-    # ! quadsConstructor.nodoCondicionalDos()
+    quadsConstructor.nodoCondicionalDos()
 
 def p_nodocond(p):
     '''nodocond : RIGHTPAREN'''
-    # ! quadsConstructor.nodoCondicionalUno()
+    quadsConstructor.nodoCondicionalUno()
 
 
 def p_else_condition(p):
@@ -385,7 +401,7 @@ def p_else_condition(p):
 
 def p_else(p):
     '''else : ELSE'''
-    # ! quadsConstructor.nodoCondicionalTres()
+    quadsConstructor.nodoCondicionalTres()
 
 
 # ╭───────────────────────────╮
@@ -395,12 +411,12 @@ def p_else(p):
 def p_writing(p):
     '''writing : writingprint LEFTPAREN print_val RIGHTPAREN SEMICOLON'''
     # TODO - Lógica de meter el token PRINT a los quads, o qué?
-    # ! quadsConstructor.verifyPrint()
+    quadsConstructor.verifyPrint()
 
 
 def p_writingprint(p):
     '''writingprint : PRINT'''
-    # ! quadsConstructor.insertPrint(p[1])
+    quadsConstructor.insertPrint(p[1])
 
 
 def p_print_val(p):
