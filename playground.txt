@@ -5,5 +5,4 @@ bool c = False;
 
 z = mediana(a);
 
-print(mensaje);
-// print(mensaje); No funciona
+print(mensaje, z);

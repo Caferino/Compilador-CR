@@ -116,7 +116,7 @@ def t_newline(t):
 
 # Comentarios
 def t_comment(t):
-    r'\/\/.*'
+    r'\/\/.*|\#.*'
     pass
 
 
