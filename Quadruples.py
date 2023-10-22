@@ -124,7 +124,6 @@ class Quadruples:
                 
                 i += 1
 
-
     # ------ 2 y 3. Insertando Signos (+, -, *, /, <, >, <>, =, ||, &&, !=, ...) ------ #
     def insertSign(self, token):
         self.POper.append(token)
@@ -160,7 +159,6 @@ class Quadruples:
 
                 else:
                     raise TypeError("Type mismatch in: ", left_operand, operator, right_operand)
-
 
     # ------ 5. Verificando Multiplicaciones o Divisiones ------ #
     def verifySignTimesOrDivide(self):

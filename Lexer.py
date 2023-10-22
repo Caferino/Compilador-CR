@@ -87,10 +87,9 @@ def t_ID(t):
 # Strings
 def t_CTESTRING(t):
     r'\".*\"'
-    t.value = str(t.value)
-    print('DEBUG', t.value)
+    t.value = str(t.value.strip('"'))   # Le quitamos las comillas a las strings, por estética
     quadsConstructor.PilaO.append(t.value)
-    quadsConstructor.PTypes.append('char')
+    quadsConstructor.PTypes.append('string')
     return t
 
 # Número Flotante (float)

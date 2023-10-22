@@ -31,6 +31,8 @@ typesTable = [
 ]
 
 def Semantics(left_Type, right_Type, operator):
+    # Con esto me ahorro tanto rollo para implementar las srings:
+    if left_Type == 'string' : left_Type = 'char'
     # ------------- PAPÁ CUBOTE SEMÁNTICO ------------- #
     # ------------- INT operator OPERAND ------------- #
     if left_Type == typesTable[0][0]:                       # Si INT operator OPERAND ...

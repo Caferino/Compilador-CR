@@ -215,7 +215,7 @@ def p_var_cte(p):
 def p_var_id(p):
     '''var_id : ID'''
     rules.p_saveValue(p)
-    quadsConstructor.insertTypeAndID(p[1]) # Nuestro lexer lidia con los números # ! ERROR, AQUI NO VA ESTE, POR SER DECLARACION DE VARS
+    quadsConstructor.insertTypeAndID(p[1]) # Nuestro lexer lidia con los números
                
                
 def p_var_ctei(p):
@@ -466,7 +466,7 @@ def p_return(p):
               | RETURN SEMICOLON'''
               
               
-# ! TODO ARREGLAR RECURSION
+# TODO ARREGLAR RECURSION
 def p_recursion(p):
     '''recursion : LEFTPAREN recursion RIGHTPAREN
                  | ID LEFTPAREN recursion RIGHTPAREN recursion

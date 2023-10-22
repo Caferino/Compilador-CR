@@ -83,14 +83,7 @@ class Rules:
 
     # ------------------------------------- SAVE VALUE
     def p_saveValue(self, p):
-        # Si estamos en una lista, guardar cada elemento temporalmente
-        if '{' not in str(p[1]) and '}' not in str(p[1]):
-            self.values.append(p[1])
-
-        # Si ya se va a cerrar la lista, cerramos este loop
-        if len(p) > 2:
-            if '}' in str(p[3]):
-                self.values.append(p[3])
+        self.values.append(p[1])
 
 
     # ------------------------------------- SAVE COMMA
@@ -288,10 +281,10 @@ class Rules:
         i = 0   # I missed you, baby
         for tuple in memory.symbolTable:
             if p[3] == tuple[1]:
-                mode = statistics.median(tuple[6])
+                median = statistics.median(tuple[6])
                 quadsConstructor.PTypes.append(tuple[0]) # Value's type
-                quadsConstructor.PilaO.append(mode) # Value
-                quadsConstructor.POper.append(p[1]) # 'MODA'
+                quadsConstructor.PilaO.append(median) # Value
+                quadsConstructor.POper.append(p[1]) # 'MEDIANA'
                 break
 
             # Si llegamos a la última tupla y aún no existe la variable...
