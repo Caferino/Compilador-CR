@@ -67,6 +67,7 @@ class Quadruples:
         self.cont = 0
         self.assignTemp = 'target'
         self.k = 1
+        self.extraStringsForPrint = 0
 
 
     # ------------------ EXPRESIONES LINEALES ------------------ #
@@ -364,6 +365,13 @@ class Quadruples:
 
                 operator = self.POper.pop()
                 result_Type = SemanticCube.Semantics(left_Type, right_Type, operator)
+                
+                if self.extraStringsForPrint > 0 :
+                    while self.extraStringsForPrint > 0 :
+                        left_operand += (' ' + str(self.PilaO.pop()))
+                        self.extraStringsForPrint -= 1
+                    words = left_operand.split()
+                    left_operand = " ".join(reversed(words))
 
                 if(result_Type != 'ERROR'):
                     result = None

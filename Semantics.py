@@ -302,6 +302,7 @@ class Rules:
         # asignaciones que le hayan cambiado el valor a una variable
         quadsConstructor.updateSymbolTable(memory.symbolTable)
         
+        print('debug', quadsConstructor.PilaO)
         print("Final Quadruples: ") # ! DEBUGGER
         pprint.pprint(quadsConstructor.quadruples) # ! DEBUGGER
         print("Final Symbol Table: ") # ! DEBUGGER

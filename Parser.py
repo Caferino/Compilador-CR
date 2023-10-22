@@ -432,8 +432,13 @@ def p_print_val(p):
 
 
 def p_print_exp(p):
-    '''print_exp : COMMA print_val
+    '''print_exp : COMMA print_extra print_val
                  | empty'''
+    
+
+def p_print_extra(p):
+    '''print_extra : empty'''
+    quadsConstructor.extraStringsForPrint += 1
                  
                  
 # ╭───────────────────────────╮
