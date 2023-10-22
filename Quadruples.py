@@ -123,9 +123,6 @@ class Quadruples:
                     raise TypeError('Variable ', token, ' not declared!')
                 
                 i += 1
-        
-        # ! TODO : Si es un ID, que saque su tipo real, valor también tal vez, etc.
-        # ! Espérate al error del Semantic Cube
 
 
     # ------ 2 y 3. Insertando Signos (+, -, *, /, <, >, <>, =, ||, &&, !=, ...) ------ #
@@ -383,7 +380,8 @@ class Quadruples:
 
 
     def insertPrintString(self, string):
-        pprint.pprint(self.quadruples) # ! DEBUG
+        self.PilaO.append(string)
+        self.PTypes.append('char')
 
 
     # ------ 2. Assignments ------ #

@@ -22,4 +22,9 @@ int c = 1;
 c = c / 1;
 
 print(z);
-print(expo);
+int test[4] = {1, 2, 3, 4};
+print(test[0]); // En mi lenguaje, el índice 0 regresa el último elemento, para usar menos bits al hacer cálculos matemáticos con pilas del CPU
+print(test[1]);
+print(test[2]);
+print(test[3]);
+print(test[4]);

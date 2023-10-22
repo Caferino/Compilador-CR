@@ -1,0 +1,8 @@
+int z = 50;
+int a[3] = {1, 2, 3};
+string mensaje = "Hola";
+
+z = mediana(a);
+
+print(mensaje);
+print(mediana(a));

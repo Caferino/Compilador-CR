@@ -14,25 +14,31 @@ from Quadruples import quadsConstructor
 
 # ------ PALABRAS CLAVE ------ #
 keywords = {
-    'program': 'PROGRAM',
-    'print': 'PRINT',
-    'if': 'IF',
-    'else': 'ELSE',
-    'int': 'INT',
-    'float': 'FLOAT',
-    'bool' : 'BOOL',
-    'void': 'VOID',
-    'while': 'WHILE',
-    'return' : 'RETURN',
-    'sort' : 'SORT'
+    'program' : 'PROGRAM',
+    'print'   : 'PRINT',
+    'if'      : 'IF',
+    'else'    : 'ELSE',
+    'int'     : 'INT',
+    'float'   : 'FLOAT',
+    'string'  : 'STRING',
+    'char'    : 'CHAR',
+    'bool'    : 'BOOL',
+    'void'    : 'VOID',
+    'while'   : 'WHILE',
+    'return'  : 'RETURN',
+    'sort'    : 'SORT',
+    'media'   : 'MEDIA',
+    'moda'    : 'MODA',
+    'mediana' : 'MEDIANA'
 }
 
 
 # ------ TOKENS ------ #
 tokens = [
-    'SEMICOLON', 'SORT', 'LEFTBRACKET', 'PERIOD', 'RIGHTBRACKET', 'GREATER', 'LESS', 'NOTEQUAL', 'NOTEQUALNUM', 'PLUS', 'MINUS', 'TIMES',
-    'DIVIDE', 'EXPONENTIAL', 'MODULUS', 'LEFTPAREN', 'RIGHTPAREN', 'ID', 'CTEI', 'CTEF', 'EQUALS', 'ASSIGNL', 'LEFTCORCH', 'RIGHTCORCH',
-    'CTESTRING', 'COMMA', 'AND', 'OR', 'PRINT', 'IF', 'ELSE', 'INT', 'FLOAT', 'BOOL', 'VOID', 'WHILE', 'RETURN',
+    'SEMICOLON', 'SORT', 'MEDIA', 'MODA', 'MEDIANA', 'LEFTBRACKET', 'PERIOD', 'RIGHTBRACKET', 'GREATER', 'LESS', 'NOTEQUAL', 'NOTEQUALNUM',
+    'PLUS', 'MINUS', 'TIMES', 'DIVIDE', 'EXPONENTIAL', 'MODULUS', 'LEFTPAREN', 'RIGHTPAREN', 'ID', 'CTEI', 'CTEF', 'EQUALS', 'ASSIGNL',
+    'LEFTCORCH', 'RIGHTCORCH', 'CTESTRING', 'COMMA', 'AND', 'OR', 'PRINT', 'IF', 'ELSE', 'INT', 'FLOAT', 'STRING', 'CHAR', 'BOOL', 'VOID',
+    'WHILE', 'RETURN',
 ]
 
 
@@ -64,6 +70,9 @@ t_AND = r'&&'
 t_OR = r'\|\|'
 t_PERIOD = r'\.'
 t_SORT = r'sort'
+t_MEDIA = r'media'
+t_MODA = r'moda'
+t_MEDIANA = r'mediana'
 t_ignore = " \t"
 
 
@@ -78,6 +87,10 @@ def t_ID(t):
 # Strings
 def t_CTESTRING(t):
     r'\".*\"'
+    t.value = str(t.value)
+    print('DEBUG', t.value)
+    quadsConstructor.PilaO.append(t.value)
+    quadsConstructor.PTypes.append('char')
     return t
 
 # Número Flotante (float)
