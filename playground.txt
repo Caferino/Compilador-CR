@@ -6,3 +6,15 @@ bool c = False;
 z = mediana(a);
 
 print(mensaje, z);
+print(mensaje, mensaje, mensaje);
+print(mensaje, "hola", mensaje);
+print(mensaje, "hola", "hola");
+print(mensaje);
+print(mensaje);
+print(mensaje);
+
+z = 50;
+
+print(z);
+print(z);
+print(z);
