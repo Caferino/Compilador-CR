@@ -98,7 +98,7 @@ class Quadruples:
                 indices = re.findall(r'\[(.*?)\]', token)
                 indices = [int(index) for index in indices]
                 token = varName
-                if len(indices) == 1 : column = indices
+                if len(indices) == 1 : column = indices[0] - 1
                 elif len(indices) == 2 : row, column = indices
                 elif len(indices) == 3 : depth, row, column = indices
                 
@@ -390,7 +390,7 @@ class Quadruples:
                                 # Guardamos la/s dimension/es
                                 indices = re.findall(r'\[(.*?)\]', left_operand)
                                 indices = [int(index) for index in indices]
-                                if len(indices) == 1 : column = indices
+                                if len(indices) == 1 : column = indices[0] - 1
                                 elif len(indices) == 2 : row, column = indices
                                 elif len(indices) == 3 : depth, row, column = indices
                                 
