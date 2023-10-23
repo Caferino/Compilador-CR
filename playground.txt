@@ -2,19 +2,18 @@ int z = 50;
 int a[3] = {1, 2, 3};
 string mensaje = "Hola";
 bool c = False;
+char mensaje2 = "Mundo";
+string Lol = "ERROR";
 
 z = mediana(a);
 
-print(mensaje, z);
+print(mensaje, mensaje2, z);
 print(mensaje, mensaje, mensaje);
 print(mensaje, "hola", mensaje);
 print(mensaje, "hola", "hola");
-print(mensaje);
-print(mensaje);
-print(mensaje);
+print(mensaje2);
+print("mensaje");
+print("Lol");
 
 z = 50;
-
-print(z);
-print(z);
 print(z);

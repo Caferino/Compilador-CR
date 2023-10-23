@@ -67,7 +67,7 @@ class Quadruples:
         self.cont = 0
         self.assignTemp = 'target'
         self.k = 1
-        self.extraStringsForPrint = 0
+        self.extraStringsForPrint = 1
 
 
     # ------------------ EXPRESIONES LINEALES ------------------ #
@@ -87,8 +87,7 @@ class Quadruples:
 
             # En caso de ser una matriz, sacamos la dirección del valor
             isMatrix = False
-            if '[' in token : 
-                # print("Aqui estamos") # ! DEBUG
+            if '[' in token :
                 isMatrix = True
                 # Separamos el nombre de las dimensiones
                 varName = token
@@ -99,11 +98,8 @@ class Quadruples:
                 indices = re.findall(r'\[(.*?)\]', token)
                 indices = [int(index) for index in indices]
                 varDimensions = indices
-                # print("varName =", varName) # ! DEBUG
-                # print("Dimensions =", varDimensions) # ! DEBUG
                 token = varName
                 valueAddress = reduce(operator.mul, varDimensions, 1) - 1
-                # print("valueAddress =", valueAddress) # ! DEBUG
 
             # Si no, lo buscamos como tal
             i = 0   # I missed you, baby
@@ -366,12 +362,27 @@ class Quadruples:
                 operator = self.POper.pop()
                 result_Type = SemanticCube.Semantics(left_Type, right_Type, operator)
                 
-                if self.extraStringsForPrint > 0 :
+                if self.extraStringsForPrint > 1 :
+                    words = ''
                     while self.extraStringsForPrint > 0 :
-                        left_operand += (' ' + str(self.PilaO.pop()))
+                        if '"' not in left_operand :
+                            for tuple in self.symbolTable :
+                                if left_operand == tuple[1] :
+                                    words += (' ' + str(tuple[6][0]).strip('"'))
+                                    break
+                                    # TODO - Y SI ES MATRIZ? REUTILIZAR LOGICA YA HECHA
+                                elif tuple == self.symbolTable[-1] :
+                                    raise TypeError("Variable at print doesn't exist: ", left_operand)
+                        else :
+                            words += (' ' + left_operand.strip('"'))
+                        left_operand = self.PilaO.pop()
+                        left_type = self.PTypes.pop()
                         self.extraStringsForPrint -= 1
-                    words = left_operand.split()
+                    
+                    words = words.split()
                     left_operand = " ".join(reversed(words))
+                    self.extraStringsForPrint = 1
+                    
 
                 if(result_Type != 'ERROR'):
                     result = None

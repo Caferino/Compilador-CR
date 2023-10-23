@@ -424,6 +424,7 @@ def p_writing(p):
 def p_writingprint(p):
     '''writingprint : PRINT'''
     quadsConstructor.insertPrint(p[1])
+    # quadsConstructor.extraStringsForPrint += 1
 
 
 def p_print_val(p):

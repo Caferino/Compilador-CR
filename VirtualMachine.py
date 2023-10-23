@@ -174,7 +174,7 @@ class VirtualMachine:
                 else : self.program_counter += 1
                 continue
             elif operator.lower() == 'print':
-                print(operand1)
+                print(operand1.strip('"')) if operand1.__class__.__name__ == 'str' else print(operand1)
             elif operator.lower() == 'return':
                 return_value = self.registers[operand1]
                 self.program_counter = self.stack.pop()
