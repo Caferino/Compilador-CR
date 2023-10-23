@@ -18,9 +18,12 @@ Dentro de: ~/.../Compilaor-CR
 
 > Reinicio. Se ocupará arreglar primero la semántica. Por usar PLY, Right-To-Left o Bottom-Up, tengo que dividir la construcción de la tabla de variables en pedazos pequeños.
 
-
 **Octubre 20 2023:**
 
 > Remasterización completada, ahora el parser funciona como Top-Down en vez de Bottom-Up. Este cambio grande fue para poder manejar funcionas recursivas apropiadamente y a la vez hacer el proyecto 100 veces más legible y accesible; antes hacía todo al revés.
+
+**Octubre 22 2023:**
+
+> Ya puede hablar.
 
 ~Óscar Antonio Hinojosa Salum A00821930

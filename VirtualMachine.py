@@ -73,7 +73,7 @@ class VirtualMachine:
                     # print("tuple1 = ", tuple) # ! DEBUG
                     if operand1 == tuple[1] :
                         # print("tuple1[6] = ", tuple[6]) # ! DEBUG
-                        # Si es una lista de un elemento, sacarlo
+                        # Si es una lista de un solo elemento, sacarlo
                         if isinstance(tuple[6], list) and len(tuple[6]) == 1 : operand1 = tuple[6][0]
                         # Si sufrió alguna actualización antes de aquí, lo más seguro es
                         # que ya no es una lista de un elemento, sino número o string ...
