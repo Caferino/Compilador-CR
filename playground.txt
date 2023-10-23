@@ -1,5 +1,6 @@
 int z = 50;
 int a[3] = {1, 2, 3};
+float b[3][3] = {1.0, 2, 3.0, 4, 50.0, 60.0, 74.314642, 8, 9};
 string mensaje = "Hola";
 bool c = False;
 char mensaje2 = "Mundo";
@@ -9,11 +10,13 @@ z = mediana(a);
 
 print(mensaje, mensaje2, z);
 print(mensaje, mensaje, mensaje);
-print(mensaje, "hola", mensaje);
-print(mensaje, "hola", "hola");
+print(mensaje, "bye", mensaje);
+print(mensaje, "bye", "bye");
 print(mensaje2);
 print("mensaje");
 print("Lol");
 
-z = 50;
+z = 50 + b[1][1];
 print(z);
+print(51.0, 40.0);
+print(mensaje, mensaje2, b[3][1]);

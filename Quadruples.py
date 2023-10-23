@@ -97,9 +97,22 @@ class Quadruples:
                 # Guardamos las dimensiones
                 indices = re.findall(r'\[(.*?)\]', token)
                 indices = [int(index) for index in indices]
-                varDimensions = indices
                 token = varName
-                valueAddress = reduce(operator.mul, varDimensions, 1) - 1
+                if len(indices) == 1 : column = indices
+                elif len(indices) == 2 : row, column = indices
+                elif len(indices) == 3 : depth, row, column = indices
+                
+                for tuple in self.symbolTable :
+                    if token == tuple[1] :
+                        if len(indices) == 1 :
+                            valueAddress = column
+                        elif len(indices) == 2 :
+                            num_columns = tuple[2][1]
+                            valueAddress = (row - 1) * num_columns + (column - 1)
+                        elif len(indices) == 3 :
+                            num_rows = tuple[2][0]
+                            num_columns = tuple[2][1]
+                            valueAddress = (depth - 1) * (num_rows * num_columns) + (row - 1) * num_columns + (column - 1)
 
             # Si no, lo buscamos como tal
             i = 0   # I missed you, baby
@@ -364,15 +377,42 @@ class Quadruples:
                 
                 if self.extraStringsForPrint > 1 :
                     words = ''
+                    varName = None
                     while self.extraStringsForPrint > 0 :
-                        if '"' not in left_operand :
+                        if '"' not in str(left_operand) :
+                            # En caso de ser una matriz, sacamos la dirección del valor
+                            if '[' in str(left_operand) :
+                                # Separamos el nombre de las dimensiones
+                                varName = left_operand
+                                varNameIndex = varName.index('[')
+                                varName = varName[:varNameIndex]
+
+                                # Guardamos la/s dimension/es
+                                indices = re.findall(r'\[(.*?)\]', left_operand)
+                                indices = [int(index) for index in indices]
+                                if len(indices) == 1 : column = indices
+                                elif len(indices) == 2 : row, column = indices
+                                elif len(indices) == 3 : depth, row, column = indices
+                                
+                            # Lo buscamos en la symbolTable
                             for tuple in self.symbolTable :
                                 if left_operand == tuple[1] :
                                     words += (' ' + str(tuple[6][0]).strip('"'))
                                     break
-                                    # TODO - Y SI ES MATRIZ? REUTILIZAR LOGICA YA HECHA
+                                elif varName == tuple[1] :
+                                    if len(indices) == 1 :
+                                        valueAddress = column
+                                    elif len(indices) == 2 :
+                                        num_columns = tuple[2][1]
+                                        valueAddress = (row - 1) * num_columns + (column - 1)
+                                    elif len(indices) == 3 :
+                                        num_rows = tuple[2][0]
+                                        num_columns = tuple[2][1]
+                                        valueAddress = (depth - 1) * (num_rows * num_columns) + (row - 1) * num_columns + (column - 1)
+                                    words += (' ' + str(tuple[6][valueAddress]).strip('"'))
+                                    break
                                 elif tuple == self.symbolTable[-1] :
-                                    raise TypeError("Variable at print doesn't exist: ", left_operand)
+                                    words += (' ' + str(left_operand))
                         else :
                             words += (' ' + left_operand.strip('"'))
                         left_operand = self.PilaO.pop()
