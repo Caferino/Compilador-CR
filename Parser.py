@@ -103,6 +103,8 @@ def p_type(p):
     '''type : INT
             | FLOAT
             | BOOL
+            | STRING
+            | CHAR
             | VOID'''
     rules.p_insertType(p)
 
@@ -158,6 +160,9 @@ def p_term(p):
 
 def p_fact(p):
     '''fact : leftparen expression rightparen
+            | media
+            | moda
+            | mediana
             | var_cte'''
 
 
@@ -203,26 +208,29 @@ def p_modulus(p):
 def p_var_cte(p):
     '''var_cte : var_ctei
                | var_ctef
+               | var_string
                | var_id'''
                
                
 def p_var_id(p):
     '''var_id : ID'''
     rules.p_saveValue(p)
-    rules.p_saveToOpStack(p)
-    quadsConstructor.insertTypeAndID(p[1]) # Nuestro lexer lidia con los números # ! ERROR, AQUI NO VA ESTE, POR SER DECLARACION DE VARS
+    quadsConstructor.insertTypeAndID(p[1]) # Nuestro lexer lidia con los números
                
                
 def p_var_ctei(p):
     '''var_ctei : CTEI'''
     rules.p_saveValue(p)
-    rules.p_saveToOpStack(p)
     
     
 def p_var_ctef(p):
     '''var_ctef : CTEF'''
     rules.p_saveValue(p)
-    rules.p_saveToOpStack(p)
+    
+    
+def p_var_string(p):
+    '''var_string : CTESTRING'''
+    rules.p_saveValue(p)
 
 
 # ╭───────────────────────────╮
@@ -410,24 +418,28 @@ def p_else(p):
 
 def p_writing(p):
     '''writing : writingprint LEFTPAREN print_val RIGHTPAREN SEMICOLON'''
-    # TODO - Lógica de meter el token PRINT a los quads, o qué?
     quadsConstructor.verifyPrint()
 
 
 def p_writingprint(p):
     '''writingprint : PRINT'''
     quadsConstructor.insertPrint(p[1])
+    # quadsConstructor.extraStringsForPrint += 1
 
 
 def p_print_val(p):
-    '''print_val : expression print_exp
-                 | CTESTRING print_exp'''
+    '''print_val : expression print_exp'''
     # ! if p[1] != None : quadsConstructor.insertPrintString(p[1])
 
 
 def p_print_exp(p):
-    '''print_exp : COMMA print_val
+    '''print_exp : COMMA print_extra print_val
                  | empty'''
+    
+
+def p_print_extra(p):
+    '''print_extra : empty'''
+    quadsConstructor.extraStringsForPrint += 1
                  
                  
 # ╭───────────────────────────╮
@@ -438,6 +450,21 @@ def p_sort(p):
     '''sort : ID PERIOD SORT LEFTPAREN RIGHTPAREN SEMICOLON'''
     rules.sortMatrix(p)
     
+    
+def p_media(p):
+    '''media : MEDIA LEFTPAREN ID RIGHTPAREN'''
+    rules.media(p)
+    
+    
+def p_moda(p):
+    '''moda : MODA LEFTPAREN ID RIGHTPAREN'''
+    rules.moda(p)
+    
+    
+def p_mediana(p):
+    '''mediana : MEDIANA LEFTPAREN ID RIGHTPAREN'''
+    rules.mediana(p)
+    
 
 def p_return(p):
     '''return : RETURN recursion SEMICOLON
@@ -445,7 +472,7 @@ def p_return(p):
               | RETURN SEMICOLON'''
               
               
-# ! TODO ARREGLAR RECURSION
+# TODO ARREGLAR RECURSION
 def p_recursion(p):
     '''recursion : LEFTPAREN recursion RIGHTPAREN
                  | ID LEFTPAREN recursion RIGHTPAREN recursion

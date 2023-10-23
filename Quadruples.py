@@ -67,6 +67,7 @@ class Quadruples:
         self.cont = 0
         self.assignTemp = 'target'
         self.k = 1
+        self.extraStringsForPrint = 1
 
 
     # ------------------ EXPRESIONES LINEALES ------------------ #
@@ -86,8 +87,7 @@ class Quadruples:
 
             # En caso de ser una matriz, sacamos la dirección del valor
             isMatrix = False
-            if '[' in token : 
-                # print("Aqui estamos") # ! DEBUG
+            if '[' in token :
                 isMatrix = True
                 # Separamos el nombre de las dimensiones
                 varName = token
@@ -98,11 +98,8 @@ class Quadruples:
                 indices = re.findall(r'\[(.*?)\]', token)
                 indices = [int(index) for index in indices]
                 varDimensions = indices
-                # print("varName =", varName) # ! DEBUG
-                # print("Dimensions =", varDimensions) # ! DEBUG
                 token = varName
                 valueAddress = reduce(operator.mul, varDimensions, 1) - 1
-                # print("valueAddress =", valueAddress) # ! DEBUG
 
             # Si no, lo buscamos como tal
             i = 0   # I missed you, baby
@@ -123,10 +120,6 @@ class Quadruples:
                     raise TypeError('Variable ', token, ' not declared!')
                 
                 i += 1
-        
-        # ! TODO : Si es un ID, que saque su tipo real, valor también tal vez, etc.
-        # ! Espérate al error del Semantic Cube
-
 
     # ------ 2 y 3. Insertando Signos (+, -, *, /, <, >, <>, =, ||, &&, !=, ...) ------ #
     def insertSign(self, token):
@@ -163,7 +156,6 @@ class Quadruples:
 
                 else:
                     raise TypeError("Type mismatch in: ", left_operand, operator, right_operand)
-
 
     # ------ 5. Verificando Multiplicaciones o Divisiones ------ #
     def verifySignTimesOrDivide(self):
@@ -369,6 +361,28 @@ class Quadruples:
 
                 operator = self.POper.pop()
                 result_Type = SemanticCube.Semantics(left_Type, right_Type, operator)
+                
+                if self.extraStringsForPrint > 1 :
+                    words = ''
+                    while self.extraStringsForPrint > 0 :
+                        if '"' not in left_operand :
+                            for tuple in self.symbolTable :
+                                if left_operand == tuple[1] :
+                                    words += (' ' + str(tuple[6][0]).strip('"'))
+                                    break
+                                    # TODO - Y SI ES MATRIZ? REUTILIZAR LOGICA YA HECHA
+                                elif tuple == self.symbolTable[-1] :
+                                    raise TypeError("Variable at print doesn't exist: ", left_operand)
+                        else :
+                            words += (' ' + left_operand.strip('"'))
+                        left_operand = self.PilaO.pop()
+                        left_type = self.PTypes.pop()
+                        self.extraStringsForPrint -= 1
+                    
+                    words = words.split()
+                    left_operand = " ".join(reversed(words))
+                    self.extraStringsForPrint = 1
+                    
 
                 if(result_Type != 'ERROR'):
                     result = None
@@ -383,7 +397,8 @@ class Quadruples:
 
 
     def insertPrintString(self, string):
-        pprint.pprint(self.quadruples) # ! DEBUG
+        self.PilaO.append(string)
+        self.PTypes.append('char')
 
 
     # ------ 2. Assignments ------ #
