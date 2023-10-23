@@ -168,6 +168,7 @@ def p_fact(p):
             | mediana
             | varianza
             | regsim
+            | plot
             | var_cte'''
 
 
@@ -481,6 +482,11 @@ def p_regsim(p):
               | REGSIM LEFTPAREN ID COMMA ID COMMA CTEI RIGHTPAREN
               | REGSIM LEFTPAREN ID COMMA ID COMMA ID RIGHTPAREN'''
     rules.regsim(p)
+    
+    
+def p_plot(p):
+    '''plot : PLOT LEFTPAREN ID COMMA ID RIGHTPAREN'''
+    rules.plot(p)
     
 
 def p_return(p):

@@ -16,6 +16,7 @@ from functools import reduce # Para multiplicar listas y matrices
 import operator
 import numpy as np
 from sklearn.linear_model import LinearRegression
+import matplotlib.pyplot as plt
 
 from Quadruples import quadsConstructor
 
@@ -336,10 +337,10 @@ class Rules:
             i += 1
         x = np.array(x).reshape(-1, 1)
         y = np.array(y)
-        # Create and fir data into a linear regression model
+        # Create and fit data into a linear regression model
         model = LinearRegression()
         model.fit(x, y)
-        # Predict a new value
+        # Predict the value given by the user
         var = p[7]
         # En caso de ser un ID...
         if var.__class__.__name__ == 'str' :
@@ -384,6 +385,39 @@ class Rules:
         quadsConstructor.PTypes.append('float') # Value's type
         quadsConstructor.PilaO.append(predicted_value) # Value
         quadsConstructor.POper.append(p[1]) # 'REGSIM'
+        
+        
+    # ------------------------------------- PLOTTER
+    def plot(self, p):
+        i = 0   # I missed you, baby
+        x = None
+        y = None
+        for tuple in memory.symbolTable:
+            if p[3] == tuple[1]:
+                x = tuple[6]
+            
+            if p[5] == tuple[1]:
+                y = tuple[6]
+
+            # Si llegamos a la última tupla y aún no existe la variable...
+            if i == len(memory.symbolTable) - 1:
+                if x == None :
+                    raise TypeError('Variable ', p[3], ' not declared!')
+                elif y == None :
+                    raise TypeError('Variable ', p[5], ' not declared!')
+            
+            i += 1
+        
+        # Create a line plot
+        plt.plot(x, y)
+
+        # Add labels and a title
+        plt.xlabel('X-axis')
+        plt.ylabel('Y-axis')
+        plt.title('Sample Line Plot')
+        
+        # Display the plot
+        plt.show()
 
 
     # ========================================================================================================

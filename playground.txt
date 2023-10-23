@@ -1,5 +1,5 @@
-int x[5] = {10, 20, 30, 40, 50};
-int y[5] = {15, 28, 33, 38, 49};
+int x[5] = {1, 2, 3, 4, 5};
+int y[5] = {2, 4, 6, 8, 10};
 int b[3] = {1, 60, 3};
 float z[3][3] = {1, 2, 3, 4, 60.0, 6, 7, 8, 9};
 int predict = 60;
@@ -11,3 +11,5 @@ result = regsim(x, y, b[1]);
 print(result);
 result = regsim(x, y, z[1][1]);
 print(result);
+
+plot(x, y);
