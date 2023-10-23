@@ -14,6 +14,8 @@ import pprint # Para imprimir el Symbol Table de manera bonita
 import statistics
 from functools import reduce # Para multiplicar listas y matrices
 import operator
+import numpy as np
+from sklearn.linear_model import LinearRegression
 
 from Quadruples import quadsConstructor
 
@@ -292,6 +294,96 @@ class Rules:
                 raise TypeError('Variable ', p[3], ' not declared!')
             
             i += 1
+            
+            
+    # ------------------------------------- VARIANZA
+    def varianza(self, p):
+        i = 0   # I missed you, baby
+        for tuple in memory.symbolTable:
+            if p[3] == tuple[1]:
+                variance = statistics.variance(tuple[6])
+                quadsConstructor.PTypes.append(tuple[0]) # Value's type
+                quadsConstructor.PilaO.append(variance) # Value
+                quadsConstructor.POper.append(p[1]) # 'VARIANZA'
+                break
+
+            # Si llegamos a la última tupla y aún no existe la variable...
+            if i == len(memory.symbolTable) - 1:
+                raise TypeError('Variable ', p[3], ' not declared!')
+            
+            i += 1
+            
+            
+    # ------------------------------------- REGRESIÓN SIMPLE
+    def regsim(self, p):
+        i = 0   # I missed you, baby
+        x = None
+        y = None
+        for tuple in memory.symbolTable:
+            if p[3] == tuple[1]:
+                x = tuple[6]
+            
+            if p[5] == tuple[1]:
+                y = tuple[6]
+
+            # Si llegamos a la última tupla y aún no existe la variable...
+            if i == len(memory.symbolTable) - 1:
+                if x == None :
+                    raise TypeError('Variable ', p[3], ' not declared!')
+                elif y == None :
+                    raise TypeError('Variable ', p[5], ' not declared!')
+            
+            i += 1
+        x = np.array(x).reshape(-1, 1)
+        y = np.array(y)
+        # Create and fir data into a linear regression model
+        model = LinearRegression()
+        model.fit(x, y)
+        # Predict a new value
+        var = p[7]
+        # En caso de ser un ID...
+        if var.__class__.__name__ == 'str' :
+            print('debuggg', var)
+            # En caso de ser una matriz, sacamos la dirección del valor
+            if '[' in var :
+                # Separamos el nombre de las dimensiones
+                varIndex = var.index('[')
+                var = var[:varIndex]
+
+                # Guardamos la/s dimension/es
+                indices = re.findall(r'\[(.*?)\]', p[7])
+                indices = [int(index) for index in indices]
+                if len(indices) == 1 : column = indices[0] - 1
+                elif len(indices) == 2 : row, column = indices
+                elif len(indices) == 3 : depth, row, column = indices
+                
+                # Lo buscamos en la symbolTable
+                for tuple in memory.symbolTable :
+                    if var == tuple[1] :
+                        if len(indices) == 1 :
+                            valueAddress = column
+                        elif len(indices) == 2 :
+                            num_columns = tuple[2][1]
+                            valueAddress = (row - 1) * num_columns + (column - 1)
+                        elif len(indices) == 3 :
+                            num_rows = tuple[2][0]
+                            num_columns = tuple[2][1]
+                            valueAddress = (depth - 1) * (num_rows * num_columns) + (row - 1) * num_columns + (column - 1)
+                        var = tuple[6][valueAddress]
+                        break
+                    elif tuple == memory.symbolTable[-1] :
+                        raise TypeError('Variable', p[7], 'doesnt exist!')
+                    
+            else :
+                for tuple in memory.symbolTable :
+                    if var == tuple[1] :
+                        var = tuple[6][0]
+        
+        new_value = var
+        predicted_value = float(model.predict(np.array([[new_value]])))
+        quadsConstructor.PTypes.append('float') # Value's type
+        quadsConstructor.PilaO.append(predicted_value) # Value
+        quadsConstructor.POper.append(p[1]) # 'REGSIM'
 
 
     # ========================================================================================================

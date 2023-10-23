@@ -1,0 +1,16 @@
+# CR++ Requirements
+# File for PIP - Run at the project's root (the folder this same file is on):
+# pip install -r requirements.txt
+
+# Standard Python libraries
+re
+pprint
+statistics
+numpy
+
+# Third-party libraries
+scikit-learn
+matplotlib
+functools
+sys
+ply

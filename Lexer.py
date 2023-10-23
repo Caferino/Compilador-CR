@@ -14,28 +14,30 @@ from Quadruples import quadsConstructor
 
 # ------ PALABRAS CLAVE ------ #
 keywords = {
-    'program' : 'PROGRAM',
-    'print'   : 'PRINT',
-    'if'      : 'IF',
-    'else'    : 'ELSE',
-    'int'     : 'INT',
-    'float'   : 'FLOAT',
-    'string'  : 'STRING',
-    'char'    : 'CHAR',
-    'bool'    : 'BOOL',
-    'void'    : 'VOID',
-    'while'   : 'WHILE',
-    'return'  : 'RETURN',
-    'sort'    : 'SORT',
-    'media'   : 'MEDIA',
-    'moda'    : 'MODA',
-    'mediana' : 'MEDIANA'
+    'program'  : 'PROGRAM',
+    'print'    : 'PRINT',
+    'if'       : 'IF',
+    'else'     : 'ELSE',
+    'int'      : 'INT',
+    'float'    : 'FLOAT',
+    'string'   : 'STRING',
+    'char'     : 'CHAR',
+    'bool'     : 'BOOL',
+    'void'     : 'VOID',
+    'while'    : 'WHILE',
+    'return'   : 'RETURN',
+    'sort'     : 'SORT',
+    'media'    : 'MEDIA',
+    'moda'     : 'MODA',
+    'mediana'  : 'MEDIANA',
+    'varianza' : 'VARIANZA',
+    'regsim'   : 'REGSIM'
 }
 
 
 # ------ TOKENS ------ #
 tokens = [
-    'SEMICOLON', 'SORT', 'MEDIA', 'MODA', 'MEDIANA', 'LEFTBRACKET', 'PERIOD', 'RIGHTBRACKET', 'GREATER', 'LESS', 'NOTEQUAL', 'NOTEQUALNUM',
+    'SEMICOLON', 'SORT', 'MEDIA', 'MODA', 'MEDIANA', 'VARIANZA', 'REGSIM', 'LEFTBRACKET', 'PERIOD', 'RIGHTBRACKET', 'GREATER', 'LESS', 'NOTEQUAL', 'NOTEQUALNUM',
     'PLUS', 'MINUS', 'TIMES', 'DIVIDE', 'EXPONENTIAL', 'MODULUS', 'LEFTPAREN', 'RIGHTPAREN', 'ID', 'CTEI', 'CTEF', 'EQUALS', 'ASSIGNL',
     'LEFTCORCH', 'RIGHTCORCH', 'CTESTRING', 'COMMA', 'AND', 'OR', 'PRINT', 'IF', 'ELSE', 'INT', 'FLOAT', 'STRING', 'CHAR', 'BOOL', 'VOID',
     'WHILE', 'RETURN',
@@ -73,6 +75,8 @@ t_SORT = r'sort'
 t_MEDIA = r'media'
 t_MODA = r'moda'
 t_MEDIANA = r'mediana'
+t_VARIANZA = r'varianza'
+t_REGSIM = r'regsim'
 t_ignore = " \t"
 
 

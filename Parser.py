@@ -158,11 +158,16 @@ def p_term(p):
     quadsConstructor.verifySignTimesOrDivide()
 
 
+# ╭───────────────────────────╮
+# │            FACT           │ ! ===================
+# ╰───────────────────────────╯
 def p_fact(p):
     '''fact : leftparen expression rightparen
             | media
             | moda
             | mediana
+            | varianza
+            | regsim
             | var_cte'''
 
 
@@ -464,6 +469,18 @@ def p_moda(p):
 def p_mediana(p):
     '''mediana : MEDIANA LEFTPAREN ID RIGHTPAREN'''
     rules.mediana(p)
+    
+    
+def p_varianza(p):
+    '''varianza : VARIANZA LEFTPAREN ID RIGHTPAREN'''
+    rules.varianza(p)
+    
+    
+def p_regsim(p):
+    '''regsim : REGSIM LEFTPAREN ID COMMA ID COMMA CTEF RIGHTPAREN
+              | REGSIM LEFTPAREN ID COMMA ID COMMA CTEI RIGHTPAREN
+              | REGSIM LEFTPAREN ID COMMA ID COMMA ID RIGHTPAREN'''
+    rules.regsim(p)
     
 
 def p_return(p):
