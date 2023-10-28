@@ -37,16 +37,18 @@ def p_block(p):
 def p_statement(p):
     '''statement : vars
                  | function
-                 | assignment_block
-                 | expression
                  | function_call
+                 | assignment_block
                  | loop
                  | condition
                  | writing
                  | sort
                  | return
                  | empty'''
-    # ! rules.p_saveToOpStack(p) # ! Might be useless, who knows
+                 # ! Hice un movimiento loco:
+                 # ! Debajo de assigment_block borré '| expression' y todo siguió funcionando igual...
+                 # ! Lo borré porque no permitía, de alguna manera, que function_call funcione, creo por ser similares en función
+                 # ! Si de verdad llegara a necesitarlo aquí, puedo intentar poner function_call en p_block, '| function_call block'
 
 
 # ╭───────────────────────────╮
@@ -221,7 +223,7 @@ def p_var_cte(p):
 def p_var_id(p):
     '''var_id : ID'''
     rules.p_saveValue(p)
-    quadsConstructor.insertTypeAndID(p[1]) # Nuestro lexer lidia con los números
+    quadsConstructor.insertTypeAndID(p[1]) # ! Nuestro lexer lidia con los números y strings
                
                
 def p_var_ctei(p):
@@ -333,12 +335,13 @@ def p_function_block(p):
     '''function_block : block rightcorch'''
     rules.p_insertScope('global')
     rules.parentFunction = None
+    quadsConstructor.inFunction = False # Al declarar una funcion, que ignore los prints
+    quadsConstructor.endFunction()
 
 
 def p_function_parameters(p):
     '''function_parameters : function_param function_extra_parameters
                            | empty'''
-    # ! rules.p_registerLocalVariables() # ! BORRAR CREO
        
                 
 def p_function_param(p):
@@ -358,23 +361,46 @@ def p_function_extra_parameters_comma(p):
     rules.p_updateSymbolTable()
 
 
-def p_assignment_block(p):
-    '''assignment_block : ID ASSIGNL expression SEMICOLON
-                        | ID EQUALS expression SEMICOLON'''
-    rules.values = []  # Por usar una regla compartida (expression), debemos limpiar esto
-    quadsConstructor.insertAssignmentID(p[1])
-    quadsConstructor.insertAssignmentSign(p[2])
-    quadsConstructor.verifyAssignment()
-
+# ╭───────────────────────────╮
+# │       Function Call       │
+# ╰───────────────────────────╯
 
 def p_function_call(p):
-    '''function_call : id leftparen expression function_call_expressions rightparen'''
+    '''function_call : fcn_onentwo leftparen expression fcn_three function_call_expressions fcn_five rightparen fcn_six SEMICOLON
+                     | fcn_onentwo leftparen rightparen fcn_six SEMICOLON'''
 
+
+def p_fcn_six(p):
+    '''fcn_six : empty'''
+    quadsConstructor.nodoFunctionCallSeis()
+
+
+def p_fcn_five(p):
+    '''fcn_five : empty'''
+    quadsConstructor.nodoFunctionCallCinco()
+    
+
+def p_fcn_four(p):
+    '''fcn_four : empty'''
+    quadsConstructor.nodoFunctionCallCuatro()
+
+
+def p_fcn_three(p):
+    '''fcn_three : empty'''
+    rules.setCurrentParam()
+    quadsConstructor.nodoFunctionCallTres()
+    
+
+def p_fcn_onentwo(p):
+    '''fcn_onentwo : ID'''
+    quadsConstructor.nodoFunctionCallUno(p[1])
+    quadsConstructor.nodoFunctionCallDos(p[1])
+    
 
 def p_function_call_expressions(p):
-    '''function_call_expressions : comma function_call_expressions
+    '''function_call_expressions : comma fcn_four expression fcn_three function_call_expressions
                                  | empty'''
-
+    
 
 # ╭───────────────────────────╮
 # │           Loops           │
@@ -494,8 +520,17 @@ def p_return(p):
               | RETURN ID SEMICOLON
               | RETURN SEMICOLON'''
               
+
+def p_assignment_block(p):
+    '''assignment_block : ID ASSIGNL expression SEMICOLON
+                        | ID EQUALS expression SEMICOLON'''
+    rules.values = []  # Por usar una regla compartida (expression), debemos limpiar esto
+    quadsConstructor.insertAssignmentID(p[1])
+    quadsConstructor.insertAssignmentSign(p[2])
+    quadsConstructor.verifyAssignment()
               
-# TODO ARREGLAR RECURSION
+              
+# TODO ARREGLAR RECURSION ! WIP HAVE NOT TESTED THIS UGLY THING YET
 def p_recursion(p):
     '''recursion : LEFTPAREN recursion RIGHTPAREN
                  | ID LEFTPAREN recursion RIGHTPAREN recursion
@@ -543,7 +578,7 @@ if __name__ == '__main__':
             data = f.read()
             f.close()
             if yacc.parse(data) == "COMPILED":
-                print("Compilation Completed")
+                pass
         except EOFError:
             print(EOFError)
     else:

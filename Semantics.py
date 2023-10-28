@@ -16,7 +16,7 @@ from functools import reduce # Para multiplicar listas y matrices
 import operator
 import numpy as np
 from sklearn.linear_model import LinearRegression
-import matplotlib.pyplot as plt
+from Plotter import plotThis
 
 from Quadruples import quadsConstructor
 
@@ -25,6 +25,9 @@ memory = MemoryMap()
 
 class Rules:
     def __init__(self):
+        # ========================== Debugging Mode # ! Set to True to turn it ON, otherwise False
+        self.debugMode = True
+        
         # Temporales
         self.type = ''
         self.varName = ''
@@ -36,9 +39,6 @@ class Rules:
         self.parentFunction = None
         self.localVariables = []
         self.localVarCounters = {'int': 0, 'float': 0, 'bool': 0, 'string': 0}
-
-
-        
         
         # -- Old
         # Auxiliares
@@ -69,6 +69,7 @@ class Rules:
             varName = varName[:varNameIndex]
         
         # SI YA EXISTE varName EN LA symbolTable, QUEBRAR PROGRAMA
+        # ! Para recursion tal vez será mejor actualizar el valor
         self.verifyVariableExistence(varName)
         self.varName = varName
         
@@ -82,6 +83,7 @@ class Rules:
     # ------------------------------------- IS FUNCTION
     def p_isFunction(self):
         self.isFunction = True
+        quadsConstructor.inFunction = True
         
 
     # ------------------------------------- SAVE VALUE
@@ -127,7 +129,7 @@ class Rules:
                 break
             
         if index != -1:
-            updated_tuple = (*memory.symbolTable[index][:6], self.localVarCounters)
+            updated_tuple = (*memory.symbolTable[index][:6], self.localVarCounters, quadsConstructor.cont) # ! Esto afecta mucho
             memory.symbolTable[index] = updated_tuple
             
         self.localVarCounters = {'int': 0, 'float': 0, 'bool': 0, 'string': 0}
@@ -152,12 +154,12 @@ class Rules:
         self.varValues = []
         self.varDimensions = []
         self.isFunction = False
-        topValue = None
         
         
     # ------------------------------------- FUNCTION ID
     def p_insertFunction(self):
         memory.insertRow( (self.type, self.varName, self.varDimensions, self.scope, self.isFunction, self.parentFunction, self.varValues) )
+        quadsConstructor.updateSymbolTable(memory.symbolTable) ## ! IMPORTANTE, permite dinamismo
         self.parentFunction = self.varName
         
         # === RESET ===
@@ -344,7 +346,7 @@ class Rules:
         var = p[7]
         # En caso de ser un ID...
         if var.__class__.__name__ == 'str' :
-            print('debuggg', var)
+            print('debuggg', var) # ! DEBUG
             # En caso de ser una matriz, sacamos la dirección del valor
             if '[' in var :
                 # Separamos el nombre de las dimensiones
@@ -408,16 +410,12 @@ class Rules:
             
             i += 1
         
-        # Create a line plot
-        plt.plot(x, y)
-
-        # Add labels and a title
-        plt.xlabel('X-axis')
-        plt.ylabel('Y-axis')
-        plt.title('Sample Line Plot')
+        plotThis(x, y)
         
-        # Display the plot
-        plt.show()
+        
+    # ------------------------------------- FUNCTION CALLER
+    def setCurrentParam(self):
+        quadsConstructor.currentParam = self.varName
 
 
     # ========================================================================================================
@@ -427,9 +425,12 @@ class Rules:
         # Creo que con esta actualización nos aseguramos de tener las
         # asignaciones que le hayan cambiado el valor a una variable
         quadsConstructor.updateSymbolTable(memory.symbolTable)
+        quadsConstructor.generateQuadruple('ENDPROG', self.debugMode, '', '')
         
-        print('debug', quadsConstructor.PilaO)
-        print("Final Quadruples: ") # ! DEBUGGER
-        pprint.pprint(quadsConstructor.quadruples) # ! DEBUGGER
-        print("Final Symbol Table: ") # ! DEBUGGER
-        pprint.pprint(memory.symbolTable) # ! DEBUGGER
+        if self.debugMode:
+            print("Final Quadruples: ") # ! DEBUGGER
+            # pprint.pprint(quadsConstructor.quadruples) # ! DEBUGGER
+            for i, item in enumerate(quadsConstructor.quadruples):
+                print(f"{i}: {item}")
+            print("Final Symbol Table: ") # ! DEBUGGER
+            pprint.pprint(memory.symbolTable) # ! DEBUGGER

@@ -63,16 +63,11 @@ class VirtualMachine:
 
             # Si nuestro operando izquierdo es un espacio temporal ...
             if isinstance(operand1, str) and re.match(r"^t\d+$", operand1) : 
-                # print("OPERAND1 AQUI = ", operand1)  # ! DEBUG
-                # print(self.registers)                # ! DEBUG
                 operand1 = self.registers[int(operand1[1:])]
-                # print("Operand1 value = ", operand1) # ! DEBUG
             # Si no, debe ser un ID cuyo valor debemos sacar de la SymbolTable
             elif isinstance(operand1, str):
                 for tuple in self.symbolTable :
-                    # print("tuple1 = ", tuple) # ! DEBUG
                     if operand1 == tuple[1] :
-                        # print("tuple1[6] = ", tuple[6]) # ! DEBUG
                         # Si es una lista de un solo elemento, sacarlo
                         if isinstance(tuple[6], list) and len(tuple[6]) == 1 : operand1 = tuple[6][0]
                         # Si sufrió alguna actualización antes de aquí, lo más seguro es
@@ -90,13 +85,10 @@ class VirtualMachine:
             # Si nuestro operando derecho es un espacio temporal ...
             if isinstance(operand2, str) and re.match(r"^t\d+$", operand2) : 
                 operand2 = self.registers[int(operand2[1:])]
-                # print("Operand2 value = ", operand2) # ! DEBUG
             # Si no, debe ser un ID cuyo valor debemos sacar de la SymbolTable
             elif isinstance(operand2, str):
                 for tuple in self.symbolTable :
-                    # print("tuple2 = ", tuple) # ! DEBUG
                     if operand2 == tuple[1] :
-                        # print("tuple2[6] = ", tuple[6]) # ! DEBUG
                         # Si es una lista de un elemento, sacarlo
                         if isinstance(tuple[6], list) : operand2 = tuple[6][0]
                         else : operand2 = tuple[6]
@@ -116,7 +108,7 @@ class VirtualMachine:
             if operand2 == None : operand2 = 1
 
 
-            # Dios mío bendito. Los famosos registers de Windows que rompen todo
+            # ======= REGISTERS ========
             if operator == '+' :
                 self.registers[target] = operand1 + operand2
             elif operator == '-' :
@@ -174,20 +166,27 @@ class VirtualMachine:
                 else : self.program_counter += 1
                 continue
             elif operator.lower() == 'print':
-                print(operand1.strip('"')) if operand1.__class__.__name__ == 'str' else print(operand1)
+                if not operand2: # operand2 = inFunction? - En caso de estar leyendo una funcion, que no imprima nada
+                    print(operand1.strip('"')) if operand1.__class__.__name__ == 'str' else print(operand1)
             elif operator.lower() == 'return':
                 return_value = self.registers[operand1]
                 self.program_counter = self.stack.pop()
                 self.registers[target] = return_value
                 continue
-            elif operator.lower() == 'era':
-                print("ERA logic here")
             elif operator.lower() == 'gosub':
                 print("GOSUB logic here")
-            elif operator.lower() == 'param':
-                print("PARAM logic here")
+                # Meter el salto de la linea en la que estaba...
+                # PJumps... No estoy seguro
             elif operator.lower() == 'endfunc':
                 print("ENDFUNC logic here")
+                # PJumps...
+                # Hacer el salto a la linea en la que estaba...
+            elif operator.lower() == 'endprog':
+                print('Compilation Completed')
+            '''elif operator.lower() == 'param':
+                print("PARAM logic here")'''
+            '''elif operator.lower() == 'era':
+                print("ERA logic here")'''
                 
 
             self.program_counter += 1

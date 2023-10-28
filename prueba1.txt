@@ -21,15 +21,24 @@ void uno(int p, int q, int m){
     bool varAdentroDeUno3 = -5;
     int varAdentroDeUno4 = 1;
 
+    varAdentroDeUno2 = varAdentroDeUno2 + varAdentroDeUno1;
+    varAdentroDeUno2 = varAdentroDeUno2 + varAdentroDeUno1;
+    varAdentroDeUno2 = varAdentroDeUno2 + varAdentroDeUno1;
+
 }
 
 void dos(float pastor, bool salsa){
     // print("Me hice caca en el pantalón II.");
     float varAdentroDeDos = 55;
+
+    varAdentroDeDos = varAdentroDeDos + varAdentroDeDos;
+    varAdentroDeDos = varAdentroDeDos + varAdentroDeDos;
+    varAdentroDeDos = varAdentroDeDos + varAdentroDeDos;
 }
 
 void tres() {
-    // Caca
+    // Nada
+    print("tres"); # Problematico
 }
 
 int ultimaVar, Cassius = 49, Draegan <- 33, Daniel[2][2] = {1,2,3}, Cacoide;
@@ -53,3 +62,5 @@ else{
 print(x);
 x = x + (440 - 20);
 print(x);
+
+uno(x, 2, 3);
