@@ -32,8 +32,6 @@ class MemoryMap:
             for each_existing_tuple in self.symbolTable:
                 # Si la variable ya existe, actualizamos solo el value
                 if new_row[1] == each_existing_tuple[1]:
-                    # ACTUALIZAR VALUE SOLAMENTE
-                    # VERIFICAR TIPOS, EJEMPLO: FLOAT Z ... BOOL Z, ¿QUÉ SUCEDE?
                     found = True
                     break
 

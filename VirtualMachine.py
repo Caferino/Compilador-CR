@@ -10,16 +10,18 @@
 # ======================== Virtual Machine ======================== #
 
 from functools import reduce
-import operator
+"""import operator
+import sys""" # ! Borrar
 import pprint
-import sys
 import re
 
 class VirtualMachine:
     def __init__(self):
-        self.registers = []
-        self.registers.append("GOTO MAIN")
-        self.stack = []
+        self.memorySize = 500
+        self.registers = [None] * self.memorySize
+        self.registers[0] = "GOTO MAIN"
+        self.stack = [] # ! Donde se usa??
+        self.functionJumps = []
         self.program_counter = 0
         self.quadruples = []
         self.symbolTable = []
@@ -32,10 +34,6 @@ class VirtualMachine:
 
 
     def run(self):
-        # print("It's showtime: ") # ! DEBUGGER
-        # pprint.pprint(self.quadruples, stream=sys.stdout) # ! DEBUGGER
-
-
         '''
         Input: Cuádruplos en forma de tuplas tipo:
             [operador, operandoIzquierdo, operandoDerecho, dondeInsertarResultado]
@@ -46,33 +44,20 @@ class VirtualMachine:
             quadruple = self.quadruples[self.program_counter]
             operator, operand1, operand2, target = quadruple
 
-
-            """ print("BEFORE operator = ", operator)
-            print("BEFORE operand1 = ", operand1)
-            print("BEFORE operand2 = ", operand2)
-            print("BEFORE target = ", target)
-            # print("Registers size = ", len(self.registers), "+ 1") # ! DEBUG """
-
-
             # Qué asco ya sé, una búsqueda lineal O(n) por cada operando que sea una variable...
             # Si nuestro resultado será un espacio temporal, lo "hacemos" índice (t1 = 1, t82 = 82, ...)
             # "t0", al "no existir", lo dejé reservado para el GOTO MAIN por si acaso y mientras
             if isinstance(target, str) and re.match(r"^t\d+$", target) : 
                 target = int(target[1:])
-                self.registers.append(target)
+                # self.registers.append(target)
 
             # Si nuestro operando izquierdo es un espacio temporal ...
             if isinstance(operand1, str) and re.match(r"^t\d+$", operand1) : 
-                # print("OPERAND1 AQUI = ", operand1)  # ! DEBUG
-                # print(self.registers)                # ! DEBUG
                 operand1 = self.registers[int(operand1[1:])]
-                # print("Operand1 value = ", operand1) # ! DEBUG
             # Si no, debe ser un ID cuyo valor debemos sacar de la SymbolTable
             elif isinstance(operand1, str):
                 for tuple in self.symbolTable :
-                    # print("tuple1 = ", tuple) # ! DEBUG
                     if operand1 == tuple[1] :
-                        # print("tuple1[6] = ", tuple[6]) # ! DEBUG
                         # Si es una lista de un solo elemento, sacarlo
                         if isinstance(tuple[6], list) and len(tuple[6]) == 1 : operand1 = tuple[6][0]
                         # Si sufrió alguna actualización antes de aquí, lo más seguro es
@@ -90,13 +75,10 @@ class VirtualMachine:
             # Si nuestro operando derecho es un espacio temporal ...
             if isinstance(operand2, str) and re.match(r"^t\d+$", operand2) : 
                 operand2 = self.registers[int(operand2[1:])]
-                # print("Operand2 value = ", operand2) # ! DEBUG
             # Si no, debe ser un ID cuyo valor debemos sacar de la SymbolTable
             elif isinstance(operand2, str):
                 for tuple in self.symbolTable :
-                    # print("tuple2 = ", tuple) # ! DEBUG
                     if operand2 == tuple[1] :
-                        # print("tuple2[6] = ", tuple[6]) # ! DEBUG
                         # Si es una lista de un elemento, sacarlo
                         if isinstance(tuple[6], list) : operand2 = tuple[6][0]
                         else : operand2 = tuple[6]
@@ -105,18 +87,11 @@ class VirtualMachine:
             if operand2 == 'True' or operand2 == "False" :
                 operand2 = eval(operand2)
 
-
-            """ print("AFTER operator = ", operator)
-            print("AFTER operand1 = ", operand1)
-            print("AFTER operand2 = ", operand2)
-            print("AFTER target = ", target)
-            pprint.pprint(self.quadruples)
-            # print("Registers size = ", len(self.registers), "+ 1") # ! DEBUG """
             if operand1 == None : operand1 = 1
             if operand2 == None : operand2 = 1
 
 
-            # Dios mío bendito. Los famosos registers de Windows que rompen todo
+            # ======= REGISTERS ========
             if operator == '+' :
                 self.registers[target] = operand1 + operand2
             elif operator == '-' :
@@ -174,20 +149,33 @@ class VirtualMachine:
                 else : self.program_counter += 1
                 continue
             elif operator.lower() == 'print':
-                print(operand1.strip('"')) if operand1.__class__.__name__ == 'str' else print(operand1)
+                if not operand2: # operand2 = inFunction? - En caso de estar leyendo una funcion, que no imprima nada
+                    print(operand1.strip('"')) if operand1.__class__.__name__ == 'str' else print(operand1)
             elif operator.lower() == 'return':
                 return_value = self.registers[operand1]
-                self.program_counter = self.stack.pop()
+                self.program_counter = self.functionJumps.pop()
                 self.registers[target] = return_value
                 continue
-            elif operator.lower() == 'era':
-                print("ERA logic here")
             elif operator.lower() == 'gosub':
-                print("GOSUB logic here")
-            elif operator.lower() == 'param':
-                print("PARAM logic here")
+                self.program_counter = target
+                self.functionJumps.append(operand2)
+                continue
+                # Meter el salto de la linea en la que estaba...
+                # PJumps... No estoy seguro
             elif operator.lower() == 'endfunc':
-                print("ENDFUNC logic here")
-                
+                if self.functionJumps : 
+                    self.program_counter = self.functionJumps.pop()
+                    continue
+                # PJumps...
+                # Hacer el salto a la linea en la que estaba...
+            elif operator.lower() == 'endprog':
+                if operand1:
+                    print("v v v v v v    === DEBUGGING ===    v v v v v v")
+                    print("-------------- === Quadruples === --------------")
+                    for i, item in enumerate(self.quadruples):
+                        print(f"{i}: {item}")
+                    print("-------------- === Symbol Table === --------------")
+                    pprint.pprint(self.symbolTable)
+                print('Compilation Completed')
 
             self.program_counter += 1

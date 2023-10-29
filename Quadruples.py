@@ -11,10 +11,7 @@
 
 from VirtualMachine import VirtualMachine
 from functools import reduce
-import operator
 import SemanticCube
-import pprint
-import sys
 import re
 
 virtualMachine = VirtualMachine()
@@ -63,11 +60,14 @@ class Quadruples:
         # Para los estatutos que requieren saltos
         self.PJumps = []
         self.dirFunc = []
-        # self.cont = 1  ## ! Los cuádruplos empiezan desde 1.
+        self.inFunction = False
         self.cont = 0
         self.assignTemp = 'target'
         self.k = 1
         self.extraStringsForPrint = 1
+        self.currentParam = ''
+        self.currentFunctionName = ''
+        self.currentFunctionPosition = None
 
 
     # ------------------ EXPRESIONES LINEALES ------------------ #
@@ -141,8 +141,6 @@ class Quadruples:
 
     # ------ 4. Verificando Sumas o Restas ------ #
     def verifySignPlusOrMinus(self):
-        # print("Current POper: ", self.POper) # ! DEBUG
-        # if self.POper and self.POper[-1] == '-' : print("WTFFFFFFFFF")
         if self.POper:
             if self.POper[-1] == '+' or self.POper[-1] == '-':
                 # Asignamos operandos y operador a validar y ejecutar
@@ -172,7 +170,6 @@ class Quadruples:
 
     # ------ 5. Verificando Multiplicaciones o Divisiones ------ #
     def verifySignTimesOrDivide(self):
-        # print("Current POper: ", self.POper) # ! DEBUG
         if self.POper:
             if self.POper[-1] == '*' or self.POper[-1] == '/' or self.POper[-1] == '**':
                 # Asignamos operandos y operador a validar y ejecutar
@@ -202,7 +199,6 @@ class Quadruples:
 
     # ------ 6. Verificando Condicionales ------ #
     def verifyConditionals(self):
-        # print("Current POper: ", self.POper) # ! DEBUG
         if self.POper:
             if self.POper[-1] == '>' or self.POper[-1] == '<' or self.POper[-1] == '<>' or self.POper[-1] == '!=' or self.POper[-1] == '==' or self.POper[-1] == '||' or self.POper[-1] == '&&' or self.POper[-1] == '<=' :
                 # Asignamos operandos y operador a validar y ejecutar
@@ -290,8 +286,7 @@ class Quadruples:
 
     # ------------------ FUNCTION ------------------ #
     # ------ 1. Nodo para insertar el contador de cuádruplos ------ #
-    def nodoFunctionUno(self, funcID):
-        print("NODO FUNCTION UNO") # ! DEBUG
+    '''def nodoFunctionUno(self, funcID):
         for i, tuple_item in enumerate(self.symbolTable):
             if funcID == tuple_item[1]:
                 currentRow = self.symbolTable[i]
@@ -301,8 +296,12 @@ class Quadruples:
 
 
     def nodoFunctionDos(self):
-        print("NODO FUNCTION DOS") # ! DEBUG
-        self.generateQuadruple('ENDFUNC', '', '', '')
+        self.generateQuadruple('ENDFUNC', '', '', '')'''
+        
+    
+    def nodogosub(self):
+        self.PJumps.append(self.cont)
+        self.generateQuadruple('GOTO', '', '', 'linePlaceholder')
 
 
 
@@ -313,44 +312,53 @@ class Quadruples:
     def nodoFunctionCallUno(self, ID):
         exists = False
         for tuple in self.symbolTable :
-            if ID == tuple[1] :
+            if ID == tuple[1] and tuple[4] :
                 exists = True
+                self.currentFunctionName = tuple[1]
+                self.currentFunctionPosition = tuple[7]
                 break
 
-        if exists == False : raise TypeError("Function", ID, "not declared.")
+        if not exists : raise TypeError("Function", ID, "not declared.")
 
 
     def nodoFunctionCallDos(self, ID):
-        print("FUNCTION CALL 2") # ! DEBUG
-        self.generateQuadruple('ERA', '', '', ID) # (Activation Record expansion –NEW—size)
+        # self.generateQuadruple('ERA', '', '', ID)
         self.k = 1
-        # TODO - Add a pointer to the first parameter type in the ParameterTable. """
 
 
     def nodoFunctionCallTres(self):
-        print("FUNCTION CALL 3") # ! DEBUG
         argument = self.PilaO.pop()
         argumentType = self.PTypes.pop()
-        # TODO - Verify ArgumentType against current Parameter (#k) in ParameterTable.
-        self.generateQuadruple('PARAM', argument, '', self.k) # Generate action PARAMETER, Argument, Argument#k """
+        varName = None
+        for tuple in self.symbolTable :
+            if self.currentParam == tuple[1] :
+                if argumentType == tuple[0] : 
+                    varName = tuple[1]
+                    break
+                else : raise TypeError("Wrong type on parameter", self.currentParam, "at function call of", tuple[5])
+        
+        self.generateQuadruple('=', argument, None, varName) # PARAM, Argument, Argument#k // Similar to assignments
 
 
     def nodoFunctionCallCuatro(self):
-        print("FUNCTION CALL 4") # ! DEBUG
-        self.k = self.k + 1 
-        # TODO - Move to next parameter.
+        self.k = self.k + 1
 
 
     def nodoFunctionCallCinco(self):
-        print("FUNCTION CALL 5") # ! DEBUG
-        # TODO - Verify that the last parameter points to null (coherence in number of parameters).
+        for tuple in self.symbolTable :
+            if self.currentFunctionName == tuple[1] :
+                total_sum = 0
+                for key, value in tuple[6].items() :
+                    total_sum += value
+                if self.k != total_sum : 
+                    raise TypeError("Wrong parameter call size at", self.currentFunctionName)
+                else : 
+                    self.k = 1
+                    break
 
 
     def nodoFunctionCallSeis(self):
-        print("FUNCTION CALL 6") # ! DEBUG
-        # 6.- Generate action GOSUB, procedure-self.name, , initial-address
-        # TODO - Puedo sacar procedureName de un parentFunction en cualquier parámetro
-        # ! self.generateQuadruple('GOSUB', prdocedureName, '', initialAddress)
+        self.generateQuadruple('GOSUB', self.currentFunctionName, quadsConstructor.cont + 1, self.currentFunctionPosition)
 
 
 
@@ -366,7 +374,7 @@ class Quadruples:
             if self.POper[-1] == 'print':
                 # Asignamos operandos y operador a validar y ejecutar
                 ## ! IMPORTANTE: El orden de los .pop() importan!
-                right_operand = None
+                right_operand = self.inFunction  # Para evitar imprimir si se esta leyendo una funcion, no ejecutando
                 left_operand = self.PilaO.pop()
 
                 right_Type = None
@@ -483,6 +491,13 @@ class Quadruples:
         # Empujamos el nuevo cuádruple a nuestra lista o memoria
         self.quadruples.append( (operator, left_operand, right_operand, result) )
         self.cont += 1
+        
+        
+    # ------ Definir fin de Función ------ #
+    def endFunction(self):
+        end = self.PJumps.pop()
+        self.fill(end, self.cont + 1)
+        self.generateQuadruple('ENDFUNC', '', '', '')
 
 
     # ------ Llenado de líneas de salto para GOTOF y GOTOV ------ #

@@ -14,6 +14,9 @@ import pprint # Para imprimir el Symbol Table de manera bonita
 import statistics
 from functools import reduce # Para multiplicar listas y matrices
 import operator
+import numpy as np
+from sklearn.linear_model import LinearRegression
+from Plotter import plotThis
 
 from Quadruples import quadsConstructor
 
@@ -22,6 +25,9 @@ memory = MemoryMap()
 
 class Rules:
     def __init__(self):
+        # ========================== Debugging Mode # ! Set to True to turn it ON, otherwise False
+        self.debugMode = True
+        
         # Temporales
         self.type = ''
         self.varName = ''
@@ -33,9 +39,6 @@ class Rules:
         self.parentFunction = None
         self.localVariables = []
         self.localVarCounters = {'int': 0, 'float': 0, 'bool': 0, 'string': 0}
-
-
-        
         
         # -- Old
         # Auxiliares
@@ -66,6 +69,7 @@ class Rules:
             varName = varName[:varNameIndex]
         
         # SI YA EXISTE varName EN LA symbolTable, QUEBRAR PROGRAMA
+        # ! Para recursion tal vez será mejor actualizar el valor
         self.verifyVariableExistence(varName)
         self.varName = varName
         
@@ -79,6 +83,7 @@ class Rules:
     # ------------------------------------- IS FUNCTION
     def p_isFunction(self):
         self.isFunction = True
+        quadsConstructor.inFunction = True
         
 
     # ------------------------------------- SAVE VALUE
@@ -124,7 +129,7 @@ class Rules:
                 break
             
         if index != -1:
-            updated_tuple = (*memory.symbolTable[index][:6], self.localVarCounters)
+            updated_tuple = (*memory.symbolTable[index][:6], self.localVarCounters, quadsConstructor.cont + 1)
             memory.symbolTable[index] = updated_tuple
             
         self.localVarCounters = {'int': 0, 'float': 0, 'bool': 0, 'string': 0}
@@ -149,12 +154,12 @@ class Rules:
         self.varValues = []
         self.varDimensions = []
         self.isFunction = False
-        topValue = None
         
         
     # ------------------------------------- FUNCTION ID
     def p_insertFunction(self):
         memory.insertRow( (self.type, self.varName, self.varDimensions, self.scope, self.isFunction, self.parentFunction, self.varValues) )
+        quadsConstructor.updateSymbolTable(memory.symbolTable) ## ! IMPORTANTE, permite dinamismo
         self.parentFunction = self.varName
         
         # === RESET ===
@@ -196,9 +201,6 @@ class Rules:
     def p_verifyMatrix(self):
         matrixSize = reduce(operator.mul, self.varDimensions, 1)
         ## Condicional para validar el tamaño de matriz
-        print("Variable:", self.varName)
-        print("varValues:", self.varValues)
-        print("varDimensions:", self.varDimensions)
         if len(self.varValues) > matrixSize : raise TypeError("Matrix", self.varName, "too large.")
 
         # Ahora sabemos que la matriz tiene un tamaño correcto, pero está llena?
@@ -207,7 +209,6 @@ class Rules:
         if length_difference > 0 : 
             desired_value = None
             self.varValues = self.varValues + [desired_value] * length_difference
-            # raise TypeError("Rellenar Matrix", self.varName, "con", length_difference, "Nones") # ! DEBUG
             
             
     # ========================================================================================================
@@ -230,7 +231,6 @@ class Rules:
                 currentRow = currentRow[:index_to_change] + (sortedValues,)
                 # Ponemos la nueva fila de vuelta
                 memory.symbolTable[i] = currentRow
-                # pprint.pprint(memory.symbolTable) # ! DEBUG
                 break
 
             # Si llegamos a la última tupla y aún no existe la variable...
@@ -292,6 +292,124 @@ class Rules:
                 raise TypeError('Variable ', p[3], ' not declared!')
             
             i += 1
+            
+            
+    # ------------------------------------- VARIANZA
+    def varianza(self, p):
+        i = 0   # I missed you, baby
+        for tuple in memory.symbolTable:
+            if p[3] == tuple[1]:
+                variance = statistics.variance(tuple[6])
+                quadsConstructor.PTypes.append(tuple[0]) # Value's type
+                quadsConstructor.PilaO.append(variance) # Value
+                quadsConstructor.POper.append(p[1]) # 'VARIANZA'
+                break
+
+            # Si llegamos a la última tupla y aún no existe la variable...
+            if i == len(memory.symbolTable) - 1:
+                raise TypeError('Variable ', p[3], ' not declared!')
+            
+            i += 1
+            
+            
+    # ------------------------------------- REGRESIÓN SIMPLE
+    def regsim(self, p):
+        i = 0   # I missed you, baby
+        x = None
+        y = None
+        for tuple in memory.symbolTable:
+            if p[3] == tuple[1]:
+                x = tuple[6]
+            
+            if p[5] == tuple[1]:
+                y = tuple[6]
+
+            # Si llegamos a la última tupla y aún no existe la variable...
+            if i == len(memory.symbolTable) - 1:
+                if x == None :
+                    raise TypeError('Variable ', p[3], ' not declared!')
+                elif y == None :
+                    raise TypeError('Variable ', p[5], ' not declared!')
+            
+            i += 1
+        x = np.array(x).reshape(-1, 1)
+        y = np.array(y)
+        # Create and fit data into a linear regression model
+        model = LinearRegression()
+        model.fit(x, y)
+        # Predict the value given by the user
+        var = p[7]
+        # En caso de ser un ID...
+        if var.__class__.__name__ == 'str' :
+            # En caso de ser una matriz, sacamos la dirección del valor
+            if '[' in var :
+                # Separamos el nombre de las dimensiones
+                varIndex = var.index('[')
+                var = var[:varIndex]
+
+                # Guardamos la/s dimension/es
+                indices = re.findall(r'\[(.*?)\]', p[7])
+                indices = [int(index) for index in indices]
+                if len(indices) == 1 : column = indices[0] - 1
+                elif len(indices) == 2 : row, column = indices
+                elif len(indices) == 3 : depth, row, column = indices
+                
+                # Lo buscamos en la symbolTable
+                for tuple in memory.symbolTable :
+                    if var == tuple[1] :
+                        if len(indices) == 1 :
+                            valueAddress = column
+                        elif len(indices) == 2 :
+                            num_columns = tuple[2][1]
+                            valueAddress = (row - 1) * num_columns + (column - 1)
+                        elif len(indices) == 3 :
+                            num_rows = tuple[2][0]
+                            num_columns = tuple[2][1]
+                            valueAddress = (depth - 1) * (num_rows * num_columns) + (row - 1) * num_columns + (column - 1)
+                        var = tuple[6][valueAddress]
+                        break
+                    elif tuple == memory.symbolTable[-1] :
+                        raise TypeError('Variable', p[7], 'doesnt exist!')
+                    
+            else :
+                for tuple in memory.symbolTable :
+                    if var == tuple[1] :
+                        var = tuple[6][0]
+        
+        new_value = var
+        predicted_value = float(model.predict(np.array([[new_value]])))
+        quadsConstructor.PTypes.append('float') # Value's type
+        quadsConstructor.PilaO.append(predicted_value) # Value
+        quadsConstructor.POper.append(p[1]) # 'REGSIM'
+        
+        
+    # ------------------------------------- PLOTTER
+    def plot(self, p):
+        i = 0   # I missed you, baby
+        x = None
+        y = None
+        for tuple in memory.symbolTable:
+            if p[3] == tuple[1]:
+                x = tuple[6]
+            
+            if p[5] == tuple[1]:
+                y = tuple[6]
+
+            # Si llegamos a la última tupla y aún no existe la variable...
+            if i == len(memory.symbolTable) - 1:
+                if x == None :
+                    raise TypeError('Variable ', p[3], ' not declared!')
+                elif y == None :
+                    raise TypeError('Variable ', p[5], ' not declared!')
+            
+            i += 1
+        
+        plotThis(x, y)
+        
+        
+    # ------------------------------------- FUNCTION CALLER
+    def setCurrentParam(self):
+        quadsConstructor.currentParam = self.varName
 
 
     # ========================================================================================================
@@ -301,9 +419,4 @@ class Rules:
         # Creo que con esta actualización nos aseguramos de tener las
         # asignaciones que le hayan cambiado el valor a una variable
         quadsConstructor.updateSymbolTable(memory.symbolTable)
-        
-        print('debug', quadsConstructor.PilaO)
-        print("Final Quadruples: ") # ! DEBUGGER
-        pprint.pprint(quadsConstructor.quadruples) # ! DEBUGGER
-        print("Final Symbol Table: ") # ! DEBUGGER
-        pprint.pprint(memory.symbolTable) # ! DEBUGGER
+        quadsConstructor.generateQuadruple('ENDPROG', self.debugMode, '', '')
