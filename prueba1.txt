@@ -34,6 +34,7 @@ void dos(float pastor, bool salsa){
     varAdentroDeDos = varAdentroDeDos + varAdentroDeDos;
     varAdentroDeDos = varAdentroDeDos + varAdentroDeDos;
     varAdentroDeDos = varAdentroDeDos + varAdentroDeDos;
+    print(varAdentroDeDos);
 }
 
 void tres() {
@@ -64,3 +65,4 @@ x = x + (440 - 20);
 print(x);
 
 uno(x, 2, 3);
+print(x);

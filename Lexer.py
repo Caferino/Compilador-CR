@@ -94,7 +94,6 @@ def t_ID(t):
 def t_CTESTRING(t):
     r'\".*?\"'
     t.value = str(t.value)
-    print('DEBUG', t.value)
     quadsConstructor.PilaO.append(t.value)
     quadsConstructor.PTypes.append('string')
     return t

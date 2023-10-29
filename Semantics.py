@@ -129,7 +129,7 @@ class Rules:
                 break
             
         if index != -1:
-            updated_tuple = (*memory.symbolTable[index][:6], self.localVarCounters, quadsConstructor.cont) # ! Esto afecta mucho
+            updated_tuple = (*memory.symbolTable[index][:6], self.localVarCounters, quadsConstructor.cont + 1)
             memory.symbolTable[index] = updated_tuple
             
         self.localVarCounters = {'int': 0, 'float': 0, 'bool': 0, 'string': 0}
@@ -201,9 +201,6 @@ class Rules:
     def p_verifyMatrix(self):
         matrixSize = reduce(operator.mul, self.varDimensions, 1)
         ## Condicional para validar el tamaño de matriz
-        print("Variable:", self.varName)
-        print("varValues:", self.varValues)
-        print("varDimensions:", self.varDimensions)
         if len(self.varValues) > matrixSize : raise TypeError("Matrix", self.varName, "too large.")
 
         # Ahora sabemos que la matriz tiene un tamaño correcto, pero está llena?
@@ -212,7 +209,6 @@ class Rules:
         if length_difference > 0 : 
             desired_value = None
             self.varValues = self.varValues + [desired_value] * length_difference
-            # raise TypeError("Rellenar Matrix", self.varName, "con", length_difference, "Nones") # ! DEBUG
             
             
     # ========================================================================================================
@@ -235,7 +231,6 @@ class Rules:
                 currentRow = currentRow[:index_to_change] + (sortedValues,)
                 # Ponemos la nueva fila de vuelta
                 memory.symbolTable[i] = currentRow
-                # pprint.pprint(memory.symbolTable) # ! DEBUG
                 break
 
             # Si llegamos a la última tupla y aún no existe la variable...
@@ -346,7 +341,6 @@ class Rules:
         var = p[7]
         # En caso de ser un ID...
         if var.__class__.__name__ == 'str' :
-            print('debuggg', var) # ! DEBUG
             # En caso de ser una matriz, sacamos la dirección del valor
             if '[' in var :
                 # Separamos el nombre de las dimensiones
@@ -426,11 +420,3 @@ class Rules:
         # asignaciones que le hayan cambiado el valor a una variable
         quadsConstructor.updateSymbolTable(memory.symbolTable)
         quadsConstructor.generateQuadruple('ENDPROG', self.debugMode, '', '')
-        
-        if self.debugMode:
-            print("Final Quadruples: ") # ! DEBUGGER
-            # pprint.pprint(quadsConstructor.quadruples) # ! DEBUGGER
-            for i, item in enumerate(quadsConstructor.quadruples):
-                print(f"{i}: {item}")
-            print("Final Symbol Table: ") # ! DEBUGGER
-            pprint.pprint(memory.symbolTable) # ! DEBUGGER

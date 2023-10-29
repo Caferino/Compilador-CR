@@ -171,7 +171,9 @@ def p_fact(p):
             | varianza
             | regsim
             | plot
+            | function_call
             | var_cte'''
+            # ! probablemente aqui puedo anadir function_call si no se complica con var_cte
 
 
 def p_leftparen(p):
@@ -323,7 +325,12 @@ def p_function_id(p):
     
     
 def p_function_local_variables(p):
-    '''function_local_variables : function_parameters nodoregistervars rightparen leftcorch function_block'''
+    '''function_local_variables : function_parameters nodoregistervars rightparen nodogosub leftcorch function_block'''
+    
+    
+def p_nodogosub(p):
+    '''nodogosub : empty'''
+    quadsConstructor.nodogosub()
     
     
 def p_nodoregistervars(p):
@@ -368,6 +375,11 @@ def p_function_extra_parameters_comma(p):
 def p_function_call(p):
     '''function_call : fcn_onentwo leftparen expression fcn_three function_call_expressions fcn_five rightparen fcn_six SEMICOLON
                      | fcn_onentwo leftparen rightparen fcn_six SEMICOLON'''
+                     
+                     
+def p_function_call_expressions(p):
+    '''function_call_expressions : comma fcn_four expression fcn_three function_call_expressions
+                                 | empty'''
 
 
 def p_fcn_six(p):
@@ -395,11 +407,6 @@ def p_fcn_onentwo(p):
     '''fcn_onentwo : ID'''
     quadsConstructor.nodoFunctionCallUno(p[1])
     quadsConstructor.nodoFunctionCallDos(p[1])
-    
-
-def p_function_call_expressions(p):
-    '''function_call_expressions : comma fcn_four expression fcn_three function_call_expressions
-                                 | empty'''
     
 
 # ╭───────────────────────────╮
@@ -514,10 +521,14 @@ def p_plot(p):
     '''plot : PLOT LEFTPAREN ID COMMA ID RIGHTPAREN'''
     rules.plot(p)
     
+    
+    
+# ╭──────────────────────────────────────────────────────────────╮
+# │                       === RETURN ===                         │
+# ╰──────────────────────────────────────────────────────────────╯
 
 def p_return(p):
-    '''return : RETURN recursion SEMICOLON
-              | RETURN ID SEMICOLON
+    '''return : RETURN expression SEMICOLON
               | RETURN SEMICOLON'''
               
 
@@ -530,7 +541,7 @@ def p_assignment_block(p):
     quadsConstructor.verifyAssignment()
               
               
-# TODO ARREGLAR RECURSION ! WIP HAVE NOT TESTED THIS UGLY THING YET
+# TODO - ARREGLAR RECURSION ! WIP HAVE NOT TESTED THIS UGLY THING YET
 def p_recursion(p):
     '''recursion : LEFTPAREN recursion RIGHTPAREN
                  | ID LEFTPAREN recursion RIGHTPAREN recursion

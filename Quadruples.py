@@ -141,8 +141,6 @@ class Quadruples:
 
     # ------ 4. Verificando Sumas o Restas ------ #
     def verifySignPlusOrMinus(self):
-        # print("Current POper: ", self.POper) # ! DEBUG
-        # if self.POper and self.POper[-1] == '-' : print("WTFFFFFFFFF")
         if self.POper:
             if self.POper[-1] == '+' or self.POper[-1] == '-':
                 # Asignamos operandos y operador a validar y ejecutar
@@ -172,7 +170,6 @@ class Quadruples:
 
     # ------ 5. Verificando Multiplicaciones o Divisiones ------ #
     def verifySignTimesOrDivide(self):
-        # print("Current POper: ", self.POper) # ! DEBUG
         if self.POper:
             if self.POper[-1] == '*' or self.POper[-1] == '/' or self.POper[-1] == '**':
                 # Asignamos operandos y operador a validar y ejecutar
@@ -202,7 +199,6 @@ class Quadruples:
 
     # ------ 6. Verificando Condicionales ------ #
     def verifyConditionals(self):
-        # print("Current POper: ", self.POper) # ! DEBUG
         if self.POper:
             if self.POper[-1] == '>' or self.POper[-1] == '<' or self.POper[-1] == '<>' or self.POper[-1] == '!=' or self.POper[-1] == '==' or self.POper[-1] == '||' or self.POper[-1] == '&&' or self.POper[-1] == '<=' :
                 # Asignamos operandos y operador a validar y ejecutar
@@ -291,7 +287,6 @@ class Quadruples:
     # ------------------ FUNCTION ------------------ #
     # ------ 1. Nodo para insertar el contador de cuádruplos ------ #
     '''def nodoFunctionUno(self, funcID):
-        print("NODO FUNCTION UNO") # ! DEBUG
         for i, tuple_item in enumerate(self.symbolTable):
             if funcID == tuple_item[1]:
                 currentRow = self.symbolTable[i]
@@ -301,8 +296,12 @@ class Quadruples:
 
 
     def nodoFunctionDos(self):
-        print("NODO FUNCTION DOS") # ! DEBUG
         self.generateQuadruple('ENDFUNC', '', '', '')'''
+        
+    
+    def nodogosub(self):
+        self.PJumps.append(self.cont)
+        self.generateQuadruple('GOTO', '', '', 'linePlaceholder')
 
 
 
@@ -338,7 +337,7 @@ class Quadruples:
                     break
                 else : raise TypeError("Wrong type on parameter", self.currentParam, "at function call of", tuple[5])
         
-        self.generateQuadruple('=', argument, '', varName) # PARAM, Argument, Argument#k // Similar to assignments
+        self.generateQuadruple('=', argument, None, varName) # PARAM, Argument, Argument#k // Similar to assignments
 
 
     def nodoFunctionCallCuatro(self):
@@ -359,7 +358,7 @@ class Quadruples:
 
 
     def nodoFunctionCallSeis(self):
-        self.generateQuadruple('GOSUB', self.currentFunctionName, '', self.currentFunctionPosition)
+        self.generateQuadruple('GOSUB', self.currentFunctionName, quadsConstructor.cont + 1, self.currentFunctionPosition)
 
 
 
@@ -435,7 +434,6 @@ class Quadruples:
 
                 if(result_Type != 'ERROR'):
                     result = None
-                    print('DEBUGGGG PRINT', operator, left_operand, right_operand, result)
                     self.generateQuadruple(operator, left_operand, right_operand, result)
 
                     # "If any operand were a temporal space, return it to AVAIL"
@@ -497,6 +495,8 @@ class Quadruples:
         
     # ------ Definir fin de Función ------ #
     def endFunction(self):
+        end = self.PJumps.pop()
+        self.fill(end, self.cont + 1)
         self.generateQuadruple('ENDFUNC', '', '', '')
 
 
