@@ -60,7 +60,6 @@ class Quadruples:
         # Para los estatutos que requieren saltos
         self.PJumps = []
         self.dirFunc = []
-        self.inFunction = False
         self.cont = 0
         self.assignTemp = 'target'
         self.k = 1
@@ -378,7 +377,7 @@ class Quadruples:
             if self.POper[-1] == 'print':
                 # Asignamos operandos y operador a validar y ejecutar
                 ## ! IMPORTANTE: El orden de los .pop() importan!
-                right_operand = self.inFunction  # Para evitar imprimir si se esta leyendo una funcion, no ejecutando
+                right_operand = None
                 left_operand = self.PilaO.pop()
 
                 right_Type = None

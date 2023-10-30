@@ -24,6 +24,7 @@ void uno(int p, int q, int m){
     varAdentroDeUno2 = varAdentroDeUno2 + varAdentroDeUno1;
     varAdentroDeUno2 = varAdentroDeUno2 + varAdentroDeUno1;
     varAdentroDeUno2 = varAdentroDeUno2 + varAdentroDeUno1;
+    print(varAdentroDeUno2);
 
 }
 
