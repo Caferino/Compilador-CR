@@ -28,6 +28,6 @@ Dentro de: ~/.../Compilaor-CR
 
 **Octubre 28 2023:**
 
-> Durante la Semana i logré acabar toda la lógica de los prints, strings y la mitad de funciones. Me falta asegurarme de que no se impriman variables locales estando afuera de la función, arreglar la asignación de parámetros en las function_calls, y finalmente, lo último de todo el proyecto: el return y la recursión; ya están en el Parser, solo faltan sus cuádruplos y testing final.
+> Llamadas a funciones lista, faltan algunos tweaks, el return y la recursión.
 
 ~Óscar Antonio Hinojosa Salum A00821930

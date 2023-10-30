@@ -399,7 +399,7 @@ def p_fcn_four(p):
 
 def p_fcn_three(p):
     '''fcn_three : empty'''
-    rules.setCurrentParam()
+    rules.setCurrentParam() # ! ESTA MAL, BORRAR
     quadsConstructor.nodoFunctionCallTres()
     
 
