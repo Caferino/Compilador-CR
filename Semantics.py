@@ -38,6 +38,8 @@ class Rules:
         self.varValues = []
         self.parentFunction = None
         self.localVariables = []
+        self.parameters = {}
+        self.parameterscont = 1
         self.localVarCounters = {'int': 0, 'float': 0, 'bool': 0, 'string': 0}
         
         # -- Old
@@ -105,6 +107,8 @@ class Rules:
     # ------------------------------------- SAVE LOCAL VARIABLE  
     def p_saveLocalVariable(self):
         self.localVariables.append(self.type)
+        self.parameters[self.parameterscont] = (self.type, self.varName)
+        self.parameterscont += 1
         
         
     # ------------------------------------- REGISTER LOCAL VARIABLES
@@ -129,10 +133,12 @@ class Rules:
                 break
             
         if index != -1:
-            updated_tuple = (*memory.symbolTable[index][:6], self.localVarCounters, quadsConstructor.cont + 1)
+            updated_tuple = (*memory.symbolTable[index][:6], self.localVarCounters, quadsConstructor.cont + 1, self.parameters)
             memory.symbolTable[index] = updated_tuple
             
         self.localVarCounters = {'int': 0, 'float': 0, 'bool': 0, 'string': 0}
+        self.parameters = {}
+        self.parameterscont = 1
         
     
     
@@ -407,7 +413,7 @@ class Rules:
         plotThis(x, y)
         
         
-    # ------------------------------------- FUNCTION CALLER
+    # ------------------------------------- FUNCTION CALLER # ! BORRAR ESTO
     def setCurrentParam(self):
         quadsConstructor.currentParam = self.varName
 

@@ -68,6 +68,7 @@ class Quadruples:
         self.currentParam = ''
         self.currentFunctionName = ''
         self.currentFunctionPosition = None
+        self.currentFunctionParams = []
 
 
     # ------------------ EXPRESIONES LINEALES ------------------ #
@@ -316,6 +317,7 @@ class Quadruples:
                 exists = True
                 self.currentFunctionName = tuple[1]
                 self.currentFunctionPosition = tuple[7]
+                self.currentFunctionParams = tuple[8]
                 break
 
         if not exists : raise TypeError("Function", ID, "not declared.")
@@ -329,15 +331,17 @@ class Quadruples:
     def nodoFunctionCallTres(self):
         argument = self.PilaO.pop()
         argumentType = self.PTypes.pop()
-        varName = None
+        if argumentType != self.currentFunctionParams[self.k][0] : raise TypeError('Invalid parameter type for', argument, 'at function call', self.currentFunctionName)
+        """varName = None
+        print('DEBUGG', self.currentFunctionParams) # ! DEBUG
         for tuple in self.symbolTable :
             if self.currentParam == tuple[1] :
                 if argumentType == tuple[0] : 
                     varName = tuple[1]
                     break
-                else : raise TypeError("Wrong type on parameter", self.currentParam, "at function call of", tuple[5])
+                else : raise TypeError("Wrong type on parameter", self.currentParam, "at function call of", tuple[5])"""
         
-        self.generateQuadruple('=', argument, None, varName) # PARAM, Argument, Argument#k // Similar to assignments
+        self.generateQuadruple('=', argument, None, self.currentFunctionParams[self.k][1]) # PARAM, Argument, Argument#k // Similar to assignments
 
 
     def nodoFunctionCallCuatro(self):
