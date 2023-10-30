@@ -21,10 +21,10 @@ void uno(int p, int q, int m){
     bool varAdentroDeUno3 = -5;
     int varAdentroDeUno4 = 1;
 
+    varAdentroDeUno2 = varAdentroDeUno2 + varAdentroDeUno1 + 1 + 1;
     varAdentroDeUno2 = varAdentroDeUno2 + varAdentroDeUno1;
     varAdentroDeUno2 = varAdentroDeUno2 + varAdentroDeUno1;
-    varAdentroDeUno2 = varAdentroDeUno2 + varAdentroDeUno1;
-    print(varAdentroDeUno2);
+    print(varAdentroDeUno2 + p + 1 + 1);
 
 }
 
@@ -66,4 +66,4 @@ x = x + (440 - 20);
 print(x);
 
 uno(x, 2, 3);
-print(x);
+print(x + 1);

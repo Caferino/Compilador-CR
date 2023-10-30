@@ -295,7 +295,7 @@ def p_operator(p):
     '''operator : plus term operator
                 | minus term operator
                 | empty'''
-    # ! quadsConstructor.verifySignPlusOrMinus() ## ! CREO ESTO ARREGLA EXPRESIONES LINEALES O ROMPE MAS
+    quadsConstructor.verifySignPlusOrMinus() ## ! CREO ESTO ARREGLA EXPRESIONES LINEALES O ROMPE MAS
 
 
 def p_plus(p):
@@ -457,6 +457,8 @@ def p_else(p):
 def p_writing(p):
     '''writing : writingprint LEFTPAREN print_val RIGHTPAREN SEMICOLON'''
     quadsConstructor.verifyPrint()
+    rules.varValues = []
+    rules.values = []
 
 
 def p_writingprint(p):

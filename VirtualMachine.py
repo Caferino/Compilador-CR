@@ -170,10 +170,10 @@ class VirtualMachine:
             elif operator.lower() == 'endprog':
                 if operand1:
                     print("v v v v v v    === DEBUGGING ===    v v v v v v")
-                    print("-------------- === Quadruples === --------------")
+                    print("-------------- === Final Quadruples === --------------")
                     for i, item in enumerate(self.quadruples):
                         print(f"{i}: {item}")
-                    print("-------------- === Symbol Table === --------------")
+                    print("-------------- === Final Symbol Table (Updated Values) === --------------")
                     pprint.pprint(self.symbolTable)
                 print('Compilation Completed')
 
