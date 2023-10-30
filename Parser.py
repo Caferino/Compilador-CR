@@ -342,7 +342,6 @@ def p_function_block(p):
     '''function_block : block rightcorch'''
     rules.p_insertScope('global')
     rules.parentFunction = None
-    quadsConstructor.inFunction = False # Al declarar una funcion, que ignore los prints
     quadsConstructor.endFunction()
 
 

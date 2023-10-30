@@ -47,7 +47,6 @@ class Rules:
         self.currentFunctionParams = []
         self.tuplesToModify = []
         self.allTypes = []
-        self.inFunction = False
         self.opStack = []
         self.openList = False
 
@@ -85,7 +84,6 @@ class Rules:
     # ------------------------------------- IS FUNCTION
     def p_isFunction(self):
         self.isFunction = True
-        quadsConstructor.inFunction = True
         
 
     # ------------------------------------- SAVE VALUE
