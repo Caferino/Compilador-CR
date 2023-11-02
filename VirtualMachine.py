@@ -176,5 +176,9 @@ class VirtualMachine:
                     print("-------------- === Final Symbol Table (Updated Values) === --------------")
                     pprint.pprint(self.symbolTable)
                 print('Compilation Completed')
+            elif operator.lower() == 'era':
+                print('ERA LOGIC HERE')
+            elif operator.lower() == 'test':
+                print('TEST HERE')
 
             self.program_counter += 1

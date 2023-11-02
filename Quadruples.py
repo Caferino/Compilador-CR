@@ -66,6 +66,7 @@ class Quadruples:
         self.extraStringsForPrint = 1
         self.currentParam = ''
         self.currentFunctionName = ''
+        self.currentFunctionType = ''
         self.currentFunctionPosition = None
         self.currentFunctionParams = []
 
@@ -314,6 +315,7 @@ class Quadruples:
         for tuple in self.symbolTable :
             if ID == tuple[1] and tuple[4] :
                 exists = True
+                self.currentFunctionType = tuple[0]
                 self.currentFunctionName = tuple[1]
                 self.currentFunctionPosition = tuple[7]
                 self.currentFunctionParams = tuple[8]
@@ -484,7 +486,15 @@ class Quadruples:
 
                 else:
                     raise TypeError("Type mismatch in: ", left_operand, operator, right_operand)
-
+                
+            
+    # ------ 3. Returns ------ #    
+    def verifyReturn(self, p, currentFunctionName, currentFunctionType):
+        print('AQUI', len(p))
+        # Si p[2] es un ';' es porque no hay valor qué regresar
+        if p[2] == ';' and currentFunctionType.lower() != 'void' : raise TypeError("Function", currentFunctionName, "of type", currentFunctionType, "should return a value")
+        elif len(p) > 3 and currentFunctionType.lower() == 'void' : raise TypeError("Void function", currentFunctionName, "should not return any value")
+        self.generateQuadruple('TEST', '', '', '')
 
 
 

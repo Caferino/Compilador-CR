@@ -44,11 +44,13 @@ def p_statement(p):
                  | writing
                  | sort
                  | return
+                 | plot
                  | empty'''
                  # ! Hice un movimiento loco:
                  # ! Debajo de assigment_block borré '| expression' y todo siguió funcionando igual...
                  # ! Lo borré porque no permitía, de alguna manera, que function_call funcione, creo por ser similares en función
                  # ! Si de verdad llegara a necesitarlo aquí, puedo intentar poner function_call en p_block, '| function_call block'
+                 # !!! Esto hace que no sea valido tener expresiones sin asignarlas a alguien en mi lenguaje
 
 
 # ╭───────────────────────────╮
@@ -170,7 +172,6 @@ def p_fact(p):
             | mediana
             | varianza
             | regsim
-            | plot
             | function_call
             | var_cte'''
             # ! probablemente aqui puedo anadir function_call si no se complica con var_cte
@@ -190,6 +191,7 @@ def p_term_operator(p):
                      | divide fact term_operator
                      | modulus fact term_operator
                      | empty'''
+    quadsConstructor.verifySignTimesOrDivide() ## ! CREO ESTO ARREGLA EXPRESIONES LINEALES O ROMPE MAS
 
 def p_exponential(p):
     '''exponential : EXPONENTIAL'''
@@ -255,6 +257,7 @@ def p_comparation(p):
                    | notequal exp
                    | notequalnum exp
                    | empty'''
+    quadsConstructor.verifyConditionals() ## ! CREO ESTO ARREGLA EXPRESIONES LINEALES O ROMPE MAS
 
 
 def p_and(p):
@@ -342,6 +345,7 @@ def p_function_block(p):
     '''function_block : block rightcorch'''
     rules.p_insertScope('global')
     rules.parentFunction = None
+    rules.parentFunctionType = None
     quadsConstructor.endFunction()
 
 
@@ -519,7 +523,7 @@ def p_regsim(p):
     
     
 def p_plot(p):
-    '''plot : PLOT LEFTPAREN ID COMMA ID RIGHTPAREN'''
+    '''plot : PLOT LEFTPAREN ID COMMA ID RIGHTPAREN SEMICOLON'''
     rules.plot(p)
     
     
@@ -530,9 +534,14 @@ def p_plot(p):
 
 def p_return(p):
     '''return : RETURN expression SEMICOLON
-              | RETURN SEMICOLON'''
-              
+              | RETURN SEMICOLON''' # ! Para funciones de tipo void
+    quadsConstructor.verifyReturn(p, rules.parentFunction, rules.parentFunctionType)
 
+
+
+# ╭──────────────────────────────────────────────────────────────╮
+# │                       === ASSIGN ===                         │
+# ╰──────────────────────────────────────────────────────────────╯
 def p_assignment_block(p):
     '''assignment_block : ID ASSIGNL expression SEMICOLON
                         | ID EQUALS expression SEMICOLON'''
@@ -540,18 +549,6 @@ def p_assignment_block(p):
     quadsConstructor.insertAssignmentID(p[1])
     quadsConstructor.insertAssignmentSign(p[2])
     quadsConstructor.verifyAssignment()
-              
-              
-# TODO - ARREGLAR RECURSION ! WIP HAVE NOT TESTED THIS UGLY THING YET
-def p_recursion(p):
-    '''recursion : LEFTPAREN recursion RIGHTPAREN
-                 | ID LEFTPAREN recursion RIGHTPAREN recursion
-                 | PLUS recursion
-                 | MINUS recursion
-                 | var_cte PLUS var_cte
-                 | var_cte MINUS var_cte
-                 | var_cte
-                 | empty'''
 
 
 

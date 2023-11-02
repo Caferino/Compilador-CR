@@ -12,4 +12,18 @@ print(result);
 result = regsim(x, y, z[1][1]);
 print(result);
 
-plot(x, y);
+int uno(int p, int q, int m){
+    int varAdentroDeUno1 = 5;
+    float varAdentroDeUno2 = 10;
+    bool varAdentroDeUno3 = -5;
+    int varAdentroDeUno4 = 1;
+
+    varAdentroDeUno2 = varAdentroDeUno2 + varAdentroDeUno1 + 1 + 1;
+    varAdentroDeUno2 = varAdentroDeUno2 + varAdentroDeUno1;
+    varAdentroDeUno2 = varAdentroDeUno2 + varAdentroDeUno1;
+    print(varAdentroDeUno2 + p + 1 + 1);
+
+    return p;
+}
+
+uno(x[1], 2, 3);

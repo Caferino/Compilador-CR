@@ -37,6 +37,7 @@ class Rules:
         self.values = []
         self.varValues = []
         self.parentFunction = None
+        self.parentFunctionType = None
         self.localVariables = []
         self.parameters = {}
         self.parameterscont = 1
@@ -165,6 +166,7 @@ class Rules:
         memory.insertRow( (self.type, self.varName, self.varDimensions, self.scope, self.isFunction, self.parentFunction, self.varValues) )
         quadsConstructor.updateSymbolTable(memory.symbolTable) ## ! IMPORTANTE, permite dinamismo
         self.parentFunction = self.varName
+        self.parentFunctionType = self.type
         
         # === RESET ===
         self.isFunction = False
@@ -221,12 +223,10 @@ class Rules:
     
     # ------------------------------------- SORT MATRIX 
     def sortMatrix(self, p):
-        # Si no, lo buscamos como tal
-        i = 0   # I missed you, baby
+        i = 0
         for tuple in memory.symbolTable:
             if p[1] == tuple[1]:
                 sortedValues = sorted(tuple[6], key=lambda x: (x is None, x))
-                # print(sortedValues)
 
                 # Sacamos la fila del symbol table con la variable por actualizar
                 currentRow = tuple
@@ -246,7 +246,7 @@ class Rules:
             
     # ------------------------------------- MEDIA
     def media(self, p):
-        i = 0   # I missed you, baby
+        i = 0
         for tuple in memory.symbolTable:
             if p[3] == tuple[1]:
                 media = sum(tuple[6]) / len(tuple[6])
@@ -264,7 +264,7 @@ class Rules:
             
     # ------------------------------------- MODA
     def moda(self, p):
-        i = 0   # I missed you, baby
+        i = 0
         for tuple in memory.symbolTable:
             if p[3] == tuple[1]:
                 mode = statistics.mode(tuple[6])
@@ -282,7 +282,7 @@ class Rules:
             
     # ------------------------------------- MEDIANA
     def mediana(self, p):
-        i = 0   # I missed you, baby
+        i = 0
         for tuple in memory.symbolTable:
             if p[3] == tuple[1]:
                 median = statistics.median(tuple[6])
@@ -300,7 +300,7 @@ class Rules:
             
     # ------------------------------------- VARIANZA
     def varianza(self, p):
-        i = 0   # I missed you, baby
+        i = 0
         for tuple in memory.symbolTable:
             if p[3] == tuple[1]:
                 variance = statistics.variance(tuple[6])
