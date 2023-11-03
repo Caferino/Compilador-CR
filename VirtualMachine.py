@@ -149,12 +149,20 @@ class VirtualMachine:
                 else : self.program_counter += 1
                 continue
             elif operator.lower() == 'print':
+                if isinstance(operand1, list):
+                    for index, element in enumerate(operand1) :
+                        if isinstance(element, str) and re.match(r"^t\d+$", element) : 
+                            operand1[index] = str(self.registers[int(element[1:])])
+                    operand1 = " ".join(reversed(operand1))
                 print(operand1.strip('"')) if operand1.__class__.__name__ == 'str' else print(operand1)
             elif operator.lower() == 'return':
-                return_value = self.registers[operand1]
+                """return_value = self.registers[operand1]
                 self.program_counter = self.functionJumps.pop()
                 self.registers[target] = return_value
-                continue
+                continue""" # ! Old version, creo esto ya no es necesario por cómo funciona mi signo de =
+                if self.functionJumps :
+                    self.program_counter = self.functionJumps[-1]
+                    continue
             elif operator.lower() == 'gosub':
                 self.program_counter = target
                 self.functionJumps.append(operand2)

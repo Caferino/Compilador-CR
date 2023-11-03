@@ -287,19 +287,6 @@ class Quadruples:
 
     # ------------------ FUNCTION ------------------ #
     # ------ 1. Nodo para insertar el contador de cuádruplos ------ #
-    '''def nodoFunctionUno(self, funcID):
-        for i, tuple_item in enumerate(self.symbolTable):
-            if funcID == tuple_item[1]:
-                currentRow = self.symbolTable[i]
-                # Añadimos una nueva columna con su posición en los cuádruplos
-                currentRow = currentRow + (self.cont,)
-                self.symbolTable[i] = currentRow
-
-
-    def nodoFunctionDos(self):
-        self.generateQuadruple('ENDFUNC', '', '', '')'''
-        
-    
     def nodogosub(self):
         self.PJumps.append(self.cont)
         self.generateQuadruple('GOTO', '', '', 'linePlaceholder')
@@ -332,16 +319,7 @@ class Quadruples:
     def nodoFunctionCallTres(self):
         argument = self.PilaO.pop()
         argumentType = self.PTypes.pop()
-        if argumentType != self.currentFunctionParams[self.k][0] : raise TypeError('Invalid parameter type for', argument, 'at function call', self.currentFunctionName)
-        """varName = None
-        print('DEBUGG', self.currentFunctionParams) # ! DEBUG
-        for tuple in self.symbolTable :
-            if self.currentParam == tuple[1] :
-                if argumentType == tuple[0] : 
-                    varName = tuple[1]
-                    break
-                else : raise TypeError("Wrong type on parameter", self.currentParam, "at function call of", tuple[5])"""
-        
+        if argumentType != self.currentFunctionParams[self.k][0] : raise TypeError('Invalid parameter type for', argument, 'at function call', self.currentFunctionName)  
         self.generateQuadruple('=', argument, None, self.currentFunctionParams[self.k][1]) # PARAM, Argument, Argument#k // Similar to assignments
 
 
@@ -433,7 +411,7 @@ class Quadruples:
                         self.extraStringsForPrint -= 1
                     
                     words = words.split()
-                    left_operand = " ".join(reversed(words))
+                    left_operand = words
                     self.extraStringsForPrint = 1
                     
 
@@ -490,12 +468,11 @@ class Quadruples:
             
     # ------ 3. Returns ------ #    
     def verifyReturn(self, p, currentFunctionName, currentFunctionType):
-        print('AQUI', len(p))
         # Si p[2] es un ';' es porque no hay valor qué regresar
         if p[2] == ';' and currentFunctionType.lower() != 'void' : raise TypeError("Function", currentFunctionName, "of type", currentFunctionType, "should return a value")
         elif len(p) > 3 and currentFunctionType.lower() == 'void' : raise TypeError("Void function", currentFunctionName, "should not return any value")
-        self.generateQuadruple('TEST', '', '', '')
-
+        self.endReturnFunction()
+        
 
 
     # ------------------ MÉTODOS AUXILIARES ------------------ #
@@ -505,6 +482,13 @@ class Quadruples:
         self.quadruples.append( (operator, left_operand, right_operand, result) )
         self.cont += 1
         
+        
+    # ------ Definir fin de Función en un Return ------ #
+    def endReturnFunction(self):
+        end = self.PJumps[-1]
+        self.fill(end, self.cont + 1)
+        self.generateQuadruple('RETURN', '', '', '')
+    
         
     # ------ Definir fin de Función ------ #
     def endFunction(self):

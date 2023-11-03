@@ -395,19 +395,15 @@ class Rules:
         for tuple in memory.symbolTable:
             if p[3] == tuple[1]:
                 x = tuple[6]
-            
             if p[5] == tuple[1]:
                 y = tuple[6]
-
             # Si llegamos a la última tupla y aún no existe la variable...
             if i == len(memory.symbolTable) - 1:
                 if x == None :
                     raise TypeError('Variable ', p[3], ' not declared!')
                 elif y == None :
                     raise TypeError('Variable ', p[5], ' not declared!')
-            
             i += 1
-        
         plotThis(x, y)
         
         
