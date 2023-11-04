@@ -37,6 +37,7 @@ class Rules:
         self.values = []
         self.varValues = []
         self.parentFunction = None
+        self.parentFunctionType = None
         self.localVariables = []
         self.parameters = {}
         self.parameterscont = 1
@@ -165,6 +166,7 @@ class Rules:
         memory.insertRow( (self.type, self.varName, self.varDimensions, self.scope, self.isFunction, self.parentFunction, self.varValues) )
         quadsConstructor.updateSymbolTable(memory.symbolTable) ## ! IMPORTANTE, permite dinamismo
         self.parentFunction = self.varName
+        self.parentFunctionType = self.type
         
         # === RESET ===
         self.isFunction = False
@@ -197,7 +199,7 @@ class Rules:
     def verifyVariableExistence(self, varName):
         for each_tuple in memory.symbolTable :
             if varName == each_tuple[1] :
-                raise TypeError("Variable", varName, "already exists.")
+                raise TypeError(f"Variable '{varName}' already exists!")
                 break
             
             
@@ -205,7 +207,7 @@ class Rules:
     def p_verifyMatrix(self):
         matrixSize = reduce(operator.mul, self.varDimensions, 1)
         ## Condicional para validar el tamaño de matriz
-        if len(self.varValues) > matrixSize : raise TypeError("Matrix", self.varName, "too large.")
+        if len(self.varValues) > matrixSize : raise TypeError(f"Matrix '{self.varName}' too large!")
 
         # Ahora sabemos que la matriz tiene un tamaño correcto, pero está llena?
         # Si el usuario no llenó todos los espacios, llenarlos con 'None'
@@ -221,12 +223,10 @@ class Rules:
     
     # ------------------------------------- SORT MATRIX 
     def sortMatrix(self, p):
-        # Si no, lo buscamos como tal
-        i = 0   # I missed you, baby
+        i = 0
         for tuple in memory.symbolTable:
             if p[1] == tuple[1]:
                 sortedValues = sorted(tuple[6], key=lambda x: (x is None, x))
-                # print(sortedValues)
 
                 # Sacamos la fila del symbol table con la variable por actualizar
                 currentRow = tuple
@@ -236,17 +236,15 @@ class Rules:
                 # Ponemos la nueva fila de vuelta
                 memory.symbolTable[i] = currentRow
                 break
-
             # Si llegamos a la última tupla y aún no existe la variable...
             if i == len(memory.symbolTable) - 1:
-                raise TypeError('Variable ', p[1], ' not declared!')
-            
+                raise TypeError(f"Variable '{p[1]}' not declared!")
             i += 1
             
             
     # ------------------------------------- MEDIA
     def media(self, p):
-        i = 0   # I missed you, baby
+        i = 0
         for tuple in memory.symbolTable:
             if p[3] == tuple[1]:
                 media = sum(tuple[6]) / len(tuple[6])
@@ -254,17 +252,15 @@ class Rules:
                 quadsConstructor.PilaO.append(media) # Value
                 quadsConstructor.POper.append(p[1]) # 'MEDIA'
                 break
-
             # Si llegamos a la última tupla y aún no existe la variable...
             if i == len(memory.symbolTable) - 1:
-                raise TypeError('Variable ', p[3], ' not declared!')
-            
+                raise TypeError(f"Variable '{p[3]}' not declared!")
             i += 1
             
             
     # ------------------------------------- MODA
     def moda(self, p):
-        i = 0   # I missed you, baby
+        i = 0
         for tuple in memory.symbolTable:
             if p[3] == tuple[1]:
                 mode = statistics.mode(tuple[6])
@@ -272,17 +268,15 @@ class Rules:
                 quadsConstructor.PilaO.append(mode) # Value
                 quadsConstructor.POper.append(p[1]) # 'MODA'
                 break
-
             # Si llegamos a la última tupla y aún no existe la variable...
             if i == len(memory.symbolTable) - 1:
-                raise TypeError('Variable ', p[3], ' not declared!')
-            
+                raise TypeError(f"Variable '{p[3]}' not declared!")
             i += 1
             
             
     # ------------------------------------- MEDIANA
     def mediana(self, p):
-        i = 0   # I missed you, baby
+        i = 0
         for tuple in memory.symbolTable:
             if p[3] == tuple[1]:
                 median = statistics.median(tuple[6])
@@ -290,17 +284,15 @@ class Rules:
                 quadsConstructor.PilaO.append(median) # Value
                 quadsConstructor.POper.append(p[1]) # 'MEDIANA'
                 break
-
             # Si llegamos a la última tupla y aún no existe la variable...
             if i == len(memory.symbolTable) - 1:
-                raise TypeError('Variable ', p[3], ' not declared!')
-            
+                raise TypeError(f"Variable '{p[3]}' not declared!")
             i += 1
             
             
     # ------------------------------------- VARIANZA
     def varianza(self, p):
-        i = 0   # I missed you, baby
+        i = 0
         for tuple in memory.symbolTable:
             if p[3] == tuple[1]:
                 variance = statistics.variance(tuple[6])
@@ -308,11 +300,9 @@ class Rules:
                 quadsConstructor.PilaO.append(variance) # Value
                 quadsConstructor.POper.append(p[1]) # 'VARIANZA'
                 break
-
             # Si llegamos a la última tupla y aún no existe la variable...
             if i == len(memory.symbolTable) - 1:
-                raise TypeError('Variable ', p[3], ' not declared!')
-            
+                raise TypeError(f"Variable '{p[3]}' not declared!")
             i += 1
             
             
@@ -324,16 +314,15 @@ class Rules:
         for tuple in memory.symbolTable:
             if p[3] == tuple[1]:
                 x = tuple[6]
-            
             if p[5] == tuple[1]:
                 y = tuple[6]
 
             # Si llegamos a la última tupla y aún no existe la variable...
             if i == len(memory.symbolTable) - 1:
                 if x == None :
-                    raise TypeError('Variable ', p[3], ' not declared!')
+                    raise TypeError(f"Variable '{p[3]}' not declared!")
                 elif y == None :
-                    raise TypeError('Variable ', p[5], ' not declared!')
+                    raise TypeError(f"Variable '{p[5]}' not declared!")
             
             i += 1
         x = np.array(x).reshape(-1, 1)
@@ -373,7 +362,7 @@ class Rules:
                         var = tuple[6][valueAddress]
                         break
                     elif tuple == memory.symbolTable[-1] :
-                        raise TypeError('Variable', p[7], 'doesnt exist!')
+                        raise TypeError(f"Variable '{p[7]}' doesn't exist!")
                     
             else :
                 for tuple in memory.symbolTable :
@@ -389,31 +378,22 @@ class Rules:
         
     # ------------------------------------- PLOTTER
     def plot(self, p):
-        i = 0   # I missed you, baby
+        i = 0
         x = None
         y = None
         for tuple in memory.symbolTable:
             if p[3] == tuple[1]:
                 x = tuple[6]
-            
             if p[5] == tuple[1]:
                 y = tuple[6]
-
             # Si llegamos a la última tupla y aún no existe la variable...
             if i == len(memory.symbolTable) - 1:
                 if x == None :
-                    raise TypeError('Variable ', p[3], ' not declared!')
+                    raise TypeError(f"Variable '{p[3]}' not declared!")
                 elif y == None :
-                    raise TypeError('Variable ', p[5], ' not declared!')
-            
+                    raise TypeError(f"Variable '{p[5]}' not declared!")
             i += 1
-        
         plotThis(x, y)
-        
-        
-    # ------------------------------------- FUNCTION CALLER # ! BORRAR ESTO
-    def setCurrentParam(self):
-        quadsConstructor.currentParam = self.varName
 
 
     # ========================================================================================================

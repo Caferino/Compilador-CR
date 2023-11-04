@@ -121,7 +121,6 @@ class VirtualMachine:
                 if target.__class__.__name__ == 'str' :
                     for i, tuple_item in enumerate(self.symbolTable):
                         if target == tuple_item[1]:
-                            
                             currentRow = self.symbolTable[i]
                             # Actualizamos la columna "value"
                             index_to_change = 6
@@ -149,19 +148,19 @@ class VirtualMachine:
                 else : self.program_counter += 1
                 continue
             elif operator.lower() == 'print':
+                if isinstance(operand1, list):
+                    for index, element in enumerate(operand1) :
+                        if isinstance(element, str) and re.match(r"^t\d+$", element) : 
+                            operand1[index] = str(self.registers[int(element[1:])])
+                    operand1 = " ".join(reversed(operand1))
                 print(operand1.strip('"')) if operand1.__class__.__name__ == 'str' else print(operand1)
-            elif operator.lower() == 'return':
-                return_value = self.registers[operand1]
-                self.program_counter = self.functionJumps.pop()
-                self.registers[target] = return_value
-                continue
             elif operator.lower() == 'gosub':
                 self.program_counter = target
                 self.functionJumps.append(operand2)
                 continue
                 # Meter el salto de la linea en la que estaba...
                 # PJumps... No estoy seguro
-            elif operator.lower() == 'endfunc':
+            elif operator.lower() == 'endfunc' or operator.lower() == 'return':
                 if self.functionJumps : 
                     self.program_counter = self.functionJumps.pop()
                     continue
@@ -176,5 +175,17 @@ class VirtualMachine:
                     print("-------------- === Final Symbol Table (Updated Values) === --------------")
                     pprint.pprint(self.symbolTable)
                 print('Compilation Completed')
+            elif operator.lower() == 'era':
+                print('ERA LOGIC HERE')
+            elif operator.lower() == 'test':
+                print('TEST HERE')
+            """elif operator.lower() == 'return':
+                return_value = self.registers[operand1]
+                self.program_counter = self.functionJumps.pop()
+                self.registers[target] = return_value
+                continue
+                if self.functionJumps :
+                    self.program_counter = self.functionJumps[-1]
+                    continue"""
 
             self.program_counter += 1

@@ -1,15 +1,17 @@
-int x[5] = {1, 2, 3, 4, 5};
-int y[5] = {2, 4, 6, 8, 10};
-int b[3] = {1, 60, 3};
-float z[3][3] = {1, 2, 3, 4, 60.0, 6, 7, 8, 9};
-int predict = 60;
 int result = 0;
 
-result = regsim(x, y, predict);
-print(result);
-result = regsim(x, y, b[1]);
-print(result);
-result = regsim(x, y, z[1][1]);
-print(result);
+int uno(int p, int q, int m){
+    int varAdentroDeUno1 = 5;
+    float varAdentroDeUno2 = 10;
+    bool varAdentroDeUno3 = -5;
+    int varAdentroDeUno4 = 1;
 
-plot(x, y);
+    varAdentroDeUno2 = varAdentroDeUno2 + 20;
+    p = 3;
+    print("Resultado:", varAdentroDeUno2 + p + 1 + 1);
+
+    return 50;
+}
+
+result = uno(1, 2, 3);
+print(result);

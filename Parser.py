@@ -37,18 +37,20 @@ def p_block(p):
 def p_statement(p):
     '''statement : vars
                  | function
-                 | function_call
+                 | function_call SEMICOLON
                  | assignment_block
                  | loop
                  | condition
                  | writing
                  | sort
                  | return
+                 | plot
                  | empty'''
                  # ! Hice un movimiento loco:
                  # ! Debajo de assigment_block borré '| expression' y todo siguió funcionando igual...
                  # ! Lo borré porque no permitía, de alguna manera, que function_call funcione, creo por ser similares en función
                  # ! Si de verdad llegara a necesitarlo aquí, puedo intentar poner function_call en p_block, '| function_call block'
+                 # !!! Esto hace que no sea valido tener expresiones sin asignarlas a alguien en mi lenguaje
 
 
 # ╭───────────────────────────╮
@@ -157,7 +159,7 @@ def p_exp(p):
 
 def p_term(p):
     '''term : fact term_operator'''
-    quadsConstructor.verifySignTimesOrDivide()
+    quadsConstructor.verifySignTimesOrDivide() # If POper.top == '*' or '/' ...
 
 
 # ╭───────────────────────────╮
@@ -170,9 +172,8 @@ def p_fact(p):
             | mediana
             | varianza
             | regsim
-            | plot
-            | function_call
-            | var_cte'''
+            | var_cte
+            | function_call'''
             # ! probablemente aqui puedo anadir function_call si no se complica con var_cte
 
 
@@ -190,6 +191,7 @@ def p_term_operator(p):
                      | divide fact term_operator
                      | modulus fact term_operator
                      | empty'''
+    quadsConstructor.verifySignTimesOrDivide() ## ! CREO ESTO ARREGLA EXPRESIONES LINEALES O ROMPE MAS
 
 def p_exponential(p):
     '''exponential : EXPONENTIAL'''
@@ -255,6 +257,7 @@ def p_comparation(p):
                    | notequal exp
                    | notequalnum exp
                    | empty'''
+    quadsConstructor.verifyConditionals() ## ! CREO ESTO ARREGLA EXPRESIONES LINEALES O ROMPE MAS
 
 
 def p_and(p):
@@ -342,6 +345,7 @@ def p_function_block(p):
     '''function_block : block rightcorch'''
     rules.p_insertScope('global')
     rules.parentFunction = None
+    rules.parentFunctionType = None
     quadsConstructor.endFunction()
 
 
@@ -372,8 +376,9 @@ def p_function_extra_parameters_comma(p):
 # ╰───────────────────────────╯
 
 def p_function_call(p):
-    '''function_call : fcn_onentwo leftparen expression fcn_three function_call_expressions fcn_five rightparen fcn_six SEMICOLON
-                     | fcn_onentwo leftparen rightparen fcn_six SEMICOLON'''
+    '''function_call : fcn_onentwo leftparen expression fcn_three function_call_expressions fcn_five rightparen fcn_six
+                     | fcn_onentwo leftparen rightparen fcn_six'''
+                     # ! Por usar expression aqui, tal vez tengo que vaciar rules.values y rules.varValues
                      
                      
 def p_function_call_expressions(p):
@@ -398,7 +403,6 @@ def p_fcn_four(p):
 
 def p_fcn_three(p):
     '''fcn_three : empty'''
-    rules.setCurrentParam() # ! ESTA MAL, BORRAR
     quadsConstructor.nodoFunctionCallTres()
     
 
@@ -464,12 +468,10 @@ def p_writing(p):
 def p_writingprint(p):
     '''writingprint : PRINT'''
     quadsConstructor.insertPrint(p[1])
-    # quadsConstructor.extraStringsForPrint += 1
 
 
 def p_print_val(p):
     '''print_val : expression print_exp'''
-    # ! if p[1] != None : quadsConstructor.insertPrintString(p[1])
 
 
 def p_print_exp(p):
@@ -519,7 +521,7 @@ def p_regsim(p):
     
     
 def p_plot(p):
-    '''plot : PLOT LEFTPAREN ID COMMA ID RIGHTPAREN'''
+    '''plot : PLOT LEFTPAREN ID COMMA ID RIGHTPAREN SEMICOLON'''
     rules.plot(p)
     
     
@@ -531,8 +533,15 @@ def p_plot(p):
 def p_return(p):
     '''return : RETURN expression SEMICOLON
               | RETURN SEMICOLON'''
-              
+    rules.values = [] # ! Posible solucion
+    rules.varValues = []
+    quadsConstructor.verifyReturn(p, rules.parentFunction, rules.parentFunctionType)
 
+
+
+# ╭──────────────────────────────────────────────────────────────╮
+# │                       === ASSIGN ===                         │
+# ╰──────────────────────────────────────────────────────────────╯
 def p_assignment_block(p):
     '''assignment_block : ID ASSIGNL expression SEMICOLON
                         | ID EQUALS expression SEMICOLON'''
@@ -540,18 +549,6 @@ def p_assignment_block(p):
     quadsConstructor.insertAssignmentID(p[1])
     quadsConstructor.insertAssignmentSign(p[2])
     quadsConstructor.verifyAssignment()
-              
-              
-# TODO - ARREGLAR RECURSION ! WIP HAVE NOT TESTED THIS UGLY THING YET
-def p_recursion(p):
-    '''recursion : LEFTPAREN recursion RIGHTPAREN
-                 | ID LEFTPAREN recursion RIGHTPAREN recursion
-                 | PLUS recursion
-                 | MINUS recursion
-                 | var_cte PLUS var_cte
-                 | var_cte MINUS var_cte
-                 | var_cte
-                 | empty'''
 
 
 
@@ -560,7 +557,6 @@ def p_recursion(p):
 # ╰──────────────────────────────────────────────────────────────╯
 
 def p_error(p):
-    # raise TypeError("Syntax error in input! - {} ".format(p)) # Para detener la compilación
     print("Syntax error in input! - {} ".format(p))
 
 

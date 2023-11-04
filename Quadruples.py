@@ -64,8 +64,8 @@ class Quadruples:
         self.assignTemp = 'target'
         self.k = 1
         self.extraStringsForPrint = 1
-        self.currentParam = ''
         self.currentFunctionName = ''
+        self.currentFunctionType = ''
         self.currentFunctionPosition = None
         self.currentFunctionParams = []
 
@@ -130,7 +130,7 @@ class Quadruples:
     
                 # Si llegamos a la última tupla y aún no existe la variable...
                 elif token != tuple[1] and i == len(self.symbolTable) - 1:
-                    raise TypeError('Variable ', token, ' not declared!')
+                    raise TypeError(f"Variable '{token}' not declared!")
                 
                 i += 1
 
@@ -166,7 +166,7 @@ class Quadruples:
                     Avail.release(right_operand)
 
                 else:
-                    raise TypeError("Type mismatch in: ", left_operand, operator, right_operand)
+                    raise TypeError(f"Type mismatch in: '{left_operand} {operator} {right_operand}' ({left_Type} ≠ {right_Type})")
 
     # ------ 5. Verificando Multiplicaciones o Divisiones ------ #
     def verifySignTimesOrDivide(self):
@@ -195,7 +195,7 @@ class Quadruples:
                     Avail.release(right_operand)
 
                 else:
-                    raise TypeError("Type mismatch in: ", left_operand, operator, right_operand)
+                    raise TypeError(f"Type mismatch in: '{left_operand} {operator} {right_operand}' ({left_Type} ≠ {right_Type})")
 
     # ------ 6. Verificando Condicionales ------ #
     def verifyConditionals(self):
@@ -224,7 +224,7 @@ class Quadruples:
                     Avail.release(right_operand)
 
                 else:
-                    raise TypeError("Type mismatch in: ", left_operand, operator, right_operand)
+                    raise TypeError(f"Type mismatch in: '{left_operand} {operator} {right_operand}' ({left_Type} ≠ {right_Type})")
 
 
 
@@ -233,7 +233,7 @@ class Quadruples:
     # ------ 1. Primer nodo de un IF/ELSE statement ------ #
     def nodoCondicionalUno(self):
         exp_type = self.PTypes.pop()
-        if(exp_type != 'bool') : raise TypeError("Type Mismatch in a Conditional!", exp_type, "in", self.quadruples)
+        if(exp_type != 'bool') : raise TypeError(f"Type Mismatch in a Conditional! '{exp_type}' in '{self.quadruples}'")
         else:
             result = self.PilaO.pop()
             self.generateQuadruple('GotoF', result, '', 'linePlaceHolder')
@@ -267,7 +267,7 @@ class Quadruples:
     # ------ 2. Segundo nodo de WHILE ------ #
     def nodoWhileDos(self):
         exp_type = self.PTypes.pop()
-        if(exp_type != 'bool') : raise TypeError("Type Mismatch in a While Loop!", exp_type, "in", self.quadruples)
+        if(exp_type != 'bool') : raise TypeError(f"Type Mismatch in a While Loop! '{exp_type}' in '{self.quadruples}'")
         else:
             result = self.PilaO.pop()
             self.generateQuadruple('GotoF', result, '', 'linePlaceHolder')
@@ -286,19 +286,6 @@ class Quadruples:
 
     # ------------------ FUNCTION ------------------ #
     # ------ 1. Nodo para insertar el contador de cuádruplos ------ #
-    '''def nodoFunctionUno(self, funcID):
-        for i, tuple_item in enumerate(self.symbolTable):
-            if funcID == tuple_item[1]:
-                currentRow = self.symbolTable[i]
-                # Añadimos una nueva columna con su posición en los cuádruplos
-                currentRow = currentRow + (self.cont,)
-                self.symbolTable[i] = currentRow
-
-
-    def nodoFunctionDos(self):
-        self.generateQuadruple('ENDFUNC', '', '', '')'''
-        
-    
     def nodogosub(self):
         self.PJumps.append(self.cont)
         self.generateQuadruple('GOTO', '', '', 'linePlaceholder')
@@ -314,12 +301,13 @@ class Quadruples:
         for tuple in self.symbolTable :
             if ID == tuple[1] and tuple[4] :
                 exists = True
+                self.currentFunctionType = tuple[0]
                 self.currentFunctionName = tuple[1]
                 self.currentFunctionPosition = tuple[7]
                 self.currentFunctionParams = tuple[8]
                 break
 
-        if not exists : raise TypeError("Function", ID, "not declared.")
+        if not exists : raise TypeError(f"Function '{ID}' not declared!")
 
 
     def nodoFunctionCallDos(self, ID):
@@ -330,16 +318,7 @@ class Quadruples:
     def nodoFunctionCallTres(self):
         argument = self.PilaO.pop()
         argumentType = self.PTypes.pop()
-        if argumentType != self.currentFunctionParams[self.k][0] : raise TypeError('Invalid parameter type for', argument, 'at function call', self.currentFunctionName)
-        """varName = None
-        print('DEBUGG', self.currentFunctionParams) # ! DEBUG
-        for tuple in self.symbolTable :
-            if self.currentParam == tuple[1] :
-                if argumentType == tuple[0] : 
-                    varName = tuple[1]
-                    break
-                else : raise TypeError("Wrong type on parameter", self.currentParam, "at function call of", tuple[5])"""
-        
+        if argumentType != self.currentFunctionParams[self.k][0] : raise TypeError(f"Invalid parameter type for '{argument}' at function call '{self.currentFunctionName}'")  
         self.generateQuadruple('=', argument, None, self.currentFunctionParams[self.k][1]) # PARAM, Argument, Argument#k // Similar to assignments
 
 
@@ -354,7 +333,7 @@ class Quadruples:
                 for key, value in tuple[6].items() :
                     total_sum += value
                 if self.k != total_sum : 
-                    raise TypeError("Wrong parameter call size at", self.currentFunctionName)
+                    raise TypeError(f"Wrong parameter call size at '{self.currentFunctionName}'")
                 else : 
                     self.k = 1
                     break
@@ -431,7 +410,7 @@ class Quadruples:
                         self.extraStringsForPrint -= 1
                     
                     words = words.split()
-                    left_operand = " ".join(reversed(words))
+                    left_operand = words
                     self.extraStringsForPrint = 1
                     
 
@@ -444,7 +423,7 @@ class Quadruples:
                     Avail.release(left_operand)
 
                 else:
-                    raise TypeError("Type mismatch in: ", left_operand, operator, right_operand)
+                    raise TypeError(f"Type mismatch in: '{left_operand} {operator} {right_operand}' ({left_Type} ≠ {right_Type})")
 
 
     def insertPrintString(self, string):
@@ -453,12 +432,17 @@ class Quadruples:
 
 
     # ------ 2. Assignments ------ #
-    def insertAssignmentSign(self, token):
-        self.POper.append(token)
-
-
     def insertAssignmentID(self, token):
         self.assignTemp = token
+        # ! AQUI DEBES USAR Pilao Y PTypes, mis assignments se pasan por los huevos la semantic cube
+        for tuple in self.symbolTable :
+            if token == tuple[1] :
+                self.PilaO.append(tuple[1])
+                self.PTypes.append(tuple[0])
+        
+        
+    def insertAssignmentSign(self, token):
+        self.POper.append(token)
 
 
     def verifyAssignment(self):
@@ -466,26 +450,37 @@ class Quadruples:
             if self.POper[-1] == '=' or self.POper[-1] == '<-':
                 # Asignamos operandos y operador a validar y ejecutar
                 ## ! IMPORTANTE: El orden de los .pop() importan!
-                right_operand = None
+                right_operand = self.PilaO.pop()
                 left_operand = self.PilaO.pop()
 
-                right_Type = None
+                right_Type = self.PTypes.pop()
                 left_Type = self.PTypes.pop()
 
                 operator = self.POper.pop()
                 result_Type = SemanticCube.Semantics(left_Type, right_Type, operator)
 
-                if(result_Type != 'ERROR'):
-                    result = self.assignTemp
-                    self.generateQuadruple(operator, left_operand, right_operand, result)
-                    self.PilaO.append(result)
+                if (result_Type != 'ERROR'):
+                    self.generateQuadruple(operator, left_operand, '', right_operand)
+                    self.PilaO.append(right_operand)
                     self.PTypes.append(result_Type)
-                    
-
                 else:
-                    raise TypeError("Type mismatch in: ", left_operand, operator, right_operand)
-
-
+                    raise TypeError(f"Type mismatch in: '{left_operand} {operator} {right_operand}' ({left_Type} ≠ {right_Type})")
+                
+            
+    # ------ 3. Returns ------ #    
+    def verifyReturn(self, p, currentFunctionName, currentFunctionType):
+        # Si p[2] es un ';' es porque no hay valor qué regresar
+        if p[2] == ';' and currentFunctionType.lower() != 'void' : raise TypeError(f"Function '{currentFunctionName}' of type '{currentFunctionType}' should return a value!")
+        elif len(p) > 3 and currentFunctionType.lower() == 'void' : raise TypeError(f"Void function '{currentFunctionName}' should NOT return any value!")
+        self.endReturnFunction()
+        
+        
+    # ------ Definir fin de Función en un Return ------ #
+    def endReturnFunction(self):
+        end = self.PJumps[-1]
+        self.fill(end, self.cont + 1)
+        self.generateQuadruple('RETURN', '', '', '')
+        
 
 
     # ------------------ MÉTODOS AUXILIARES ------------------ #
@@ -494,7 +489,7 @@ class Quadruples:
         # Empujamos el nuevo cuádruple a nuestra lista o memoria
         self.quadruples.append( (operator, left_operand, right_operand, result) )
         self.cont += 1
-        
+    
         
     # ------ Definir fin de Función ------ #
     def endFunction(self):
