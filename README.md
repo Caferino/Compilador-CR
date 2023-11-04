@@ -30,4 +30,8 @@ Dentro de: ~/.../Compilaor-CR
 
 > Llamadas a funciones lista, faltan algunos tweaks, el return y la recursión.
 
+**Noviembre 3 2023:**
+
+> Llamadas a funciones con Returns funcionando, mejor verificación de tipos al imprimir o asignar valores (en estos dos casos no servía para nada el SemanticCube por alguna razón de mal diseño, ahora sí se usa bien) y mejores errores, con menos comillas y comas que salían sobrando (por no saber usar 'f-strings' antes)... Solo queda la recursión, la cual debe caer como un guante, lo más difícil será diseñar el control de los "snapshots" de la SymbolTable y saber cuál leer en el momento; es decir, saber en cuál número de la iteración recursiva debe ejecutarse la función, con cuáles valores, etc.
+
 ~Óscar Antonio Hinojosa Salum A00821930
