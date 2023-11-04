@@ -37,7 +37,7 @@ def p_block(p):
 def p_statement(p):
     '''statement : vars
                  | function
-                 | function_call
+                 | function_call SEMICOLON
                  | assignment_block
                  | loop
                  | condition
@@ -159,7 +159,7 @@ def p_exp(p):
 
 def p_term(p):
     '''term : fact term_operator'''
-    quadsConstructor.verifySignTimesOrDivide()
+    quadsConstructor.verifySignTimesOrDivide() # If POper.top == '*' or '/' ...
 
 
 # ╭───────────────────────────╮
@@ -172,8 +172,8 @@ def p_fact(p):
             | mediana
             | varianza
             | regsim
-            | function_call
-            | var_cte'''
+            | var_cte
+            | function_call'''
             # ! probablemente aqui puedo anadir function_call si no se complica con var_cte
 
 
@@ -376,8 +376,9 @@ def p_function_extra_parameters_comma(p):
 # ╰───────────────────────────╯
 
 def p_function_call(p):
-    '''function_call : fcn_onentwo leftparen expression fcn_three function_call_expressions fcn_five rightparen fcn_six SEMICOLON
-                     | fcn_onentwo leftparen rightparen fcn_six SEMICOLON'''
+    '''function_call : fcn_onentwo leftparen expression fcn_three function_call_expressions fcn_five rightparen fcn_six
+                     | fcn_onentwo leftparen rightparen fcn_six'''
+                     # ! Por usar expression aqui, tal vez tengo que vaciar rules.values y rules.varValues
                      
                      
 def p_function_call_expressions(p):
@@ -402,7 +403,6 @@ def p_fcn_four(p):
 
 def p_fcn_three(p):
     '''fcn_three : empty'''
-    rules.setCurrentParam() # ! ESTA MAL, BORRAR
     quadsConstructor.nodoFunctionCallTres()
     
 
@@ -468,12 +468,10 @@ def p_writing(p):
 def p_writingprint(p):
     '''writingprint : PRINT'''
     quadsConstructor.insertPrint(p[1])
-    # quadsConstructor.extraStringsForPrint += 1
 
 
 def p_print_val(p):
     '''print_val : expression print_exp'''
-    # ! if p[1] != None : quadsConstructor.insertPrintString(p[1])
 
 
 def p_print_exp(p):
@@ -534,7 +532,9 @@ def p_plot(p):
 
 def p_return(p):
     '''return : RETURN expression SEMICOLON
-              | RETURN SEMICOLON''' # ! Para funciones de tipo void
+              | RETURN SEMICOLON'''
+    rules.values = [] # ! Posible solucion
+    rules.varValues = []
     quadsConstructor.verifyReturn(p, rules.parentFunction, rules.parentFunctionType)
 
 
@@ -557,7 +557,6 @@ def p_assignment_block(p):
 # ╰──────────────────────────────────────────────────────────────╯
 
 def p_error(p):
-    # raise TypeError("Syntax error in input! - {} ".format(p)) # Para detener la compilación
     print("Syntax error in input! - {} ".format(p))
 
 

@@ -1,4 +1,3 @@
-int x[5] = {1, 2, 3, 4, 5};
 int result = 0;
 
 int uno(int p, int q, int m){
@@ -11,7 +10,8 @@ int uno(int p, int q, int m){
     p = 3;
     print("Resultado:", varAdentroDeUno2 + p + 1 + 1);
 
+    return 50;
 }
 
-# result = uno(x[1], 2, 3);
+result = uno(1, 2, 3);
 print(result);
