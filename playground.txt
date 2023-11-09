@@ -6,12 +6,10 @@ int uno(int p, int q, int m){
     bool varAdentroDeUno3 = -5;
     int varAdentroDeUno4 = 1;
 
-    varAdentroDeUno2 = varAdentroDeUno2 + 20;
-    p = 3;
-    print("Resultado:", varAdentroDeUno2 + p + 1 + 1);
+    print(p);
 
     return 50;
 }
 
-result = uno(1, 2, 3);
+result = uno(100, 2, 3);
 print(result);
