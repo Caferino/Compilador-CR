@@ -25,11 +25,16 @@ class VirtualMachine:
         self.program_counter = 0
         self.quadruples = []
         self.symbolTable = []
+        self.recursiveTable = [] # Oh boy
+        self.recursiveIteration = 1
+        self.inFunction = False
+        self.currentSymbolTable = []
 
 
     def start(self, quadruples, newSymbolTable):
         self.quadruples = quadruples
         self.symbolTable = newSymbolTable
+        self.currentSymbolTable = self.symbolTable
         self.run()
 
 
@@ -40,9 +45,15 @@ class VirtualMachine:
 
         Output: Resultados del programa.
         '''
+        
+        # ! IMP - Tal vez, para incluir recursion, desde acá tendré que checar si mi memoria auxiliar
+        # ! de la recursion '#x' tiene datos, y por ende debería usarlos...
         while self.program_counter < len(self.quadruples):
             quadruple = self.quadruples[self.program_counter]
             operator, operand1, operand2, target = quadruple
+            
+            if self.inFunction :
+                self.currentSymbolTable = self.recursiveTable
 
             # Qué asco ya sé, una búsqueda lineal O(n) por cada operando que sea una variable...
             # Si nuestro resultado será un espacio temporal, lo "hacemos" índice (t1 = 1, t82 = 82, ...)
@@ -55,8 +66,8 @@ class VirtualMachine:
             if isinstance(operand1, str) and re.match(r"^t\d+$", operand1) : 
                 operand1 = self.registers[int(operand1[1:])]
             # Si no, debe ser un ID cuyo valor debemos sacar de la SymbolTable
-            elif isinstance(operand1, str):
-                for tuple in self.symbolTable :
+            elif isinstance(operand1, str):    
+                for tuple in self.currentSymbolTable :
                     if operand1 == tuple[1] :
                         # Si es una lista de un solo elemento, sacarlo
                         if isinstance(tuple[6], list) and len(tuple[6]) == 1 : operand1 = tuple[6][0]
@@ -77,7 +88,7 @@ class VirtualMachine:
                 operand2 = self.registers[int(operand2[1:])]
             # Si no, debe ser un ID cuyo valor debemos sacar de la SymbolTable
             elif isinstance(operand2, str):
-                for tuple in self.symbolTable :
+                for tuple in self.currentSymbolTable :
                     if operand2 == tuple[1] :
                         # Si es una lista de un elemento, sacarlo
                         if isinstance(tuple[6], list) : operand2 = tuple[6][0]
@@ -119,17 +130,17 @@ class VirtualMachine:
             elif operator == '=' or operator == '<-' :
                 # Si es un string, es porque a fuerza es un ID ...
                 if target.__class__.__name__ == 'str' :
-                    for i, tuple_item in enumerate(self.symbolTable):
+                    for i, tuple_item in enumerate(self.currentSymbolTable):
                         if target == tuple_item[1]:
-                            currentRow = self.symbolTable[i]
+                            currentRow = self.currentSymbolTable[i]
                             # Actualizamos la columna "value"
                             index_to_change = 6
                             currentRow = currentRow[:index_to_change] + (operand1,)
-                            self.symbolTable[i] = currentRow
+                            self.currentSymbolTable[i] = currentRow
                             # En caso de haberse transformado de INT a FLOAT, actualizar TYPE
                             if currentRow[0] != operand1.__class__.__name__ :
                                 currentRow = (operand1.__class__.__name__,) + currentRow[1:]
-                                self.symbolTable[i] = currentRow
+                                self.currentSymbolTable[i] = currentRow
 
                 # Si no, es el index de un espacio temporal
                 else:
@@ -161,6 +172,9 @@ class VirtualMachine:
                 # Meter el salto de la linea en la que estaba...
                 # PJumps... No estoy seguro
             elif operator.lower() == 'endfunc' or operator.lower() == 'return':
+                pprint.pprint(self.recursiveTable) # ! DEBUG
+                self.inFunction = False
+                self.currentSymbolTable = self.symbolTable
                 if self.functionJumps : 
                     self.program_counter = self.functionJumps.pop()
                     continue
@@ -177,9 +191,12 @@ class VirtualMachine:
                 print('Compilation Completed')
             elif operator.lower() == 'era':
                 print('ERA LOGIC HERE')
-            elif operator.lower() == 'test':
+                self.inFunction = True
+                self.recursiveTable = [entry for entry in self.symbolTable if entry[5] == target]
+                # pprint.pprint(self.recursiveTable) # ! DEBUG
+            """elif operator.lower() == 'test':
                 print('TEST HERE')
-            """elif operator.lower() == 'return':
+            elif operator.lower() == 'return':
                 return_value = self.registers[operand1]
                 self.program_counter = self.functionJumps.pop()
                 self.registers[target] = return_value
