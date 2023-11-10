@@ -34,7 +34,7 @@ class VirtualMachine:
     def start(self, quadruples, newSymbolTable):
         self.quadruples = quadruples
         self.symbolTable = newSymbolTable
-        self.currentSymbolTable = self.symbolTable
+        self.currentSymbolTable = newSymbolTable
         self.run()
 
 
@@ -51,9 +51,6 @@ class VirtualMachine:
         while self.program_counter < len(self.quadruples):
             quadruple = self.quadruples[self.program_counter]
             operator, operand1, operand2, target = quadruple
-            
-            if self.inFunction :
-                self.currentSymbolTable = self.recursiveTable
 
             # Qué asco ya sé, una búsqueda lineal O(n) por cada operando que sea una variable...
             # Si nuestro resultado será un espacio temporal, lo "hacemos" índice (t1 = 1, t82 = 82, ...)
@@ -61,14 +58,19 @@ class VirtualMachine:
             if isinstance(target, str) and re.match(r"^t\d+$", target) : 
                 target = int(target[1:])
                 # self.registers.append(target)
+                
+            isOperand1Str = isinstance(operand1, str)
+            isOperand2Str = isinstance(operand2, str)
 
+            print('DEBUG operand1', isOperand1Str)
             # Si nuestro operando izquierdo es un espacio temporal ...
-            if isinstance(operand1, str) and re.match(r"^t\d+$", operand1) : 
+            if isOperand1Str and re.match(r"^t\d+$", operand1) : 
                 operand1 = self.registers[int(operand1[1:])]
             # Si no, debe ser un ID cuyo valor debemos sacar de la SymbolTable
-            elif isinstance(operand1, str):    
+            elif isOperand1Str :
                 for tuple in self.currentSymbolTable :
                     if operand1 == tuple[1] :
+                        print('DEBUG FOUND!', operand1, tuple[1])
                         # Si es una lista de un solo elemento, sacarlo
                         if isinstance(tuple[6], list) and len(tuple[6]) == 1 : operand1 = tuple[6][0]
                         # Si sufrió alguna actualización antes de aquí, lo más seguro es
@@ -84,10 +86,10 @@ class VirtualMachine:
                 operand1 = eval(operand1)
 
             # Si nuestro operando derecho es un espacio temporal ...
-            if isinstance(operand2, str) and re.match(r"^t\d+$", operand2) : 
+            if isOperand2Str and re.match(r"^t\d+$", operand2) : 
                 operand2 = self.registers[int(operand2[1:])]
             # Si no, debe ser un ID cuyo valor debemos sacar de la SymbolTable
-            elif isinstance(operand2, str):
+            elif isOperand2Str:
                 for tuple in self.currentSymbolTable :
                     if operand2 == tuple[1] :
                         # Si es una lista de un elemento, sacarlo
@@ -104,6 +106,8 @@ class VirtualMachine:
 
             # ======= REGISTERS ========
             if operator == '+' :
+                print('debug', operator, operand1, operand2, target) # ! DEBUG
+                pprint.pprint(self.currentSymbolTable)
                 self.registers[target] = operand1 + operand2
             elif operator == '-' :
                 self.registers[target] = operand1 - operand2
@@ -116,6 +120,7 @@ class VirtualMachine:
             elif operator == '>' :
                 self.registers[target] = int(operand1 > operand2)
             elif operator == '<' :
+                print('debug', operator, operand1, operand2, target) # ! DEBUG
                 self.registers[target] = int(operand1 < operand2)
             elif operator == '<=' :
                 self.registers[target] = int(operand1 <= operand2)
@@ -128,6 +133,7 @@ class VirtualMachine:
             if operator == '||':
                 self.registers[target] = bool(operand1) or bool(operand2)
             elif operator == '=' or operator == '<-' :
+                print('DEBUG', operator, operand1, operand2, target) # ! DEBUG
                 # Si es un string, es porque a fuerza es un ID ...
                 if target.__class__.__name__ == 'str' :
                     for i, tuple_item in enumerate(self.currentSymbolTable):
@@ -172,7 +178,8 @@ class VirtualMachine:
                 # Meter el salto de la linea en la que estaba...
                 # PJumps... No estoy seguro
             elif operator.lower() == 'endfunc' or operator.lower() == 'return':
-                pprint.pprint(self.recursiveTable) # ! DEBUG
+                # pprint.pprint(self.recursiveTable) # ! RECURSIVE DEBUG
+                self.recursiveIteration = 1
                 self.inFunction = False
                 self.currentSymbolTable = self.symbolTable
                 if self.functionJumps : 
@@ -187,22 +194,12 @@ class VirtualMachine:
                     for i, item in enumerate(self.quadruples):
                         print(f"{i}: {item}")
                     print("-------------- === Final Symbol Table (Updated Values) === --------------")
-                    pprint.pprint(self.symbolTable)
+                    pprint.pprint(self.currentSymbolTable)
                 print('Compilation Completed')
             elif operator.lower() == 'era':
-                print('ERA LOGIC HERE')
+                self.recursiveIteration += 1
                 self.inFunction = True
-                self.recursiveTable = [entry for entry in self.symbolTable if entry[5] == target]
-                # pprint.pprint(self.recursiveTable) # ! DEBUG
-            """elif operator.lower() == 'test':
-                print('TEST HERE')
-            elif operator.lower() == 'return':
-                return_value = self.registers[operand1]
-                self.program_counter = self.functionJumps.pop()
-                self.registers[target] = return_value
-                continue
-                if self.functionJumps :
-                    self.program_counter = self.functionJumps[-1]
-                    continue"""
+                self.currentSymbolTable = [entry for entry in self.symbolTable if entry[5] == target]
+                # pprint.pprint(self.recursiveTable) # ! RECURSIVE DEBUG
 
             self.program_counter += 1

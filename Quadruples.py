@@ -319,7 +319,7 @@ class Quadruples:
         argument = self.PilaO.pop()
         argumentType = self.PTypes.pop()
         if argumentType != self.currentFunctionParams[self.k][0] : raise TypeError(f"Invalid parameter type for '{argument}' at function call '{self.currentFunctionName}'")  
-        self.generateQuadruple('=', argument, '', self.currentFunctionParams[self.k][1]) # PARAM, Argument, Argument#k // Similar to assignments
+        self.generateQuadruple('=', argument, '(param)', self.currentFunctionParams[self.k][1]) # PARAM, Argument, Argument#k // Similar to assignments
 
 
     def nodoFunctionCallCuatro(self):
