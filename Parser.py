@@ -178,10 +178,6 @@ def p_fact(p):
             | regsim
             | var_cte
             | function_call'''
-    print('PILAO de FACT')
-    print(quadsConstructor.PilaO)
-    print('POPER')
-    print(quadsConstructor.POper)
 
 
 def p_leftparen(p):

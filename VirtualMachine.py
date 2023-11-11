@@ -66,7 +66,8 @@ class VirtualMachine:
             elif isOperand1Str :
                 foundRecursiveVar = False
                 if self.recursiveIteration > 0:
-                    for tuple in self.recursiveTable :
+                    table = self.recursiveTable[-1]
+                    for tuple in table :
                         if operand1 == tuple[1] :
                             foundRecursiveVar = True
                             # Si es una lista de un solo elemento, sacarlo
@@ -99,7 +100,8 @@ class VirtualMachine:
             elif isOperand2Str:
                 foundRecursiveVar = False
                 if self.recursiveIteration > 0:
-                    for tuple in self.symbolTable :
+                    table = self.recursiveTable[-1]
+                    for tuple in table :
                         if operand2 == tuple[1] :
                             foundRecursiveVar = True
                             # Si es una lista de un elemento, sacarlo
@@ -152,18 +154,19 @@ class VirtualMachine:
                     # En caso de estar en una función cualquiera, verificar la variable en su memoria exclusiva/recursiva
                     foundRecursiveVar = False
                     if self.recursiveIteration > 0:
-                        for i, tuple_item in enumerate(self.recursiveTable):
+                        table = self.recursiveTable[-1]
+                        for i, tuple_item in enumerate(table):
                             if target == tuple_item[1]:
                                 foundRecursiveVar = True
-                                currentRow = self.recursiveTable[i]
+                                currentRow = table[i]
                                 # Actualizamos la columna "value"
                                 index_to_change = 6
                                 currentRow = currentRow[:index_to_change] + (operand1,)
-                                self.recursiveTable[i] = currentRow
+                                table[i] = currentRow
                                 # En caso de haberse transformado de INT a FLOAT, actualizar TYPE
                                 if currentRow[0] != operand1.__class__.__name__ :
                                     currentRow = (operand1.__class__.__name__,) + currentRow[1:]
-                                    self.recursiveTable[i] = currentRow
+                                    table[i] = currentRow
                     # Si no se encontró alguna varible en la tabla recursiva, es porque es global o ni siquiera estamos en una función
                     if not foundRecursiveVar:
                         for i, tuple_item in enumerate(self.symbolTable):
@@ -207,8 +210,9 @@ class VirtualMachine:
                 # Meter el salto de la linea en la que estaba...
                 # PJumps... No estoy seguro
             elif operator.lower() == 'endfunc' or operator.lower() == 'return':
-                self.recursiveIteration = 0
-                self.recursiveTable = []
+                print('CACA LOGIC,', self.recursiveIteration)
+                self.recursiveIteration -= 1
+                self.recursiveTable.pop()
                 if self.functionJumps : 
                     self.program_counter = self.functionJumps.pop()
                     continue
@@ -225,9 +229,9 @@ class VirtualMachine:
                 print('Compilation Completed')
             elif operator.lower() == 'era':
                 self.recursiveIteration += 1
-                if self.recursiveIteration > 1 :
-                    self.recursiveTable = [entry for entry in self.recursiveTable if entry[5] == target]
+                if self.recursiveIteration > 1 and self.recursiveTable :
+                    self.recursiveTable.append(self.recursiveTable[-1])
                 else :
-                    self.recursiveTable = [entry for entry in self.symbolTable if entry[5] == target]
+                    self.recursiveTable.append([entry for entry in self.symbolTable if entry[5] == target])
 
             self.program_counter += 1
