@@ -26,15 +26,12 @@ class VirtualMachine:
         self.quadruples = []
         self.symbolTable = []
         self.recursiveTable = [] # Oh boy
-        self.recursiveIteration = 1
-        self.inFunction = False
-        self.currentSymbolTable = []
+        self.recursiveIteration = 0
 
 
     def start(self, quadruples, newSymbolTable):
         self.quadruples = quadruples
         self.symbolTable = newSymbolTable
-        self.currentSymbolTable = newSymbolTable
         self.run()
 
 
@@ -62,21 +59,31 @@ class VirtualMachine:
             isOperand1Str = isinstance(operand1, str)
             isOperand2Str = isinstance(operand2, str)
 
-            print('DEBUG operand1', isOperand1Str)
             # Si nuestro operando izquierdo es un espacio temporal ...
             if isOperand1Str and re.match(r"^t\d+$", operand1) : 
                 operand1 = self.registers[int(operand1[1:])]
             # Si no, debe ser un ID cuyo valor debemos sacar de la SymbolTable
             elif isOperand1Str :
-                for tuple in self.currentSymbolTable :
-                    if operand1 == tuple[1] :
-                        print('DEBUG FOUND!', operand1, tuple[1])
-                        # Si es una lista de un solo elemento, sacarlo
-                        if isinstance(tuple[6], list) and len(tuple[6]) == 1 : operand1 = tuple[6][0]
-                        # Si sufrió alguna actualización antes de aquí, lo más seguro es
-                        # que ya no es una lista de un elemento, sino número o string ...
-                        else : operand1 = tuple[6]
-                        break
+                foundRecursiveVar = False
+                if self.recursiveIteration > 0:
+                    for tuple in self.recursiveTable :
+                        if operand1 == tuple[1] :
+                            foundRecursiveVar = True
+                            # Si es una lista de un solo elemento, sacarlo
+                            if isinstance(tuple[6], list) and len(tuple[6]) == 1 : operand1 = tuple[6][0]
+                            # Si sufrió alguna actualización antes de aquí, lo más seguro es
+                            # que ya no es una lista de un elemento, sino número o string ...
+                            else : operand1 = tuple[6]
+                            break
+                if not foundRecursiveVar:
+                    for tuple in self.symbolTable :
+                        if operand1 == tuple[1] :
+                            # Si es una lista de un solo elemento, sacarlo
+                            if isinstance(tuple[6], list) and len(tuple[6]) == 1 : operand1 = tuple[6][0]
+                            # Si sufrió alguna actualización antes de aquí, lo más seguro es
+                            # que ya no es una lista de un elemento, sino número o string ...
+                            else : operand1 = tuple[6]
+                            break
 
             # Para lidiar con condicionales, el problema de bool() es que si es una string
             # con valor de 'False' la convierte a un booleano True porque lo que checa es que
@@ -90,12 +97,22 @@ class VirtualMachine:
                 operand2 = self.registers[int(operand2[1:])]
             # Si no, debe ser un ID cuyo valor debemos sacar de la SymbolTable
             elif isOperand2Str:
-                for tuple in self.currentSymbolTable :
-                    if operand2 == tuple[1] :
-                        # Si es una lista de un elemento, sacarlo
-                        if isinstance(tuple[6], list) : operand2 = tuple[6][0]
-                        else : operand2 = tuple[6]
-                        break
+                foundRecursiveVar = False
+                if self.recursiveIteration > 0:
+                    for tuple in self.symbolTable :
+                        if operand2 == tuple[1] :
+                            foundRecursiveVar = True
+                            # Si es una lista de un elemento, sacarlo
+                            if isinstance(tuple[6], list) : operand2 = tuple[6][0]
+                            else : operand2 = tuple[6]
+                            break
+                if not foundRecursiveVar:
+                    for tuple in self.symbolTable :
+                        if operand2 == tuple[1] :
+                            # Si es una lista de un elemento, sacarlo
+                            if isinstance(tuple[6], list) : operand2 = tuple[6][0]
+                            else : operand2 = tuple[6]
+                            break
 
             if operand2 == 'True' or operand2 == "False" :
                 operand2 = eval(operand2)
@@ -105,24 +122,21 @@ class VirtualMachine:
 
 
             # ======= REGISTERS ========
-            if operator == '+' :
-                print('debug', operator, operand1, operand2, target) # ! DEBUG
-                pprint.pprint(self.currentSymbolTable)
+            if operator == '+':
                 self.registers[target] = operand1 + operand2
-            elif operator == '-' :
+            elif operator == '-':
                 self.registers[target] = operand1 - operand2
-            elif operator == '*' :
+            elif operator == '*':
                 self.registers[target] = operand1 * operand2
-            elif operator == '**' :
+            elif operator == '**':
                 self.registers[target] = operand1 ** operand2
-            elif operator == '/' :
+            elif operator == '/':
                 self.registers[target] = operand1 / operand2
-            elif operator == '>' :
+            elif operator == '>':
                 self.registers[target] = int(operand1 > operand2)
-            elif operator == '<' :
-                print('debug', operator, operand1, operand2, target) # ! DEBUG
+            elif operator == '<':
                 self.registers[target] = int(operand1 < operand2)
-            elif operator == '<=' :
+            elif operator == '<=':
                 self.registers[target] = int(operand1 <= operand2)
             elif operator == '==':
                 self.registers[target] = bool(operand1) == bool(operand2)
@@ -132,22 +146,37 @@ class VirtualMachine:
                 self.registers[target] = bool(operand1) and bool(operand2)
             if operator == '||':
                 self.registers[target] = bool(operand1) or bool(operand2)
-            elif operator == '=' or operator == '<-' :
-                print('DEBUG', operator, operand1, operand2, target) # ! DEBUG
+            elif operator == '=' or operator == '<-':
                 # Si es un string, es porque a fuerza es un ID ...
                 if target.__class__.__name__ == 'str' :
-                    for i, tuple_item in enumerate(self.currentSymbolTable):
-                        if target == tuple_item[1]:
-                            currentRow = self.currentSymbolTable[i]
-                            # Actualizamos la columna "value"
-                            index_to_change = 6
-                            currentRow = currentRow[:index_to_change] + (operand1,)
-                            self.currentSymbolTable[i] = currentRow
-                            # En caso de haberse transformado de INT a FLOAT, actualizar TYPE
-                            if currentRow[0] != operand1.__class__.__name__ :
-                                currentRow = (operand1.__class__.__name__,) + currentRow[1:]
-                                self.currentSymbolTable[i] = currentRow
-
+                    # En caso de estar en una función cualquiera, verificar la variable en su memoria exclusiva/recursiva
+                    foundRecursiveVar = False
+                    if self.recursiveIteration > 0:
+                        for i, tuple_item in enumerate(self.recursiveTable):
+                            if target == tuple_item[1]:
+                                foundRecursiveVar = True
+                                currentRow = self.recursiveTable[i]
+                                # Actualizamos la columna "value"
+                                index_to_change = 6
+                                currentRow = currentRow[:index_to_change] + (operand1,)
+                                self.recursiveTable[i] = currentRow
+                                # En caso de haberse transformado de INT a FLOAT, actualizar TYPE
+                                if currentRow[0] != operand1.__class__.__name__ :
+                                    currentRow = (operand1.__class__.__name__,) + currentRow[1:]
+                                    self.recursiveTable[i] = currentRow
+                    # Si no se encontró alguna varible en la tabla recursiva, es porque es global o ni siquiera estamos en una función
+                    if not foundRecursiveVar:
+                        for i, tuple_item in enumerate(self.symbolTable):
+                            if target == tuple_item[1]:
+                                currentRow = self.symbolTable[i]
+                                # Actualizamos la columna "value"
+                                index_to_change = 6
+                                currentRow = currentRow[:index_to_change] + (operand1,)
+                                self.symbolTable[i] = currentRow
+                                # En caso de haberse transformado de INT a FLOAT, actualizar TYPE
+                                if currentRow[0] != operand1.__class__.__name__ :
+                                    currentRow = (operand1.__class__.__name__,) + currentRow[1:]
+                                    self.symbolTable[i] = currentRow
                 # Si no, es el index de un espacio temporal
                 else:
                     self.registers[target] = operand1
@@ -178,10 +207,8 @@ class VirtualMachine:
                 # Meter el salto de la linea en la que estaba...
                 # PJumps... No estoy seguro
             elif operator.lower() == 'endfunc' or operator.lower() == 'return':
-                # pprint.pprint(self.recursiveTable) # ! RECURSIVE DEBUG
-                self.recursiveIteration = 1
-                self.inFunction = False
-                self.currentSymbolTable = self.symbolTable
+                self.recursiveIteration = 0
+                self.recursiveTable = []
                 if self.functionJumps : 
                     self.program_counter = self.functionJumps.pop()
                     continue
@@ -194,12 +221,13 @@ class VirtualMachine:
                     for i, item in enumerate(self.quadruples):
                         print(f"{i}: {item}")
                     print("-------------- === Final Symbol Table (Updated Values) === --------------")
-                    pprint.pprint(self.currentSymbolTable)
+                    pprint.pprint(self.symbolTable)
                 print('Compilation Completed')
             elif operator.lower() == 'era':
                 self.recursiveIteration += 1
-                self.inFunction = True
-                self.currentSymbolTable = [entry for entry in self.symbolTable if entry[5] == target]
-                # pprint.pprint(self.recursiveTable) # ! RECURSIVE DEBUG
+                if self.recursiveIteration > 1 :
+                    self.recursiveTable = [entry for entry in self.recursiveTable if entry[5] == target]
+                else :
+                    self.recursiveTable = [entry for entry in self.symbolTable if entry[5] == target]
 
             self.program_counter += 1

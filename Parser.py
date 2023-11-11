@@ -154,6 +154,10 @@ def p_expression(p):
 
 def p_exp(p):
     '''exp : term operator'''
+    print('PILAO de EXP')
+    print(quadsConstructor.PilaO)
+    print('POPER')
+    print(quadsConstructor.POper)
     quadsConstructor.verifySignPlusOrMinus() # If POper.top == '+' or '-' ...
 
 
@@ -174,7 +178,10 @@ def p_fact(p):
             | regsim
             | var_cte
             | function_call'''
-            # ! probablemente aqui puedo anadir function_call si no se complica con var_cte
+    print('PILAO de FACT')
+    print(quadsConstructor.PilaO)
+    print('POPER')
+    print(quadsConstructor.POper)
 
 
 def p_leftparen(p):
@@ -298,6 +305,10 @@ def p_operator(p):
     '''operator : plus term operator
                 | minus term operator
                 | empty'''
+    print('PILAO de Operator')
+    print(quadsConstructor.PilaO)
+    print('POPER')
+    print(quadsConstructor.POper)
     quadsConstructor.verifySignPlusOrMinus() ## ! CREO ESTO ARREGLA EXPRESIONES LINEALES O ROMPE MAS
 
 
