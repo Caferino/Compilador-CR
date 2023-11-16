@@ -11,4 +11,4 @@ int fibonacci(int n) {
 
 result = fibonacci(10);
 
-# print(result); # La prueba final
+print(result); # La prueba final

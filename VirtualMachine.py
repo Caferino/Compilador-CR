@@ -210,7 +210,8 @@ class VirtualMachine:
                 # Meter el salto de la linea en la que estaba...
                 # PJumps... No estoy seguro
             elif operator.lower() == 'endfunc' or operator.lower() == 'return':
-                print('CACA LOGIC,', self.recursiveIteration)
+                print('RETURN LOGIC,', operator, self.recursiveIteration)
+                # ! MI return deberia meter el resultado a la PilaO... como llegan alli?
                 self.recursiveIteration -= 1
                 self.recursiveTable.pop()
                 if self.functionJumps : 
