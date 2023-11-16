@@ -81,14 +81,11 @@ class Quadruples:
         elif token == 'True' or token == 'False':
             self.PilaO.append(token)
             self.PTypes.append('bool')
-
-        else:
-            # Si no, es un ID cuyo tipo debemos buscar
-
-            # En caso de ser una matriz, sacamos la dirección del valor
-            isMatrix = False
+        
+        else:   # Si no, es un ID cuyo tipo debemos buscar
+            isMatrix = False   # En caso de ser una matriz, sacamos la dirección del valor
             if '[' in token :
-                isMatrix = True
+                isMatrix = True        
                 # Separamos el nombre de las dimensiones
                 varName = token
                 varNameIndex = varName.index('[')
@@ -124,8 +121,8 @@ class Quadruples:
                     break
 
                 elif token == tuple[1]:   ## Posición del ID en la symbolTable
-                    self.PilaO.append(token) # Mis cuádruplos se benefician con su nombre
-                    self.PTypes.append(tuple[0]) # Posición del tipo
+                    self.PilaO.append(token)   # Mis cuádruplos se benefician con su nombre
+                    self.PTypes.append(tuple[0])   # Posición del tipo
                     break
     
                 # Si llegamos a la última tupla y aún no existe la variable...
@@ -319,7 +316,7 @@ class Quadruples:
         argument = self.PilaO.pop()
         argumentType = self.PTypes.pop()
         if argumentType != self.currentFunctionParams[self.k][0] : raise TypeError(f"Invalid parameter type for '{argument}' at function call '{self.currentFunctionName}'")  
-        self.generateQuadruple('=', argument, 'caca', self.currentFunctionParams[self.k][1]) # PARAM, Argument, Argument#k // Similar to assignments
+        self.generateQuadruple('=', argument, '(param)', self.currentFunctionParams[self.k][1]) # PARAM, Argument, Argument#k // Similar to assignments
 
 
     def nodoFunctionCallCuatro(self):

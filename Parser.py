@@ -46,11 +46,6 @@ def p_statement(p):
                  | return
                  | plot
                  | empty'''
-                 # ! Hice un movimiento loco:
-                 # ! Debajo de assigment_block borré '| expression' y todo siguió funcionando igual...
-                 # ! Lo borré porque no permitía, de alguna manera, que function_call funcione, creo por ser similares en función
-                 # ! Si de verdad llegara a necesitarlo aquí, puedo intentar poner function_call en p_block, '| function_call block'
-                 # !!! Esto hace que no sea valido tener expresiones sin asignarlas a alguien en mi lenguaje
 
 
 # ╭───────────────────────────╮
@@ -154,6 +149,10 @@ def p_expression(p):
 
 def p_exp(p):
     '''exp : term operator'''
+    print('PILAO de EXP')
+    print(quadsConstructor.PilaO)
+    print('POPER')
+    print(quadsConstructor.POper)
     quadsConstructor.verifySignPlusOrMinus() # If POper.top == '+' or '-' ...
 
 
@@ -174,7 +173,6 @@ def p_fact(p):
             | regsim
             | var_cte
             | function_call'''
-            # ! probablemente aqui puedo anadir function_call si no se complica con var_cte
 
 
 def p_leftparen(p):
@@ -192,6 +190,7 @@ def p_term_operator(p):
                      | modulus fact term_operator
                      | empty'''
     quadsConstructor.verifySignTimesOrDivide() ## ! CREO ESTO ARREGLA EXPRESIONES LINEALES O ROMPE MAS
+
 
 def p_exponential(p):
     '''exponential : EXPONENTIAL'''
@@ -227,7 +226,7 @@ def p_var_cte(p):
 def p_var_id(p):
     '''var_id : ID'''
     rules.p_saveValue(p)
-    quadsConstructor.insertTypeAndID(p[1]) # ! Nuestro lexer lidia con los números y strings
+    quadsConstructor.insertTypeAndID(p[1]) # Nuestro lexer lidia con los números y strings
                
                
 def p_var_ctei(p):
@@ -257,7 +256,7 @@ def p_comparation(p):
                    | notequal exp
                    | notequalnum exp
                    | empty'''
-    quadsConstructor.verifyConditionals() ## ! CREO ESTO ARREGLA EXPRESIONES LINEALES O ROMPE MAS
+    quadsConstructor.verifyConditionals() # ! CREO ESTO ARREGLA EXPRESIONES LINEALES O ROMPE MAS
 
 
 def p_and(p):
@@ -298,6 +297,12 @@ def p_operator(p):
     '''operator : plus term operator
                 | minus term operator
                 | empty'''
+    print('PILAO de Operator')
+    print(quadsConstructor.PilaO)
+    print('POPER')
+    print(quadsConstructor.POper)
+    #! if NOT inFunctionCall/return (encendido en fcn call onentwo y apagado en elfcncallsix) ejecutar el verifyPlus
+    #! Tal vez ocupe ponerlos en los tres verifies 'extras'
     quadsConstructor.verifySignPlusOrMinus() ## ! CREO ESTO ARREGLA EXPRESIONES LINEALES O ROMPE MAS
 
 
