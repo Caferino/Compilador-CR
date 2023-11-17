@@ -212,6 +212,10 @@ class VirtualMachine:
             elif operator.lower() == 'endfunc' or operator.lower() == 'return':
                 print('RETURN LOGIC,', operator, self.recursiveIteration)
                 # ! MI return deberia meter el resultado a la PilaO... como llegan alli?
+                # ! Posible solucion:
+                if operator.lower() == 'return' : 
+                    print('DEBUG RETURN', operator, operand1, operand2, target)
+                    # ! Meter a PilaO para que se utilice en expresión o asignación, ¿no?
                 self.recursiveIteration -= 1
                 self.recursiveTable.pop()
                 if self.functionJumps : 

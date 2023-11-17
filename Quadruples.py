@@ -316,7 +316,7 @@ class Quadruples:
         argument = self.PilaO.pop()
         argumentType = self.PTypes.pop()
         if argumentType != self.currentFunctionParams[self.k][0] : raise TypeError(f"Invalid parameter type for '{argument}' at function call '{self.currentFunctionName}'")  
-        self.generateQuadruple('=', argument, '(param)', self.currentFunctionParams[self.k][1]) # PARAM, Argument, Argument#k // Similar to assignments
+        self.generateQuadruple('=', argument, '', self.currentFunctionParams[self.k][1]) # PARAM, Argument, Argument#k // Similar to assignments
 
 
     def nodoFunctionCallCuatro(self):
@@ -466,6 +466,7 @@ class Quadruples:
             
     # ------ 3. Returns ------ #    
     def verifyReturn(self, p, currentFunctionName, currentFunctionType):
+        # Error checking
         # Si p[2] es un ';' es porque no hay valor qué regresar
         if p[2] == ';' and currentFunctionType.lower() != 'void' : raise TypeError(f"Function '{currentFunctionName}' of type '{currentFunctionType}' should return a value!")
         elif len(p) > 3 and currentFunctionType.lower() == 'void' : raise TypeError(f"Void function '{currentFunctionName}' should NOT return any value!")
@@ -476,7 +477,8 @@ class Quadruples:
     def endReturnFunction(self):
         end = self.PJumps[-1]
         self.fill(end, self.cont + 1)
-        self.generateQuadruple('RETURN', '', '', '')
+        self.generateQuadruple('RETURN', '', self.PTypes[-1], self.PilaO[-1])
+        print('DEBUG RETURN QUADRUPLES', self.PilaO)
         
 
 

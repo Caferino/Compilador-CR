@@ -149,10 +149,9 @@ def p_expression(p):
 
 def p_exp(p):
     '''exp : term operator'''
-    print('PILAO de EXP')
-    print(quadsConstructor.PilaO)
-    print('POPER')
-    print(quadsConstructor.POper)
+    print('EXP -----')
+    print('PILAO:', quadsConstructor.PilaO)
+    print('POPER:', quadsConstructor.POper)
     quadsConstructor.verifySignPlusOrMinus() # If POper.top == '+' or '-' ...
 
 
@@ -184,12 +183,12 @@ def p_rightparen(p):
 
     
 def p_term_operator(p):
-    '''term_operator : exponential fact term_operator
-                     | times fact term_operator
-                     | divide fact term_operator
-                     | modulus fact term_operator
+    '''term_operator : exponential term
+                     | times term
+                     | divide term
+                     | modulus term
                      | empty'''
-    quadsConstructor.verifySignTimesOrDivide() ## ! CREO ESTO ARREGLA EXPRESIONES LINEALES O ROMPE MAS
+    # quadsConstructor.verifySignTimesOrDivide() ## ! CREO ESTO ARREGLA EXPRESIONES LINEALES O ROMPE MAS
 
 
 def p_exponential(p):
@@ -249,14 +248,14 @@ def p_var_string(p):
 # ╰───────────────────────────╯
 
 def p_comparation(p):
-    '''comparation : and exp
-                   | or exp
-                   | greater exp
-                   | less exp
-                   | notequal exp
-                   | notequalnum exp
+    '''comparation : and expression
+                   | or expression
+                   | greater expression
+                   | less expression
+                   | notequal expression
+                   | notequalnum expression
                    | empty'''
-    quadsConstructor.verifyConditionals() # ! CREO ESTO ARREGLA EXPRESIONES LINEALES O ROMPE MAS
+    # quadsConstructor.verifyConditionals() # ! CREO ESTO ARREGLA EXPRESIONES LINEALES O ROMPE MAS
 
 
 def p_and(p):
@@ -294,16 +293,12 @@ def p_notequalnum(p):
 # ╰───────────────────────────╯
 
 def p_operator(p):
-    '''operator : plus term operator
-                | minus term operator
+    '''operator : plus exp
+                | minus exp
                 | empty'''
-    print('PILAO de Operator')
-    print(quadsConstructor.PilaO)
-    print('POPER')
-    print(quadsConstructor.POper)
     #! if NOT inFunctionCall/return (encendido en fcn call onentwo y apagado en elfcncallsix) ejecutar el verifyPlus
     #! Tal vez ocupe ponerlos en los tres verifies 'extras'
-    quadsConstructor.verifySignPlusOrMinus() ## ! CREO ESTO ARREGLA EXPRESIONES LINEALES O ROMPE MAS
+    # if len(p) > 2 : quadsConstructor.verifySignPlusOrMinus() ## ! CREO ESTO ARREGLA EXPRESIONES LINEALES O ROMPE MAS
 
 
 def p_plus(p):
