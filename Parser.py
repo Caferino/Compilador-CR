@@ -188,7 +188,6 @@ def p_term_operator(p):
                      | divide term
                      | modulus term
                      | empty'''
-    # quadsConstructor.verifySignTimesOrDivide() ## ! CREO ESTO ARREGLA EXPRESIONES LINEALES O ROMPE MAS
 
 
 def p_exponential(p):
@@ -255,7 +254,6 @@ def p_comparation(p):
                    | notequal expression
                    | notequalnum expression
                    | empty'''
-    # quadsConstructor.verifyConditionals() # ! CREO ESTO ARREGLA EXPRESIONES LINEALES O ROMPE MAS
 
 
 def p_and(p):
@@ -296,9 +294,6 @@ def p_operator(p):
     '''operator : plus exp
                 | minus exp
                 | empty'''
-    #! if NOT inFunctionCall/return (encendido en fcn call onentwo y apagado en elfcncallsix) ejecutar el verifyPlus
-    #! Tal vez ocupe ponerlos en los tres verifies 'extras'
-    # if len(p) > 2 : quadsConstructor.verifySignPlusOrMinus() ## ! CREO ESTO ARREGLA EXPRESIONES LINEALES O ROMPE MAS
 
 
 def p_plus(p):
