@@ -10,9 +10,8 @@
 # ======================== Virtual Machine ======================== #
 
 from functools import reduce
-"""import operator
-import sys""" # ! Borrar
 import pprint
+import copy
 import re
 
 class VirtualMachine:
@@ -20,13 +19,13 @@ class VirtualMachine:
         self.memorySize = 500
         self.registers = [None] * self.memorySize
         self.registers[0] = "GOTO MAIN"
-        self.stack = [] # ! Donde se usa??
         self.functionJumps = []
         self.program_counter = 0
         self.quadruples = []
         self.symbolTable = []
         self.recursiveTable = [] # Oh boy
         self.recursiveIteration = 0
+        self.recursiveResult = 0
 
 
     def start(self, quadruples, newSymbolTable):
@@ -43,8 +42,6 @@ class VirtualMachine:
         Output: Resultados del programa.
         '''
         
-        # ! IMP - Tal vez, para incluir recursion, desde acá tendré que checar si mi memoria auxiliar
-        # ! de la recursion '#x' tiene datos, y por ende debería usarlos...
         while self.program_counter < len(self.quadruples):
             quadruple = self.quadruples[self.program_counter]
             operator, operand1, operand2, target = quadruple
@@ -121,12 +118,15 @@ class VirtualMachine:
 
             if operand1 == None : operand1 = 1
             if operand2 == None : operand2 = 1
-
+            
+            
 
             # ======= REGISTERS ========
             if operator == '+':
                 self.registers[target] = operand1 + operand2
             elif operator == '-':
+                print('DEBUG MINUS', operator, operand1, operand2, target)
+                if operand1 == 1 or operand1 > 5 : pprint.pprint(self.recursiveTable)
                 self.registers[target] = operand1 - operand2
             elif operator == '*':
                 self.registers[target] = operand1 * operand2
@@ -154,7 +154,7 @@ class VirtualMachine:
                     # En caso de estar en una función cualquiera, verificar la variable en su memoria exclusiva/recursiva
                     foundRecursiveVar = False
                     if self.recursiveIteration > 0:
-                        table = self.recursiveTable[-1]
+                        table = copy.deepcopy(self.recursiveTable.pop()) # [-1], Pop y append no funcionaron, esta libreria fue obligatoria
                         for i, tuple_item in enumerate(table):
                             if target == tuple_item[1]:
                                 foundRecursiveVar = True
@@ -167,6 +167,8 @@ class VirtualMachine:
                                 if currentRow[0] != operand1.__class__.__name__ :
                                     currentRow = (operand1.__class__.__name__,) + currentRow[1:]
                                     table[i] = currentRow
+                                    
+                        self.recursiveTable.append(table) # Esto fue lo que resolvió la recursión compleja, me llevó días
                     # Si no se encontró alguna varible en la tabla recursiva, es porque es global o ni siquiera estamos en una función
                     if not foundRecursiveVar:
                         for i, tuple_item in enumerate(self.symbolTable):
@@ -210,12 +212,25 @@ class VirtualMachine:
                 # Meter el salto de la linea en la que estaba...
                 # PJumps... No estoy seguro
             elif operator.lower() == 'endfunc' or operator.lower() == 'return':
-                print('RETURN LOGIC,', operator, self.recursiveIteration)
-                # ! MI return deberia meter el resultado a la PilaO... como llegan alli?
-                # ! Posible solucion:
-                if operator.lower() == 'return' : 
-                    print('DEBUG RETURN', operator, operand1, operand2, target)
-                    # ! Meter a PilaO para que se utilice en expresión o asignación, ¿no?
+                print('DEBUG LOGIC:', 'op:', operator, 'ope1:', operand1, 'ope2:', operand2, 'tar:', target, 'recT:', self.recursiveIteration) # ! DEBUG 
+                # ! Mi return deberia meter el resultado al REGISTER apropiado... como?
+                if operator.lower() == 'return' :
+                    # Si es un string, es porque a fuerza es un ID ...
+                    if target.__class__.__name__ == 'str' :
+                        # En caso de estar en una función cualquiera, verificar la variable en su memoria exclusiva/recursiva
+                        foundRecursiveVar = False
+                        if self.recursiveIteration > 0:
+                            table = self.recursiveTable[-1]
+                            for i, tuple_item in enumerate(table):
+                                if target == tuple_item[1]:
+                                    foundRecursiveVar = True
+                                    if tuple_item[6] == 1 : self.recursiveResult += tuple_item[6]
+                        # Si no se encontró alguna varible en la tabla recursiva, es porque es global o ni siquiera estamos en una función
+                        if not foundRecursiveVar:
+                            for i, tuple_item in enumerate(self.symbolTable):
+                                if target == tuple_item[1]:
+                                    if tuple_item[6] == 1 : self.recursiveResult += tuple_item[6]
+                    
                 self.recursiveIteration -= 1
                 self.recursiveTable.pop()
                 if self.functionJumps : 
@@ -231,12 +246,14 @@ class VirtualMachine:
                         print(f"{i}: {item}")
                     print("-------------- === Final Symbol Table (Updated Values) === --------------")
                     pprint.pprint(self.symbolTable)
+                print('Recursive Result:', self.recursiveResult)
                 print('Compilation Completed')
             elif operator.lower() == 'era':
                 self.recursiveIteration += 1
                 if self.recursiveIteration > 1 and self.recursiveTable :
                     self.recursiveTable.append(self.recursiveTable[-1])
                 else :
+                    self.recursiveResult = 0
                     self.recursiveTable.append([entry for entry in self.symbolTable if entry[5] == target])
 
             self.program_counter += 1

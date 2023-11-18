@@ -68,6 +68,7 @@ class Quadruples:
         self.currentFunctionType = ''
         self.currentFunctionPosition = None
         self.currentFunctionParams = []
+        self.inFunction = False
 
 
     # ------------------ EXPRESIONES LINEALES ------------------ #
@@ -286,6 +287,7 @@ class Quadruples:
     def nodogosub(self):
         self.PJumps.append(self.cont)
         self.generateQuadruple('GOTO', '', '', 'linePlaceholder')
+        self.inFunction = True
 
 
 
@@ -313,8 +315,12 @@ class Quadruples:
 
 
     def nodoFunctionCallTres(self):
-        argument = self.PilaO.pop()
-        argumentType = self.PTypes.pop()
+        if self.inFunction : 
+            argument = self.PilaO[-1]   # ! DEBUG USAR [-1] SOLO AL ESTAR ADENTRO DE LA DECLARACION DE UNA FUNCION
+            argumentType = self.PTypes[-1] 
+        else : 
+            argument = self.PilaO.pop()   # ! DEBUG USAR [-1] SOLO AL ESTAR ADENTRO DE LA DECLARACION DE UNA FUNCION
+            argumentType = self.PTypes.pop()
         if argumentType != self.currentFunctionParams[self.k][0] : raise TypeError(f"Invalid parameter type for '{argument}' at function call '{self.currentFunctionName}'")  
         self.generateQuadruple('=', argument, '', self.currentFunctionParams[self.k][1]) # PARAM, Argument, Argument#k // Similar to assignments
 
@@ -477,8 +483,7 @@ class Quadruples:
     def endReturnFunction(self):
         end = self.PJumps[-1]
         self.fill(end, self.cont + 1)
-        self.generateQuadruple('RETURN', '', self.PTypes[-1], self.PilaO[-1])
-        print('DEBUG RETURN QUADRUPLES', self.PilaO)
+        self.generateQuadruple('RETURN', '', '', self.PilaO[-1])
         
 
 
@@ -495,6 +500,7 @@ class Quadruples:
         end = self.PJumps.pop()
         self.fill(end, self.cont + 1)
         self.generateQuadruple('ENDFUNC', '', '', '')
+        self.inFunction = False
 
 
     # ------ Llenado de líneas de salto para GOTOF y GOTOV ------ #

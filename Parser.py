@@ -144,20 +144,17 @@ def p_semicolon(p):
 
 def p_expression(p):
     '''expression : exp comparation'''
-    quadsConstructor.verifyConditionals() # If POper.top == '<' or '>' ...
+    # ! quadsConstructor.verifyConditionals() # If POper.top == '<' or '>' ...
 
 
 def p_exp(p):
     '''exp : term operator'''
-    print('EXP -----')
-    print('PILAO:', quadsConstructor.PilaO)
-    print('POPER:', quadsConstructor.POper)
-    quadsConstructor.verifySignPlusOrMinus() # If POper.top == '+' or '-' ...
+    # ! quadsConstructor.verifySignPlusOrMinus() # If POper.top == '+' or '-' ...
 
 
 def p_term(p):
     '''term : fact term_operator'''
-    quadsConstructor.verifySignTimesOrDivide() # If POper.top == '*' or '/' ...
+    # ! quadsConstructor.verifySignTimesOrDivide() # If POper.top == '*' or '/' ...
 
 
 # ╭───────────────────────────╮
@@ -188,6 +185,7 @@ def p_term_operator(p):
                      | divide term
                      | modulus term
                      | empty'''
+    if len(p) > 2 : quadsConstructor.verifySignTimesOrDivide() # If POper.top == '*' or '/' ...
 
 
 def p_exponential(p):
@@ -224,7 +222,7 @@ def p_var_cte(p):
 def p_var_id(p):
     '''var_id : ID'''
     rules.p_saveValue(p)
-    quadsConstructor.insertTypeAndID(p[1]) # Nuestro lexer lidia con los números y strings
+    quadsConstructor.insertTypeAndID(p[1])   # Nuestro lexer lidia con los números y strings
                
                
 def p_var_ctei(p):
@@ -253,7 +251,9 @@ def p_comparation(p):
                    | less expression
                    | notequal expression
                    | notequalnum expression
+                   | islessorequal expression
                    | empty'''
+    if len(p) > 2 : quadsConstructor.verifyConditionals() # If POper.top == '<' or '>' ...
 
 
 def p_and(p):
@@ -284,6 +284,11 @@ def p_notequal(p):
 def p_notequalnum(p):
     '''notequalnum : NOTEQUALNUM'''
     quadsConstructor.insertSign(p[1])
+    
+    
+def p_islessorequal(p):
+    '''islessorequal : ISLESSOREQUAL'''
+    quadsConstructor.insertSign(p[1])
 
 
 # ╭───────────────────────────╮
@@ -294,6 +299,7 @@ def p_operator(p):
     '''operator : plus exp
                 | minus exp
                 | empty'''
+    if len(p) > 2 : quadsConstructor.verifySignPlusOrMinus() # If POper.top == '+' or '-' ...
 
 
 def p_plus(p):
