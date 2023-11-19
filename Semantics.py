@@ -26,7 +26,7 @@ memory = MemoryMap()
 class Rules:
     def __init__(self):
         # ========================== Debugging Mode # ! Set to True to turn it ON, otherwise False
-        self.debugMode = True
+        self.debugMode = False
         
         # Temporales
         self.type = ''

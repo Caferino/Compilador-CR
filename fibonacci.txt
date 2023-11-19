@@ -1,7 +1,7 @@
-int result = 0;
+int result = 1;
 
 int fibonacci(int n) {
-    print(n);
+    # print(n); # DEBUG
     if (n < 2) {
         return n;
     } else {
@@ -11,4 +11,4 @@ int fibonacci(int n) {
 
 result = fibonacci(10);
 
-print(result); # La prueba final
+print("Resultado:", result); # La prueba final

@@ -14,5 +14,9 @@ else{
     print(0);
 }
 
-// ! TODO - Arreglar impresión de strings... los añadí (y quité) 
-// de var_cte en parser.py, pero algo faltó
+if(booleanoT && (booleanoF || (booleanoT && (booleanoT && booleanoT && booleanoT && booleanoT || booleanoF)))) {
+    print("Success!");
+}
+else {
+    print("Hmm...");
+}

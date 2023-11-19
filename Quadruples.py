@@ -12,6 +12,7 @@
 from VirtualMachine import VirtualMachine
 from functools import reduce
 import SemanticCube
+import shlex
 import re
 
 virtualMachine = VirtualMachine()
@@ -68,6 +69,7 @@ class Quadruples:
         self.currentFunctionType = ''
         self.currentFunctionPosition = None
         self.currentFunctionParams = []
+        self.inFunction = False
 
 
     # ------------------ EXPRESIONES LINEALES ------------------ #
@@ -286,6 +288,7 @@ class Quadruples:
     def nodogosub(self):
         self.PJumps.append(self.cont)
         self.generateQuadruple('GOTO', '', '', 'linePlaceholder')
+        self.inFunction = True
 
 
 
@@ -313,11 +316,15 @@ class Quadruples:
 
 
     def nodoFunctionCallTres(self):
-        argument = self.PilaO.pop()
+        """if self.inFunction : 
+            argument = self.PilaO[-1]   # ! DEBUG USAR [-1] SOLO AL ESTAR ADENTRO DE LA DECLARACION DE UNA FUNCION
+            argumentType = self.PTypes[-1] 
+        else : """
+        argument = self.PilaO.pop()   # ! DEBUG TAL VEZ DEBO USAR [-1] SOLO AL ESTAR ADENTRO DE LA DECLARACION DE UNA FUNCION
         argumentType = self.PTypes.pop()
         if argumentType != self.currentFunctionParams[self.k][0] : raise TypeError(f"Invalid parameter type for '{argument}' at function call '{self.currentFunctionName}'")  
-        self.generateQuadruple('=', argument, '(param)', self.currentFunctionParams[self.k][1]) # PARAM, Argument, Argument#k // Similar to assignments
-
+        self.generateQuadruple('=', argument, '', self.currentFunctionParams[self.k][1]) # PARAM, Argument, Argument#k // Similar to assignments
+        
 
     def nodoFunctionCallCuatro(self):
         self.k = self.k + 1
@@ -337,7 +344,10 @@ class Quadruples:
 
 
     def nodoFunctionCallSeis(self):
-        self.generateQuadruple('GOSUB', self.currentFunctionName, quadsConstructor.cont + 1, self.currentFunctionPosition)
+        result = Avail.next()
+        self.generateQuadruple('GOSUB', result, quadsConstructor.cont + 1, self.currentFunctionPosition)
+        self.PilaO.append(result)
+        self.PTypes.append(self.currentFunctionType)
 
 
 
@@ -360,13 +370,14 @@ class Quadruples:
                 left_Type = self.PTypes.pop()
 
                 operator = self.POper.pop()
-                result_Type = SemanticCube.Semantics(left_Type, right_Type, operator)
+                result_Type = SemanticCube.Semantics(left_Type, right_Type, operator)   # ! Creo no hace nada o no sirve, CUIDA result_Type al borar
                 
                 if self.extraStringsForPrint > 1 :
                     words = ''
                     varName = None
                     while self.extraStringsForPrint > 0 :
-                        if '"' not in str(left_operand) :
+                        print('DEBUG STRING', left_operand)
+                        if '"' not in str(left_operand) and "'" not in str(left_operand) :
                             # En caso de ser una matriz, sacamos la dirección del valor
                             if '[' in str(left_operand) :
                                 # Separamos el nombre de las dimensiones
@@ -384,7 +395,8 @@ class Quadruples:
                             # Lo buscamos en la symbolTable
                             for tuple in self.symbolTable :
                                 if left_operand == tuple[1] :
-                                    words += (' ' + str(tuple[6][0]).strip('"'))
+                                    # words += (' ' + str(tuple[6][0]).strip('"'))   # ! OLD
+                                    words += (' ' + str(left_operand).strip('"'))
                                     break
                                 elif varName == tuple[1] :
                                     if len(indices) == 1 :
@@ -401,12 +413,14 @@ class Quadruples:
                                 elif tuple == self.symbolTable[-1] :
                                     words += (' ' + str(left_operand))
                         else :
-                            words += (' ' + left_operand.strip('"'))
+                            words += (' ' + left_operand)
                         left_operand = self.PilaO.pop()
                         left_type = self.PTypes.pop()
                         self.extraStringsForPrint -= 1
                     
-                    words = words.split()
+                    print('1. Words:', words)
+                    words = shlex.split(words)
+                    print('2. Words:', words)
                     left_operand = words
                     self.extraStringsForPrint = 1
                     
@@ -423,9 +437,9 @@ class Quadruples:
                     raise TypeError(f"Type mismatch in: '{left_operand} {operator} {right_operand}' ({left_Type} ≠ {right_Type})")
 
 
-    def insertPrintString(self, string):
+    """def insertPrintString(self, string):
         self.PilaO.append(string)
-        self.PTypes.append('char')
+        self.PTypes.append('char')""" # ! BORRAR
 
 
     # ------ 2. Assignments ------ #
@@ -466,6 +480,7 @@ class Quadruples:
             
     # ------ 3. Returns ------ #    
     def verifyReturn(self, p, currentFunctionName, currentFunctionType):
+        # Error checking
         # Si p[2] es un ';' es porque no hay valor qué regresar
         if p[2] == ';' and currentFunctionType.lower() != 'void' : raise TypeError(f"Function '{currentFunctionName}' of type '{currentFunctionType}' should return a value!")
         elif len(p) > 3 and currentFunctionType.lower() == 'void' : raise TypeError(f"Void function '{currentFunctionName}' should NOT return any value!")
@@ -476,7 +491,7 @@ class Quadruples:
     def endReturnFunction(self):
         end = self.PJumps[-1]
         self.fill(end, self.cont + 1)
-        self.generateQuadruple('RETURN', '', '', '')
+        self.generateQuadruple('RETURN', '', '', self.PilaO[-1])
         
 
 
@@ -493,6 +508,8 @@ class Quadruples:
         end = self.PJumps.pop()
         self.fill(end, self.cont + 1)
         self.generateQuadruple('ENDFUNC', '', '', '')
+        self.inFunction = False
+        Avail.temporales = []    # ! DEBUG Posible solucion
 
 
     # ------ Llenado de líneas de salto para GOTOF y GOTOV ------ #
