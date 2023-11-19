@@ -219,10 +219,33 @@ class VirtualMachine:
                 else : self.program_counter += 1
                 continue
             elif operator.lower() == 'print':
+                # ! ARREGLR, AHORA RECIBE VARIABLES TAMBIEN, DEBEMOS EXTRAERLAS AQUI O CREO YA ESTA HECHO ESO
                 if isinstance(operand1, list):
                     for index, element in enumerate(operand1) :
+                        print('ELEMENT:', element)
                         if isinstance(element, str) and re.match(r"^t\d+$", element) : 
-                            operand1[index] = str(self.registers[int(element[1:])])
+                            if len(self.recursiveRegisters) > 0 : operand1[index] = str(self.recursiveRegisters[-1][int(element[1:])])
+                            else : operand1[index] = str(self.registers[int(element[1:])])
+                        elif isinstance(element, str) and '"' not in element and "'" not in element :
+                            print('SACAR VARIABLE') # ! DEBUG
+                            # En caso de estar en una función cualquiera, verificar la variable en su memoria exclusiva/recursiva
+                            foundRecursiveVar = False
+                            if self.recursiveIteration > 0:
+                                table = self.recursiveTable[-1]
+                                for i, tuple_item in enumerate(table):
+                                    if element == tuple_item[1]:
+                                        foundRecursiveVar = True
+                                        operand1[index] = str(tuple_item[6])
+                            # Si no se encontró alguna variable en la tabla recursiva, es porque es global o ni siquiera estamos en una función
+                            if not foundRecursiveVar:
+                                for i, tuple_item in enumerate(self.symbolTable):
+                                    if element == tuple_item[1]:
+                                        operand1[index] = str(tuple_item[6])
+                        elif '"' in element :
+                            operand1[index] = element.strip('"')
+                        elif "'" in element :
+                            operand1[index] = element.strip("'")
+                                        
                     operand1 = " ".join(reversed(operand1))
                 print(operand1.strip('"')) if operand1.__class__.__name__ == 'str' else print(operand1)
             elif operator.lower() == 'gosub':

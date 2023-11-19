@@ -369,13 +369,13 @@ class Quadruples:
                 left_Type = self.PTypes.pop()
 
                 operator = self.POper.pop()
-                result_Type = SemanticCube.Semantics(left_Type, right_Type, operator)
+                result_Type = SemanticCube.Semantics(left_Type, right_Type, operator)   # ! Creo no hace nada o no sirve, CUIDA result_Type al borar
                 
                 if self.extraStringsForPrint > 1 :
                     words = ''
                     varName = None
                     while self.extraStringsForPrint > 0 :
-                        if '"' not in str(left_operand) :
+                        if '"' not in str(left_operand) and "'" not in str(left_operand) :
                             # En caso de ser una matriz, sacamos la dirección del valor
                             if '[' in str(left_operand) :
                                 # Separamos el nombre de las dimensiones
@@ -393,7 +393,8 @@ class Quadruples:
                             # Lo buscamos en la symbolTable
                             for tuple in self.symbolTable :
                                 if left_operand == tuple[1] :
-                                    words += (' ' + str(tuple[6][0]).strip('"'))
+                                    # words += (' ' + str(tuple[6][0]).strip('"'))   # ! OLD
+                                    words += (' ' + str(left_operand).strip('"'))
                                     break
                                 elif varName == tuple[1] :
                                     if len(indices) == 1 :
@@ -410,7 +411,7 @@ class Quadruples:
                                 elif tuple == self.symbolTable[-1] :
                                     words += (' ' + str(left_operand))
                         else :
-                            words += (' ' + left_operand.strip('"'))
+                            words += (' ' + left_operand)
                         left_operand = self.PilaO.pop()
                         left_type = self.PTypes.pop()
                         self.extraStringsForPrint -= 1
