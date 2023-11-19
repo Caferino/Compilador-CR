@@ -315,15 +315,15 @@ class Quadruples:
 
 
     def nodoFunctionCallTres(self):
-        if self.inFunction : 
+        """if self.inFunction : 
             argument = self.PilaO[-1]   # ! DEBUG USAR [-1] SOLO AL ESTAR ADENTRO DE LA DECLARACION DE UNA FUNCION
             argumentType = self.PTypes[-1] 
-        else : 
-            argument = self.PilaO.pop()   # ! DEBUG USAR [-1] SOLO AL ESTAR ADENTRO DE LA DECLARACION DE UNA FUNCION
-            argumentType = self.PTypes.pop()
+        else : """
+        argument = self.PilaO.pop()   # ! DEBUG TAL VEZ DEBO USAR [-1] SOLO AL ESTAR ADENTRO DE LA DECLARACION DE UNA FUNCION
+        argumentType = self.PTypes.pop()
         if argumentType != self.currentFunctionParams[self.k][0] : raise TypeError(f"Invalid parameter type for '{argument}' at function call '{self.currentFunctionName}'")  
         self.generateQuadruple('=', argument, '', self.currentFunctionParams[self.k][1]) # PARAM, Argument, Argument#k // Similar to assignments
-
+        
 
     def nodoFunctionCallCuatro(self):
         self.k = self.k + 1
@@ -343,7 +343,10 @@ class Quadruples:
 
 
     def nodoFunctionCallSeis(self):
-        self.generateQuadruple('GOSUB', self.currentFunctionName, quadsConstructor.cont + 1, self.currentFunctionPosition)
+        result = Avail.next()
+        self.generateQuadruple('GOSUB', result, quadsConstructor.cont + 1, self.currentFunctionPosition)
+        self.PilaO.append(result)
+        self.PTypes.append(self.currentFunctionType)
 
 
 
@@ -429,9 +432,9 @@ class Quadruples:
                     raise TypeError(f"Type mismatch in: '{left_operand} {operator} {right_operand}' ({left_Type} ≠ {right_Type})")
 
 
-    def insertPrintString(self, string):
+    """def insertPrintString(self, string):
         self.PilaO.append(string)
-        self.PTypes.append('char')
+        self.PTypes.append('char')""" # ! BORRAR
 
 
     # ------ 2. Assignments ------ #
@@ -501,6 +504,7 @@ class Quadruples:
         self.fill(end, self.cont + 1)
         self.generateQuadruple('ENDFUNC', '', '', '')
         self.inFunction = False
+        Avail.temporales = []    # ! DEBUG Posible solucion
 
 
     # ------ Llenado de líneas de salto para GOTOF y GOTOV ------ #
