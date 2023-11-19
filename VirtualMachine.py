@@ -16,7 +16,7 @@ import re
 
 class VirtualMachine:
     def __init__(self):
-        self.memorySize = 8    # ! DEFAULT: 500 IMPORTAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAANTE!!!!!!!!!!!!
+        self.memorySize = 500 # ! MUY IMPORTANTE CUIDAR ESTO, SI SALE "IndexError: list assignment index out of range" PUEDE SER AQUI
         self.registers = [None] * self.memorySize
         self.registers[0] = "GOTO MAIN"
         self.functionJumps = []
@@ -129,46 +129,47 @@ class VirtualMachine:
 
             # ======= REGISTERS ========
             if operator == '+':
-                print('CHINGAO', operator, operand1, operand2, 't' + str(target)) # ! APLICAR ESTO A TODOS, MODULARIZARLO ARRIBA CON registers MINUS .SELF BABY
                 if len(self.recursiveRegisters) > 0 : self.recursiveRegisters[-1][target] = operand1 + operand2
                 else : self.registers[target] = operand1 + operand2
             elif operator == '-':
-                print('CHINGAO', operator, operand1, operand2, 't' + str(target)) # ! APLICAR ESTO A TODOS, MODULARIZARLO ARRIBA CON registers MINUS .SELF BABY
                 if len(self.recursiveRegisters) > 0 : self.recursiveRegisters[-1][target] = operand1 - operand2
                 else : self.registers[target] = operand1 - operand2
             elif operator == '*':
-                self.registers[target] = operand1 * operand2
+                if len(self.recursiveRegisters) > 0 : self.recursiveRegisters[-1][target] = operand1 * operand2
+                else : self.registers[target] = operand1 * operand2
             elif operator == '**':
-                self.registers[target] = operand1 ** operand2
+                if len(self.recursiveRegisters) > 0 : self.recursiveRegisters[-1][target] = operand1 ** operand2
+                else : self.registers[target] = operand1 ** operand2
             elif operator == '/':
-                self.registers[target] = operand1 / operand2
+                if len(self.recursiveRegisters) > 0 : self.recursiveRegisters[-1][target] = operand1 / operand2
+                else : self.registers[target] = operand1 / operand2
             elif operator == '>':
-                self.registers[target] = int(operand1 > operand2)
+                if len(self.recursiveRegisters) > 0 : self.recursiveRegisters[-1][target] = int(operand1 > operand2)
+                else : self.registers[target] = int(operand1 > operand2)
             elif operator == '<':
-                if len(self.recursiveRegisters) > 0 : self.recursiveRegisters[-1][target] = int(operand1 < operand2)   # ! APLICAR ESTO A TODOS, MODULARIZARLO ARRIBA CON registers MINUS .SELF BABY
+                if len(self.recursiveRegisters) > 0 : self.recursiveRegisters[-1][target] = int(operand1 < operand2)
                 else : self.registers[target] = int(operand1 < operand2)
             elif operator == '<=':
-                self.registers[target] = int(operand1 <= operand2)
+                if len(self.recursiveRegisters) > 0 : self.recursiveRegisters[-1][target] = int(operand1 <= operand2)
+                else : self.registers[target] = int(operand1 <= operand2)
             elif operator == '==':
-                self.registers[target] = bool(operand1) == bool(operand2)
+                if len(self.recursiveRegisters) > 0 : self.recursiveRegisters[-1][target] = bool(operand1) == bool(operand2)
+                else : self.registers[target] = bool(operand1) == bool(operand2)
             elif operator == '!=' or operator == '<>':
-                self.registers[target] = bool(operand1) != bool(operand2)
+                if len(self.recursiveRegisters) > 0 : self.recursiveRegisters[-1][target] = bool(operand1) != bool(operand2)
+                else : self.registers[target] = bool(operand1) != bool(operand2)
             if operator == '&&':
-                self.registers[target] = bool(operand1) and bool(operand2)
+                if len(self.recursiveRegisters) > 0 : self.recursiveRegisters[-1][target] = bool(operand1) and bool(operand2)
+                else : self.registers[target] = bool(operand1) and bool(operand2)
             if operator == '||':
-                self.registers[target] = bool(operand1) or bool(operand2)
+                if len(self.recursiveRegisters) > 0 : self.recursiveRegisters[-1][target] = bool(operand1) or bool(operand2)
+                else : self.registers[target] = bool(operand1) or bool(operand2)
             elif operator == '=' or operator == '<-':
-                print('CHINGAO', operator, operand1, operand2, target)
                 # Si es un string, es porque a fuerza es un ID ...
                 if target.__class__.__name__ == 'str' :
                     # En caso de estar en una función cualquiera, verificar la variable en su memoria exclusiva/recursiva
                     foundRecursiveVar = False
                     if self.recursiveIteration > 0:
-                        print('DEBUG PARAM ITERATION', self.recursiveIteration, 'op:', operator, 'ope1:', operand1, 'ope2:', operand2, 'tar:', target)
-                        print('REC REGS:', self.recursiveRegisters)
-                        print('CURRENT TABLE:')
-                        pprint.pprint(self.recursiveTable[-1])
-                        print('-------------')
                         table = copy.deepcopy(self.recursiveTable.pop()) # [-1], Pop y append no funcionaron, esta libreria fue obligatoria
                         for i, tuple_item in enumerate(table):
                             if target == tuple_item[1]:
@@ -183,11 +184,6 @@ class VirtualMachine:
                                     currentRow = (operand1.__class__.__name__,) + currentRow[1:]
                                     table[i] = currentRow
                         self.recursiveTable.append(table) # Esto fue lo que resolvió la recursión compleja, me llevó días
-                        print('DEBUG PARAM AFTER')
-                        print('REC REGS:', self.recursiveRegisters)
-                        print('CURRENT TABLE:')
-                        pprint.pprint(self.recursiveTable[-1])
-                        print('==============================================')
                     # Si no se encontró alguna varible en la tabla recursiva, es porque es global o ni siquiera estamos en una función
                     if not foundRecursiveVar:
                         for i, tuple_item in enumerate(self.symbolTable):
@@ -219,15 +215,12 @@ class VirtualMachine:
                 else : self.program_counter += 1
                 continue
             elif operator.lower() == 'print':
-                # ! ARREGLR, AHORA RECIBE VARIABLES TAMBIEN, DEBEMOS EXTRAERLAS AQUI O CREO YA ESTA HECHO ESO
                 if isinstance(operand1, list):
                     for index, element in enumerate(operand1) :
-                        print('ELEMENT:', element)
                         if isinstance(element, str) and re.match(r"^t\d+$", element) : 
                             if len(self.recursiveRegisters) > 0 : operand1[index] = str(self.recursiveRegisters[-1][int(element[1:])])
                             else : operand1[index] = str(self.registers[int(element[1:])])
                         elif isinstance(element, str) and '"' not in element and "'" not in element :
-                            print('SACAR VARIABLE') # ! DEBUG
                             # En caso de estar en una función cualquiera, verificar la variable en su memoria exclusiva/recursiva
                             foundRecursiveVar = False
                             if self.recursiveIteration > 0:
@@ -254,13 +247,8 @@ class VirtualMachine:
                 self.returns.append(operand1)
                 continue
             elif operator.lower() == 'endfunc' or operator.lower() == 'return':
-                # ! Esto posiblemente va después de todo lo del return:
-                # print('DEBUG LOGIC:', 'op:', operator, 'ope1:', operand1, 'ope2:', operand2, 'tar:', target, 'recT:', self.recursiveIteration) # ! DEBUG 
                 if operator.lower() == 'return' :
                     temporal = int(self.returns.pop()[1:])
-                    print('1. ITERATION:', self.recursiveIteration)   # ! DEBUG
-                    print('2. REGISTERS!', self.registers)   # ! DEBUG
-                    print('3. RECURSIVE REGISTERS!', self.recursiveRegisters)   # ! DEBUG
                     # Tu mete el target al maldito tn que sea, checa que no metas un string o char, y el pop
                     if target.__class__.__name__ == 'str' or target.__class__.__name__ == 'char' :
                         # En caso de estar en una función cualquiera, verificar la variable en su memoria exclusiva/recursiva
@@ -270,27 +258,19 @@ class VirtualMachine:
                             for i, tuple_item in enumerate(table):
                                 if target == tuple_item[1]:
                                     foundRecursiveVar = True
-                                    print('4. WTF?? TargetTemp', 't' + str(temporal), 'WILL RECEIVE:', str(target) + ' =', tuple_item[6])   # ! DEBUG
-                                    print('--------------------------------')   # ! DEBUG
                                     if len(self.recursiveRegisters) > 1 : self.recursiveRegisters[-2][temporal] = tuple_item[6]
                                     else : self.registers[temporal] = tuple_item[6]
-                                    self.recursiveResult += tuple_item[6] # ! DEBUGGER BORRAR
+                                    self.recursiveResult += tuple_item[6] # ! DEBUGGER
                         # Si no se encontró alguna variable en la tabla recursiva, es porque es global o ni siquiera estamos en una función
                         if not foundRecursiveVar:
                             for i, tuple_item in enumerate(self.symbolTable):
                                 if target == tuple_item[1]:
-                                    print('4. WTF?? TargetTemp', 't' + str(temporal), 'WILL RECEIVE:', str(target) + ' =', tuple_item[6])   # ! DEBUG
-                                    print('--------------------------------')   # ! DEBUG
                                     self.registers[temporal] = tuple_item[6]
-                                    if tuple_item[6] == 1 : self.recursiveResult += tuple_item[6] # ! DEBUGGER BORRAR
+                                    if tuple_item[6] == 1 : self.recursiveResult += tuple_item[6] # ! DEBUGGER
                     elif isTargetTemp:
-                        print('4. WTF?? TargetTemp', 't' + str(temporal), 'WILL RECEIVE:', 't' + str(target) + ' =', self.recursiveRegisters[-1][temporal])   # ! DEBUG
-                        print('--------------------------------')   # ! DEBUG
                         if len(self.recursiveRegisters) > 1 : self.recursiveRegisters[-2][temporal] = self.recursiveRegisters[-1][target]
                         else : self.registers[temporal] = self.recursiveRegisters[-1][target]
                     else:
-                        print('4. WTF?? CTEI/CTEF', 't' + str(temporal), 'WILL RECEIVE CTEI/CTEF:', target)   # ! DEBUG
-                        print('--------------------------------')   # ! DEBUG
                         if len(self.recursiveRegisters) > 1 : self.recursiveRegisters[-2][temporal] = target
                         else : self.registers[temporal] = target
                     
@@ -310,15 +290,15 @@ class VirtualMachine:
                         print(f"{i}: {item}")
                     print("-------------- === Final Symbol Table (Updated Values) === --------------")
                     pprint.pprint(self.symbolTable)
-                print('Registers:', self.registers)
-                print('Recursive Registers:', self.recursiveRegisters)
-                print('Recursive Result:', self.recursiveResult)
+                # print('Registers:', self.registers)   # It's so big
+                # print('Recursive Registers:', self.recursiveRegisters)   # Should always be empty
+                # print('Recursive Result:', self.recursiveResult)   # Can check if a recursive module branchs out well
                 print('Compilation Completed')
             elif operator.lower() == 'era':
                 self.recursiveIteration += 1
                 if self.recursiveIteration > 1 and self.recursiveTable :
                     self.recursiveTable.append(self.recursiveTable[-1].copy())
-                    self.recursiveRegisters.append(self.registers.copy()) # Encontrar estos .copy() me hizo demasiado daño
+                    self.recursiveRegisters.append(self.registers.copy())   # Encontrar estos .copy() me hizo demasiado daño
                 else :
                     self.recursiveResult = 0
                     self.recursiveTable.append([entry for entry in self.symbolTable if entry[5] == target].copy())
