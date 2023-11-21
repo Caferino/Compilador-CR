@@ -376,7 +376,6 @@ class Quadruples:
                     words = ''
                     varName = None
                     while self.extraStringsForPrint > 0 :
-                        print('DEBUG STRING', left_operand)
                         if '"' not in str(left_operand) and "'" not in str(left_operand) :
                             # En caso de ser una matriz, sacamos la dirección del valor
                             if '[' in str(left_operand) :
@@ -418,9 +417,7 @@ class Quadruples:
                         left_type = self.PTypes.pop()
                         self.extraStringsForPrint -= 1
                     
-                    print('1. Words:', words)
                     words = shlex.split(words)
-                    print('2. Words:', words)
                     left_operand = words
                     self.extraStringsForPrint = 1
                     

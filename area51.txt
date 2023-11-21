@@ -1,3 +1,11 @@
 int p;
 p = 3 + 3;
 print(p);
+
+void uno(int p) {
+    int p;
+    int a;
+    print("test");
+}
+
+uno(5);
