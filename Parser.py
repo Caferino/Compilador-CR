@@ -257,6 +257,7 @@ def p_comparation(p):
                    | notequal expression
                    | notequalnum expression
                    | islessorequal expression
+                   | isgreaterorequal expression
                    | empty'''
     if len(p) > 2 : quadsConstructor.verifyConditionals() # If POper.top == '<' or '>' ...
 
@@ -293,6 +294,11 @@ def p_notequalnum(p):
     
 def p_islessorequal(p):
     '''islessorequal : ISLESSOREQUAL'''
+    quadsConstructor.insertSign(p[1])
+    
+    
+def p_isgreaterorequal(p):
+    '''isgreaterorequal : ISGREATEROREQUAL'''
     quadsConstructor.insertSign(p[1])
 
 

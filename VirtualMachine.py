@@ -152,16 +152,19 @@ class VirtualMachine:
             elif operator == '<=':
                 if len(self.recursiveRegisters) > 0 : self.recursiveRegisters[-1][target] = int(operand1 <= operand2)
                 else : self.registers[target] = int(operand1 <= operand2)
+            elif operator == '>=':
+                if len(self.recursiveRegisters) > 0 : self.recursiveRegisters[-1][target] = int(operand1 >= operand2)
+                else : self.registers[target] = int(operand1 >= operand2)
             elif operator == '==':
                 if len(self.recursiveRegisters) > 0 : self.recursiveRegisters[-1][target] = bool(operand1) == bool(operand2)
                 else : self.registers[target] = bool(operand1) == bool(operand2)
             elif operator == '!=' or operator == '<>':
                 if len(self.recursiveRegisters) > 0 : self.recursiveRegisters[-1][target] = bool(operand1) != bool(operand2)
                 else : self.registers[target] = bool(operand1) != bool(operand2)
-            if operator == '&&':
+            elif operator == '&&':
                 if len(self.recursiveRegisters) > 0 : self.recursiveRegisters[-1][target] = bool(operand1) and bool(operand2)
                 else : self.registers[target] = bool(operand1) and bool(operand2)
-            if operator == '||':
+            elif operator == '||':
                 if len(self.recursiveRegisters) > 0 : self.recursiveRegisters[-1][target] = bool(operand1) or bool(operand2)
                 else : self.registers[target] = bool(operand1) or bool(operand2)
             elif operator == '=' or operator == '<-':
@@ -260,13 +263,13 @@ class VirtualMachine:
                                     foundRecursiveVar = True
                                     if len(self.recursiveRegisters) > 1 : self.recursiveRegisters[-2][temporal] = tuple_item[6]
                                     else : self.registers[temporal] = tuple_item[6]
-                                    self.recursiveResult += tuple_item[6] # ! DEBUGGER
+                                    self.recursiveResult += tuple_item[6]   # ! DEBUGGER
                         # Si no se encontró alguna variable en la tabla recursiva, es porque es global o ni siquiera estamos en una función
                         if not foundRecursiveVar:
                             for i, tuple_item in enumerate(self.symbolTable):
                                 if target == tuple_item[1]:
                                     self.registers[temporal] = tuple_item[6]
-                                    if tuple_item[6] == 1 : self.recursiveResult += tuple_item[6] # ! DEBUGGER
+                                    if tuple_item[6] == 1 : self.recursiveResult += tuple_item[6]   # ! DEBUGGER
                     elif isTargetTemp:
                         if len(self.recursiveRegisters) > 1 : self.recursiveRegisters[-2][temporal] = self.recursiveRegisters[-1][target]
                         else : self.registers[temporal] = self.recursiveRegisters[-1][target]

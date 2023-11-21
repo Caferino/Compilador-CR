@@ -49,7 +49,7 @@ class Quadruples:
 
     # ------------------ INIT ------------------ #
     def __init__(self):
-        # Mom
+        # The stars of the show
         self.quadruples = []
         self.symbolTable = []
 
@@ -199,7 +199,7 @@ class Quadruples:
     # ------ 6. Verificando Condicionales ------ #
     def verifyConditionals(self):
         if self.POper:
-            if self.POper[-1] == '>' or self.POper[-1] == '<' or self.POper[-1] == '<>' or self.POper[-1] == '!=' or self.POper[-1] == '==' or self.POper[-1] == '||' or self.POper[-1] == '&&' or self.POper[-1] == '<=' :
+            if self.POper[-1] == '>' or self.POper[-1] == '<' or self.POper[-1] == '<>' or self.POper[-1] == '!=' or self.POper[-1] == '==' or self.POper[-1] == '||' or self.POper[-1] == '&&' or self.POper[-1] == '<=' or self.POper[-1] == '>=' :
                 # Asignamos operandos y operador a validar y ejecutar
                 ## ! IMPORTANTE: El orden de los .pop() importan!
                 right_operand = self.PilaO.pop()
@@ -316,14 +316,10 @@ class Quadruples:
 
 
     def nodoFunctionCallTres(self):
-        """if self.inFunction : 
-            argument = self.PilaO[-1]   # ! DEBUG USAR [-1] SOLO AL ESTAR ADENTRO DE LA DECLARACION DE UNA FUNCION
-            argumentType = self.PTypes[-1] 
-        else : """
-        argument = self.PilaO.pop()   # ! DEBUG TAL VEZ DEBO USAR [-1] SOLO AL ESTAR ADENTRO DE LA DECLARACION DE UNA FUNCION
+        argument = self.PilaO.pop()
         argumentType = self.PTypes.pop()
         if argumentType != self.currentFunctionParams[self.k][0] : raise TypeError(f"Invalid parameter type for '{argument}' at function call '{self.currentFunctionName}'")  
-        self.generateQuadruple('=', argument, '', self.currentFunctionParams[self.k][1]) # PARAM, Argument, Argument#k // Similar to assignments
+        self.generateQuadruple('=', argument, '', self.currentFunctionParams[self.k][1])   # PARAM, Argument, Argument#k // Similar to assignments
         
 
     def nodoFunctionCallCuatro(self):
@@ -434,15 +430,9 @@ class Quadruples:
                     raise TypeError(f"Type mismatch in: '{left_operand} {operator} {right_operand}' ({left_Type} ≠ {right_Type})")
 
 
-    """def insertPrintString(self, string):
-        self.PilaO.append(string)
-        self.PTypes.append('char')""" # ! BORRAR
-
-
     # ------ 2. Assignments ------ #
     def insertAssignmentID(self, token):
         self.assignTemp = token
-        # ! AQUI DEBES USAR Pilao Y PTypes, mis assignments se pasan por los huevos la semantic cube
         for tuple in self.symbolTable :
             if token == tuple[1] :
                 self.PilaO.append(tuple[1])
@@ -506,7 +496,7 @@ class Quadruples:
         self.fill(end, self.cont + 1)
         self.generateQuadruple('ENDFUNC', '', '', '')
         self.inFunction = False
-        Avail.temporales = []    # ! DEBUG Posible solucion
+        Avail.temporales = []    # ! Posible solucion
 
 
     # ------ Llenado de líneas de salto para GOTOF y GOTOV ------ #

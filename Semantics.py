@@ -213,7 +213,7 @@ class Rules:
     def p_verifyMatrix(self):
         matrixSize = reduce(operator.mul, self.varDimensions, 1)
         ## Condicional para validar el tamaño de matriz
-        if len(self.varValues) > matrixSize : raise TypeError(f"Matrix '{self.varName}' too large!")
+        if len(self.varValues) > matrixSize : raise TypeError(f"Matrix '{self.varName}' too large! - line {memory.totalCodeLines}")
 
         # Ahora sabemos que la matriz tiene un tamaño correcto, pero está llena?
         # Si el usuario no llenó todos los espacios, llenarlos con 'None'
@@ -244,7 +244,7 @@ class Rules:
                 break
             # Si llegamos a la última tupla y aún no existe la variable...
             if i == len(memory.symbolTable) - 1:
-                raise TypeError(f"Variable '{p[1]}' not declared!")
+                raise TypeError(f"Variable '{p[1]}' not declared! - line {memory.totalCodeLines}")
             i += 1
             
             
@@ -260,7 +260,7 @@ class Rules:
                 break
             # Si llegamos a la última tupla y aún no existe la variable...
             if i == len(memory.symbolTable) - 1:
-                raise TypeError(f"Variable '{p[3]}' not declared!")
+                raise TypeError(f"Variable '{p[3]}' not declared! - line {memory.totalCodeLines}")
             i += 1
             
             
@@ -276,7 +276,7 @@ class Rules:
                 break
             # Si llegamos a la última tupla y aún no existe la variable...
             if i == len(memory.symbolTable) - 1:
-                raise TypeError(f"Variable '{p[3]}' not declared!")
+                raise TypeError(f"Variable '{p[3]}' not declared! - line {memory.totalCodeLines}")
             i += 1
             
             
@@ -292,7 +292,7 @@ class Rules:
                 break
             # Si llegamos a la última tupla y aún no existe la variable...
             if i == len(memory.symbolTable) - 1:
-                raise TypeError(f"Variable '{p[3]}' not declared!")
+                raise TypeError(f"Variable '{p[3]}' not declared! - line {memory.totalCodeLines}")
             i += 1
             
             
@@ -308,7 +308,7 @@ class Rules:
                 break
             # Si llegamos a la última tupla y aún no existe la variable...
             if i == len(memory.symbolTable) - 1:
-                raise TypeError(f"Variable '{p[3]}' not declared!")
+                raise TypeError(f"Variable '{p[3]}' not declared! - line {memory.totalCodeLines}")
             i += 1
             
             
@@ -326,9 +326,9 @@ class Rules:
             # Si llegamos a la última tupla y aún no existe la variable...
             if i == len(memory.symbolTable) - 1:
                 if x == None :
-                    raise TypeError(f"Variable '{p[3]}' not declared!")
+                    raise TypeError(f"Variable '{p[3]}' not declared! - line {memory.totalCodeLines}")
                 elif y == None :
-                    raise TypeError(f"Variable '{p[5]}' not declared!")
+                    raise TypeError(f"Variable '{p[5]}' not declared! - line {memory.totalCodeLines}")
             
             i += 1
         x = np.array(x).reshape(-1, 1)
@@ -395,9 +395,9 @@ class Rules:
             # Si llegamos a la última tupla y aún no existe la variable...
             if i == len(memory.symbolTable) - 1:
                 if x == None :
-                    raise TypeError(f"Variable '{p[3]}' not declared!")
+                    raise TypeError(f"Variable '{p[3]}' not declared! - line {memory.totalCodeLines}")
                 elif y == None :
-                    raise TypeError(f"Variable '{p[5]}' not declared!")
+                    raise TypeError(f"Variable '{p[5]}' not declared! - line {memory.totalCodeLines}")
             i += 1
         plotThis(x, y)
 

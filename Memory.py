@@ -32,7 +32,6 @@ class MemoryMap:
             found = False
             for each_tuple in self.symbolTable:
                 # Si la variable ya existe, actualizamos solo el value
-                print('DEBUG EXIST', new_row[1], 'vs', each_tuple[1], 'PARENT:', new_row[5], 'vs', each_tuple[5])
                 if new_row[1] == each_tuple[1] and new_row[5] == each_tuple[5]:
                     found = True
                     break
