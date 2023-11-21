@@ -47,7 +47,7 @@ class Avail:
 
 class Quadruples:
 
-    # ------------------ INIT ------------------ #
+    # ? ------------------ INIT ------------------ ? #
     def __init__(self):
         # The stars of the show
         self.quadruples = []
@@ -72,7 +72,7 @@ class Quadruples:
         self.inFunction = False
 
 
-    # ------------------ EXPRESIONES LINEALES ------------------ #
+    # * ------------------ EXPRESIONES LINEALES ------------------ * #
     # ------ 1. Insertando Type y ID ------ #
     def insertTypeAndID(self, token):
         if token.__class__.__name__ == 'int' or token.__class__.__name__ == 'float':
@@ -228,7 +228,7 @@ class Quadruples:
 
 
 
-    # ------------------ CONDICIONALES ------------------ #
+    # * ------------------ CONDICIONALES ------------------ * #
     # ------ 1. Primer nodo de un IF/ELSE statement ------ #
     def nodoCondicionalUno(self):
         exp_type = self.PTypes.pop()
@@ -257,7 +257,7 @@ class Quadruples:
 
 
 
-    # ------------------ CICLOS WHILE ------------------ #
+    # * ------------------ WHILE ------------------ * #
     # ------ 1. Primer nodo de un WHILE statement ------ #
     def nodoWhileUno(self):
         self.PJumps.append(self.cont)
@@ -283,8 +283,8 @@ class Quadruples:
 
 
 
-    # ------------------ FUNCTION ------------------ #
-    # ------ 1. Nodo para insertar el contador de cuádruplos ------ #
+    # * ------------------ FUNCTIONS ------------------ * #
+    # ------ Nodo para insertar el contador de cuádruplos ------ #
     def nodogosub(self):
         self.PJumps.append(self.cont)
         self.generateQuadruple('GOTO', '', '', 'linePlaceholder')
@@ -293,9 +293,8 @@ class Quadruples:
 
 
 
-    # ------------------ FUNCTION CALL ------------------ #
-    # ------ 1. Primer nodo de un FUNCTION CALL ------ #
-    # ------ Verificar que existe la función, sino error ------ #
+    # * ------------------ FUNCTION CALL ------------------ * #
+    # ------ 1. Verificar que existe la función, sino error ------ #
     def nodoFunctionCallUno(self, ID):
         exists = False
         for tuple in self.symbolTable :
@@ -310,11 +309,13 @@ class Quadruples:
         if not exists : raise TypeError(f"Function '{ID}' not declared!")
 
 
+    # ------ 2. Generar cuádruplo de ERA para la memoria ------ #
     def nodoFunctionCallDos(self, ID):
         self.generateQuadruple('ERA', '', '', ID)
         self.k = 1
 
 
+    # ------ 3. Asignación de parámetros ------ #
     def nodoFunctionCallTres(self):
         argument = self.PilaO.pop()
         argumentType = self.PTypes.pop()
@@ -322,10 +323,12 @@ class Quadruples:
         self.generateQuadruple('=', argument, '', self.currentFunctionParams[self.k][1])   # PARAM, Argument, Argument#k // Similar to assignments
         
 
+    # ------ 4. Cantidad total de parámetros de una función ------ #
     def nodoFunctionCallCuatro(self):
         self.k = self.k + 1
 
 
+    # ------ 5. Verificar cantidad de parámetros enviados ------ #
     def nodoFunctionCallCinco(self):
         for tuple in self.symbolTable :
             if self.currentFunctionName == tuple[1] :
@@ -339,6 +342,7 @@ class Quadruples:
                     break
 
 
+    # ------ 6. Generar el salto GOSUBroutine ------ #
     def nodoFunctionCallSeis(self):
         result = Avail.next()
         self.generateQuadruple('GOSUB', result, quadsConstructor.cont + 1, self.currentFunctionPosition)
@@ -348,8 +352,8 @@ class Quadruples:
 
 
 
-    # ------------------ PRINT, RETURN, ASSIGN ------------------ #
-    # ------ 1. Prints ------ #
+    # * ------------------ PRINT, RETURN, ASSIGN ------------------ * #
+    # ======== 1. Prints ======== #
     def insertPrint(self, token):
         self.POper.append(token)
 
@@ -430,7 +434,7 @@ class Quadruples:
                     raise TypeError(f"Type mismatch in: '{left_operand} {operator} {right_operand}' ({left_Type} ≠ {right_Type})")
 
 
-    # ------ 2. Assignments ------ #
+    # ======== 2. Assignments ======== #
     def insertAssignmentID(self, token):
         self.assignTemp = token
         for tuple in self.symbolTable :
@@ -465,24 +469,17 @@ class Quadruples:
                     raise TypeError(f"Type mismatch in: '{left_operand} {operator} {right_operand}' ({left_Type} ≠ {right_Type})")
                 
             
-    # ------ 3. Returns ------ #    
+    # ======== 3. Returns ======== #    
     def verifyReturn(self, p, currentFunctionName, currentFunctionType):
-        # Error checking
         # Si p[2] es un ';' es porque no hay valor qué regresar
         if p[2] == ';' and currentFunctionType.lower() != 'void' : raise TypeError(f"Function '{currentFunctionName}' of type '{currentFunctionType}' should return a value!")
         elif len(p) > 3 and currentFunctionType.lower() == 'void' : raise TypeError(f"Void function '{currentFunctionName}' should NOT return any value!")
         self.endReturnFunction()
-        
-        
-    # ------ Definir fin de Función en un Return ------ #
-    def endReturnFunction(self):
-        end = self.PJumps[-1]
-        self.fill(end, self.cont + 1)
-        self.generateQuadruple('RETURN', '', '', self.PilaO[-1])
+
         
 
 
-    # ------------------ MÉTODOS AUXILIARES ------------------ #
+    # * ------------------ MÉTODOS AUXILIARES ------------------ * #
     # ------ Generador de Cuádruplos ------ #
     def generateQuadruple(self, operator, left_operand, right_operand, result):
         # Empujamos el nuevo cuádruple a nuestra lista o memoria
@@ -497,12 +494,18 @@ class Quadruples:
         self.generateQuadruple('ENDFUNC', '', '', '')
         self.inFunction = False
         Avail.temporales = []    # ! Posible solucion
+        
+        
+    # ------ Definir fin de Función en un Return ------ #
+    def endReturnFunction(self):
+        end = self.PJumps[-1]
+        self.fill(end, self.cont + 1)
+        self.generateQuadruple('RETURN', '', '', self.PilaO[-1])
 
 
     # ------ Llenado de líneas de salto para GOTOF y GOTOV ------ #
-    # Mi "QUAD_POINTER" / quad_cont / counter / cont APUNTA siempre hacia el SIGUIENTE
     def fill(self, cont, line):
-        self.quadruples[cont] = (self.quadruples[cont][:3] + (line,))
+        self.quadruples[cont] = (self.quadruples[cont][:3] + (line,))   # ? Mi quad counter apunta siempre hacia el siguiente
 
 
     # ------ Actualizar symbolTable aquí. Fue por error propio ------ #

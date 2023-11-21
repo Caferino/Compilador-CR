@@ -31,7 +31,7 @@ class Rules:
         * - * - * - * - * - * - * - * - * - * - * - * - * - *
         ?     Set to True to turn it on, otherwise False    ?
         """
-        self.debugMode = True
+        self.debugMode = False
         
         ##### Variables
         self.type = ''
@@ -64,14 +64,12 @@ class Rules:
         
         
     # ------------------------------------- TYPES
-    def p_insertType(self, p):
-        self.type = p[1]
+    def p_insertType(self, type):
+        self.type = type
         
         
     # ------------------------------------- ID
-    def p_insertID(self, p):
-        varName = p[1]
-        
+    def p_insertID(self, varName):
         # Si tiene brackets pegados, es una matriz
         if "[" in varName:
             # Separamos el nombre de las dimensiones
@@ -97,19 +95,8 @@ class Rules:
         
 
     # ------------------------------------- SAVE VALUE
-    def p_saveValue(self, p):
-        self.values.append(p[1])
-
-
-    # ------------------------------------- SAVE COMMA
-    def p_saveComma(self, p):
-        self.values.append(p[1])
-
-
-    # ------------------------------------- SAVE SIGN
-    def p_saveSign(self, p):
-        if p[1] == '-':
-            self.values.append(p[1])
+    def p_saveValue(self, value):
+        self.values.append(value)
         
         
     # ------------------------------------- SAVE LOCAL VARIABLE  
