@@ -38,4 +38,8 @@ Dentro de: ~/.../Compilaor-CR
 
 > El Día de la Independencia: Logré sacar la recursión compleja, es decir, correr códigos como fibonacci o más complejos. Todo lo medité por 8+ horas diarias hecho bolita en la cama, sin papel ni apoyo visual más que el puro código, comiendo sin parar; en 4 o 5 días terminé resolviéndolo, el mayor problema se hallaba en la VirtualMachine con el control de las SymbolTables y después también las registers temporales, cada iteración recursiva debía guardar sus propios valores.
 
+**Noviembre 21 2023:**
+
+> Limpieza de código general e implementación de '>=' y '<=' mas el chequeo de variables globales vs locales (según a la función a la que pertenecen).
+
 ~Óscar Antonio Hinojosa Salum A00821930
