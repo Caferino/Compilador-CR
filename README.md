@@ -36,7 +36,7 @@ Dentro de: ~/.../Compilaor-CR
 
 **Noviembre 10 2023:**
 
-> Durante esta semana desarrollé la recursión simple, entre otros varios tweaks. La mejor bitácora deberían ser el historial de commits, le perdi atención a este README durante este lapso de tiempo doloroso.
+> Durante esta semana desarrollé la recursión simple, entre otros varios tweaks. La mejor bitácora debería ser el historial de commits, le perdi atención a este README durante este lapso de tiempo doloroso.
 
 **Noviembre 19 2023:**
 
