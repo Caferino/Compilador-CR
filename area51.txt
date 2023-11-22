@@ -1,11 +1,23 @@
-int p;
-p = 3 + 3;
-print(p);
+# =================== Area 51 ==================== #
+# DESCRIPCIÓN:					                   #
+# Playground para pruebas pequeñas de errores      #
+# - - - - - - - - - - - - - - - - - - - - - - - - -#
+# OUTPUT ESPERADO:				                   #
+# TypeError: Variable 'p' already exists! - line 5 #
+# ================================================ #
 
-void uno(int p) {
-    int p;
-    int a;
-    print("test");
+int p;
+p = 2 + 3;
+
+int uno(int p) {
+    int p;          // Esto está mal (mi contador de líneas tiene problema con newlines)
+    int res = 5;
+    res = res + p;
+    p = p + p;
+    print("p adentro de uno:", p);
+    print("res adentro de uno:", res);
+    return res;     // ARREGLAR, por alguna razón el return en este programa tiene problema, falta un .pop() somewhere...
 }
 
-uno(5);
+p = uno(p);
+print("p afuera de uno:", p);

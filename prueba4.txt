@@ -1,3 +1,14 @@
+# ================== Prueba 4 ==================== #
+# DESCRIPCIÓN:					                   #
+# Código para probar condiciones                   #
+# - - - - - - - - - - - - - - - - - - - - - - - - -#
+# OUTPUT ESPERADO:				                   #
+# 100.0                                            #
+# 100                                              #
+# Success!                                         #
+# Compilation Completed                            #
+# ================================================ #
+
 bool booleanoT = 1;
 bool booleanoF = False;
 

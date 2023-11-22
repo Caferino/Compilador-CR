@@ -1,11 +1,26 @@
+# ================== Prueba 5 ==================== #
+# DESCRIPCIÓN:					                   #
+# Código para probar condiciones y exponenciales   #
+# - - - - - - - - - - - - - - - - - - - - - - - - -#
+# OUTPUT ESPERADO:				                   #
+# 4                                                #
+# 100                                              #
+# 100                                              #
+# 100                                              #
+# 100                                              #
+# Compilation Completed                            #
+# ================================================ #
+
 bool booleanoT = True, booleanoF = False;
 int x = 2;
+
+print(x ** x);
 
 if(booleanoT && booleanoT){
     print(100);
     // Por alguna razón, tener más de tres comparaciones lo rompe...
     if((booleanoT && booleanoT) && (booleanoT || booleanoF)){
-        print(1000);
+        print(100);
     }
     else{
         print(0);
@@ -26,6 +41,3 @@ if(booleanoT && booleanoF){
 else{
     print(100);
 }
-
-x = x ** x;
-print(x);
