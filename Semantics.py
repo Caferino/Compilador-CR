@@ -9,14 +9,14 @@
 
 # ======================== Semántica ======================== #
 
-import re # Librería para expresiones regulares RegEX
-import pprint # Para imprimir el Symbol Table de manera bonita
-import statistics
-from functools import reduce # Para multiplicar listas y matrices
-import operator
-import numpy as np
 from sklearn.linear_model import LinearRegression
 from Plotter import plotThis
+from functools import reduce # Para multiplicar listas y matrices
+import numpy as np
+import statistics
+import operator
+import re                    # Librería para expresiones regulares RegEX
+#import pprint               # Para debugging, (opcional)
 
 from Quadruples import quadsConstructor
 
@@ -25,10 +25,15 @@ memory = MemoryMap()
 
 class Rules:
     def __init__(self):
-        # ========================== Debugging Mode # ! Set to True to turn it ON, otherwise False
+        """
+        * - * - * - * - * - * - * - * - * - * - * - * - * - *
+        *                   DEBUG MODE                      *
+        * - * - * - * - * - * - * - * - * - * - * - * - * - *
+        ?     Set to True to turn it on, otherwise False    ?
+        """
         self.debugMode = False
         
-        # Temporales
+        ##### Variables
         self.type = ''
         self.varName = ''
         self.varDimensions = []
@@ -42,9 +47,7 @@ class Rules:
         self.parameters = {}
         self.parameterscont = 1
         self.localVarCounters = {'int': 0, 'float': 0, 'bool': 0, 'string': 0}
-        
-        # -- Old
-        # Auxiliares
+        #### Auxiliares
         self.currentFunctionParams = []
         self.tuplesToModify = []
         self.allTypes = []
@@ -52,15 +55,21 @@ class Rules:
         self.openList = False
 
 
+    # ========================================================================================================
+    # * ======================================= INSERTIONS & MORE ========================================== *
+    # ========================================================================================================
+    # ------ Aumentar cantidad total de líneas de código ------ #
+    def p_addCodeLine(self):
+        memory.totalCodeLines += 1
+        
+        
     # ------------------------------------- TYPES
-    def p_insertType(self, p):
-        self.type = p[1]
+    def p_insertType(self, type):
+        self.type = type
         
         
     # ------------------------------------- ID
-    def p_insertID(self, p):
-        varName = p[1]
-        
+    def p_insertID(self, varName):
         # Si tiene brackets pegados, es una matriz
         if "[" in varName:
             # Separamos el nombre de las dimensiones
@@ -70,11 +79,9 @@ class Rules:
             varNameIndex = varName.index('[')
             varName = varName[:varNameIndex]
         
-        # SI YA EXISTE varName EN LA symbolTable, QUEBRAR PROGRAMA
-        # ! Para recursion tal vez será mejor actualizar el valor
+        # Si ya existe varName en la symbolTable, quebrar programa
         self.verifyVariableExistence(varName)
         self.varName = varName
-        
         
         
     # ------------------------------------- SCOPE
@@ -88,19 +95,8 @@ class Rules:
         
 
     # ------------------------------------- SAVE VALUE
-    def p_saveValue(self, p):
-        self.values.append(p[1])
-
-
-    # ------------------------------------- SAVE COMMA
-    def p_saveComma(self, p):
-        self.values.append(p[1])
-
-
-    # ------------------------------------- SAVE SIGN
-    def p_saveSign(self, p):
-        if p[1] == '-':
-            self.values.append(p[1])
+    def p_saveValue(self, value):
+        self.values.append(value)
         
         
     # ------------------------------------- SAVE LOCAL VARIABLE  
@@ -148,12 +144,12 @@ class Rules:
         # Separamos las variables en self.values con sus respectivas variables
         self.p_extractVarValues()
         
-        # Verificmos que sea una matriz con tamaño válido, si no romper programa
+        # Verificamos que sea una matriz con tamaño válido, si no, romper programa
         self.p_verifyMatrix()
             
         # self.type, self.varName, self.varDimensions, self.scope, isFunction, self.parentFunction, self.varValues
         memory.insertRow( (self.type, self.varName, self.varDimensions, self.scope, self.isFunction, self.parentFunction, self.varValues) )
-        quadsConstructor.updateSymbolTable(memory.symbolTable) ## ! IMPORTANTE, permite dinamismo
+        quadsConstructor.updateSymbolTable(memory.symbolTable)   # ! IMPORTANTE, permite dinamismo
         
         # === New SymbolTable Row ===
         self.varValues = []
@@ -164,7 +160,7 @@ class Rules:
     # ------------------------------------- FUNCTION ID
     def p_insertFunction(self):
         memory.insertRow( (self.type, self.varName, self.varDimensions, self.scope, self.isFunction, self.parentFunction, self.varValues) )
-        quadsConstructor.updateSymbolTable(memory.symbolTable) ## ! IMPORTANTE, permite dinamismo
+        quadsConstructor.updateSymbolTable(memory.symbolTable)   # ! IMPORTANTE, permite dinamismo
         self.parentFunction = self.varName
         self.parentFunctionType = self.type
         
@@ -190,16 +186,13 @@ class Rules:
             
         # Por leerse de derecha a izquierda, ocupamos girarlos...
         self.varValues.reverse()
-            
-        # TODO : If array of bools, change to 1 or 0s or True or False ! Might be useless, I think 0 = False, and >0 = True in my VM
         
     
-    # ------------------------------------- VERIFY VAR EXISTENCE
-    # TODO - Mejorar con actualizar el value solo y solo si el scope es el mismo.
+    # ------------------------------------- VERIFY VARIABLE EXISTENCE
     def verifyVariableExistence(self, varName):
         for each_tuple in memory.symbolTable :
-            if varName == each_tuple[1] :
-                raise TypeError(f"Variable '{varName}' already exists!")
+            if varName == each_tuple[1] and self.parentFunction == each_tuple[5]:
+                raise TypeError(f"Variable '{varName}' already exists! - line {memory.totalCodeLines}")
                 break
             
             
@@ -207,7 +200,7 @@ class Rules:
     def p_verifyMatrix(self):
         matrixSize = reduce(operator.mul, self.varDimensions, 1)
         ## Condicional para validar el tamaño de matriz
-        if len(self.varValues) > matrixSize : raise TypeError(f"Matrix '{self.varName}' too large!")
+        if len(self.varValues) > matrixSize : raise TypeError(f"Matrix '{self.varName}' too large! - line {memory.totalCodeLines}")
 
         # Ahora sabemos que la matriz tiene un tamaño correcto, pero está llena?
         # Si el usuario no llenó todos los espacios, llenarlos con 'None'
@@ -238,7 +231,7 @@ class Rules:
                 break
             # Si llegamos a la última tupla y aún no existe la variable...
             if i == len(memory.symbolTable) - 1:
-                raise TypeError(f"Variable '{p[1]}' not declared!")
+                raise TypeError(f"Variable '{p[1]}' not declared! - line {memory.totalCodeLines}")
             i += 1
             
             
@@ -254,7 +247,7 @@ class Rules:
                 break
             # Si llegamos a la última tupla y aún no existe la variable...
             if i == len(memory.symbolTable) - 1:
-                raise TypeError(f"Variable '{p[3]}' not declared!")
+                raise TypeError(f"Variable '{p[3]}' not declared! - line {memory.totalCodeLines}")
             i += 1
             
             
@@ -270,7 +263,7 @@ class Rules:
                 break
             # Si llegamos a la última tupla y aún no existe la variable...
             if i == len(memory.symbolTable) - 1:
-                raise TypeError(f"Variable '{p[3]}' not declared!")
+                raise TypeError(f"Variable '{p[3]}' not declared! - line {memory.totalCodeLines}")
             i += 1
             
             
@@ -286,7 +279,7 @@ class Rules:
                 break
             # Si llegamos a la última tupla y aún no existe la variable...
             if i == len(memory.symbolTable) - 1:
-                raise TypeError(f"Variable '{p[3]}' not declared!")
+                raise TypeError(f"Variable '{p[3]}' not declared! - line {memory.totalCodeLines}")
             i += 1
             
             
@@ -302,7 +295,7 @@ class Rules:
                 break
             # Si llegamos a la última tupla y aún no existe la variable...
             if i == len(memory.symbolTable) - 1:
-                raise TypeError(f"Variable '{p[3]}' not declared!")
+                raise TypeError(f"Variable '{p[3]}' not declared! - line {memory.totalCodeLines}")
             i += 1
             
             
@@ -320,9 +313,9 @@ class Rules:
             # Si llegamos a la última tupla y aún no existe la variable...
             if i == len(memory.symbolTable) - 1:
                 if x == None :
-                    raise TypeError(f"Variable '{p[3]}' not declared!")
+                    raise TypeError(f"Variable '{p[3]}' not declared! - line {memory.totalCodeLines}")
                 elif y == None :
-                    raise TypeError(f"Variable '{p[5]}' not declared!")
+                    raise TypeError(f"Variable '{p[5]}' not declared! - line {memory.totalCodeLines}")
             
             i += 1
         x = np.array(x).reshape(-1, 1)
@@ -389,9 +382,9 @@ class Rules:
             # Si llegamos a la última tupla y aún no existe la variable...
             if i == len(memory.symbolTable) - 1:
                 if x == None :
-                    raise TypeError(f"Variable '{p[3]}' not declared!")
+                    raise TypeError(f"Variable '{p[3]}' not declared! - line {memory.totalCodeLines}")
                 elif y == None :
-                    raise TypeError(f"Variable '{p[5]}' not declared!")
+                    raise TypeError(f"Variable '{p[5]}' not declared! - line {memory.totalCodeLines}")
             i += 1
         plotThis(x, y)
 

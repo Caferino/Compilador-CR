@@ -34,4 +34,12 @@ Dentro de: ~/.../Compilaor-CR
 
 > Llamadas a funciones con Returns funcionando, mejor verificación de tipos al imprimir o asignar valores (en estos dos casos no servía para nada el SemanticCube por alguna razón de mal diseño, ahora sí se usa bien) y mejores errores, con menos comillas y comas que salían sobrando (por no saber usar 'f-strings' antes)... Solo queda la recursión, la cual debe caer como un guante, lo más difícil será diseñar el control de los "snapshots" de la SymbolTable y saber cuál leer en el momento; es decir, saber en cuál número de la iteración recursiva debe ejecutarse la función, con cuáles valores, etc.
 
+**Noviembre 19 2023:**
+
+> El Día de la Independencia: Logré sacar la recursión compleja, es decir, correr códigos como fibonacci o más complejos. Todo lo medité por 8+ horas diarias hecho bolita en la cama, sin papel ni apoyo visual más que el puro código, comiendo sin parar; en 4 o 5 días terminé resolviéndolo, el mayor problema se hallaba en la VirtualMachine con el control de las SymbolTables y después también las registers temporales, cada iteración recursiva debía guardar sus propios valores.
+
+**Noviembre 21 2023:**
+
+> Limpieza de código general e implementación de '>=' y '<=' mas el chequeo de variables globales vs locales (según a la función a la que pertenecen).
+
 ~Óscar Antonio Hinojosa Salum A00821930

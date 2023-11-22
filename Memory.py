@@ -14,6 +14,7 @@ class MemoryMap:
         # self.memory = [None] * size
         self.quadruples = []
         self.symbolTable = []
+        self.totalCodeLines = 1
         
 
     """
@@ -29,9 +30,9 @@ class MemoryMap:
         # Si la Symbol Table NO está vacía, verificar existencia de la variable primero
         else:
             found = False
-            for each_existing_tuple in self.symbolTable:
+            for each_tuple in self.symbolTable:
                 # Si la variable ya existe, actualizamos solo el value
-                if new_row[1] == each_existing_tuple[1]:
+                if new_row[1] == each_tuple[1] and new_row[5] == each_tuple[5]:
                     found = True
                     break
 

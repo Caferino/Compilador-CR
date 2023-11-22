@@ -10,24 +10,24 @@
 # ======================== Cubo Semántico ======================== #
 
 typesTable = [
-#    lType    rType      **       *         /       %        +        -        >        <       <>      !=       ==       =       &&        ||
-#    --------------------------------------------------------------------------------------------------------------------------------------------
-    ['int',   'int',   'int',   'int',   'float', 'int',   'int',   'int',   'bool',  'bool',  'bool', 'bool', 'bool',  'int',   'bool',  'bool' ],
-    ['int',   'float', 'float', 'float', 'float', 'float', 'float', 'float', 'bool',  'bool',  'bool', 'bool', 'bool',  'float', 'bool',  'bool' ],
-    ['int',   'char',  'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'bool', 'bool', 'ERROR', 'ERROR', 'ERROR', 'ERROR'],
-    ['int',   'bool',  'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'bool',  'bool',  'bool', 'bool', 'bool',  'bool',  'bool',  'bool' ],
-    ['float', 'int',   'float', 'float', 'float', 'float', 'float', 'float', 'bool',  'bool',  'bool', 'bool', 'bool',  'float', 'bool',  'bool' ],
-    ['float', 'float', 'float', 'float', 'float', 'float', 'float', 'float', 'bool',  'bool',  'bool', 'bool', 'bool',  'float', 'bool',  'bool' ],
-    ['float', 'char',  'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'bool', 'bool', 'ERROR', 'ERROR', 'ERROR', 'ERROR'],
-    ['float', 'bool',  'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'bool',  'bool',  'bool', 'bool', 'bool',  'bool',  'bool',  'bool' ],
-    ['char',  'int',   'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'bool', 'bool', 'ERROR', 'ERROR', 'ERROR', 'ERROR'],
-    ['char',  'float', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'bool', 'bool', 'ERROR', 'ERROR', 'ERROR', 'ERROR'],
-    ['char',  'char',  'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'bool', 'bool', 'char',  'ERROR', 'ERROR', 'ERROR'],
-    ['char',  'bool',  'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'bool', 'bool', 'bool',  'bool',  'ERROR', 'ERROR'],
-    ['bool',  'int',   'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'bool',  'bool',  'bool', 'bool', 'bool',  'bool',  'bool',  'bool' ],
-    ['bool',  'float', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'bool',  'bool',  'bool', 'bool', 'bool',  'bool',  'bool',  'bool' ],
-    ['bool',  'char',  'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'bool', 'bool', 'ERROR', 'ERROR', 'ERROR', 'ERROR'],
-    ['bool',  'bool',  'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'bool', 'bool', 'bool',  'bool',  'bool',  'bool' ]
+#    lType    rType      **       *         /       %        +        -        >        <       <>      !=       ==       =       &&        ||       <=       >=
+#    ---------------------------------------------------------------------------------------------------------------------------------------------------------------
+    ['int',   'int',   'int',   'int',   'float', 'int',   'int',   'int',   'bool',  'bool',  'bool', 'bool', 'bool',  'int',   'bool',  'bool',  'bool',  'bool'  ],
+    ['int',   'float', 'float', 'float', 'float', 'float', 'float', 'float', 'bool',  'bool',  'bool', 'bool', 'bool',  'float', 'bool',  'bool',  'bool',  'bool'  ],
+    ['int',   'char',  'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'bool', 'bool', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR' ],
+    ['int',   'bool',  'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'bool',  'bool',  'bool', 'bool', 'bool',  'bool',  'bool',  'bool',  'bool',  'bool'  ],
+    ['float', 'int',   'float', 'float', 'float', 'float', 'float', 'float', 'bool',  'bool',  'bool', 'bool', 'bool',  'float', 'bool',  'bool',  'bool',  'bool'  ],
+    ['float', 'float', 'float', 'float', 'float', 'float', 'float', 'float', 'bool',  'bool',  'bool', 'bool', 'bool',  'float', 'bool',  'bool',  'bool',  'bool'  ],
+    ['float', 'char',  'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'bool', 'bool', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR' ],
+    ['float', 'bool',  'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'bool',  'bool',  'bool', 'bool', 'bool',  'bool',  'bool',  'bool',  'bool',  'bool'  ],
+    ['char',  'int',   'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'bool', 'bool', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR' ],
+    ['char',  'float', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'bool', 'bool', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR' ],
+    ['char',  'char',  'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'bool', 'bool', 'char',  'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR' ],
+    ['char',  'bool',  'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'bool', 'bool', 'bool',  'bool',  'ERROR', 'ERROR', 'ERROR', 'ERROR' ],
+    ['bool',  'int',   'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'bool',  'bool',  'bool', 'bool', 'bool',  'bool',  'bool',  'bool',  'bool',  'bool'  ],
+    ['bool',  'float', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'bool',  'bool',  'bool', 'bool', 'bool',  'bool',  'bool',  'bool',  'bool',  'bool'  ],
+    ['bool',  'char',  'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'bool', 'bool', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR' ],
+    ['bool',  'bool',  'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'ERROR', 'bool', 'bool', 'bool',  'bool',  'bool',  'bool',  'ERROR', 'ERROR' ]
 ]
 
 def Semantics(left_Type, right_Type, operator):
@@ -51,6 +51,8 @@ def Semantics(left_Type, right_Type, operator):
             if operator == '=': return typesTable[0][13]
             if operator == '&&': return typesTable[0][14]
             if operator == '||': return typesTable[0][15]
+            if operator == '<=': return typesTable[0][16]
+            if operator == '>=': return typesTable[0][17]
         if right_Type == typesTable[1][1]:                  # Si INT operator FLOAT
             if operator == '**': return typesTable[1][2]     # Si INT ** FLOAT return FLOAT ...
             if operator == '*': return typesTable[1][3]
@@ -66,6 +68,8 @@ def Semantics(left_Type, right_Type, operator):
             if operator == '=': return typesTable[1][13]
             if operator == '&&': return typesTable[1][14]
             if operator == '||': return typesTable[1][15]
+            if operator == '<=': return typesTable[1][16]
+            if operator == '>=': return typesTable[1][17]
         if right_Type == typesTable[2][1]:                  # Si INT operator CHAR
             if operator == '**': return typesTable[2][2]     # Si INT ** CHAR return ERROR ...
             if operator == '*': return typesTable[2][3]
@@ -81,6 +85,8 @@ def Semantics(left_Type, right_Type, operator):
             if operator == '=': return typesTable[2][13]
             if operator == '&&': return typesTable[2][14]
             if operator == '||': return typesTable[2][15]
+            if operator == '<=': return typesTable[2][16]
+            if operator == '>=': return typesTable[2][17]
         if right_Type == typesTable[3][1]:                  # Si INT operator BOOL
             if operator == '**': return typesTable[3][2]     # Si INT ** BOOL return ERROR ...
             if operator == '*': return typesTable[3][3]
@@ -96,6 +102,8 @@ def Semantics(left_Type, right_Type, operator):
             if operator == '=': return typesTable[3][13]
             if operator == '&&': return typesTable[3][14]
             if operator == '||': return typesTable[3][15]
+            if operator == '<=': return typesTable[3][16]
+            if operator == '>=': return typesTable[3][17]
 
 
     # ------------- FLOAT operator OPERAND ------------- #
@@ -115,6 +123,8 @@ def Semantics(left_Type, right_Type, operator):
             if operator == '=': return typesTable[4][13]
             if operator == '&&': return typesTable[4][14]
             if operator == '||': return typesTable[4][15]
+            if operator == '<=': return typesTable[4][16]
+            if operator == '>=': return typesTable[4][17]
         if right_Type == typesTable[5][1]:                  # Si FLOAT operator FLOAT
             if operator == '**': return typesTable[5][2]     # Si FLOAT ** FLOAT return FLOAT ...
             if operator == '*': return typesTable[5][3]
@@ -130,6 +140,8 @@ def Semantics(left_Type, right_Type, operator):
             if operator == '=': return typesTable[5][13]
             if operator == '&&': return typesTable[5][14]
             if operator == '||': return typesTable[5][15]
+            if operator == '<=': return typesTable[5][16]
+            if operator == '>=': return typesTable[5][17]
         if right_Type == typesTable[6][1]:                  # Si FLOAT operator CHAR
             if operator == '**': return typesTable[6][2]     # Si FLOAT ** CHAR return ERROR ...
             if operator == '*': return typesTable[6][3]
@@ -145,6 +157,8 @@ def Semantics(left_Type, right_Type, operator):
             if operator == '=': return typesTable[6][13]
             if operator == '&&': return typesTable[6][14]
             if operator == '||': return typesTable[6][15]
+            if operator == '<=': return typesTable[6][16]
+            if operator == '>=': return typesTable[6][17]
         if right_Type == typesTable[7][1]:                  # Si FLOAT operator BOOL
             if operator == '**': return typesTable[7][2]     # Si FLOAT ** BOOL return ERROR ...
             if operator == '*': return typesTable[7][3]
@@ -160,6 +174,8 @@ def Semantics(left_Type, right_Type, operator):
             if operator == '=': return typesTable[7][13]
             if operator == '&&': return typesTable[7][14]
             if operator == '||': return typesTable[7][15]
+            if operator == '<=': return typesTable[7][16]
+            if operator == '>=': return typesTable[7][17]
 
 
     # ------------- CHAR operator OPERAND ------------- #
@@ -179,6 +195,8 @@ def Semantics(left_Type, right_Type, operator):
             if operator == '=': return typesTable[8][13]
             if operator == '&&': return typesTable[8][14]
             if operator == '||': return typesTable[8][15]
+            if operator == '<=': return typesTable[8][16]
+            if operator == '>=': return typesTable[8][17]
         if right_Type == typesTable[9][1]:                  # Si CHAR operator FLOAT
             if operator == '**': return typesTable[9][2]     # Si CHAR ** FLOAT return ERROR ...
             if operator == '*': return typesTable[9][3]
@@ -194,6 +212,8 @@ def Semantics(left_Type, right_Type, operator):
             if operator == '=': return typesTable[9][13]
             if operator == '&&': return typesTable[9][14]
             if operator == '||': return typesTable[9][15]
+            if operator == '<=': return typesTable[9][16]
+            if operator == '>=': return typesTable[9][17]
         if right_Type == typesTable[10][1]:                 # Si CHAR operator CHAR
             if operator == '**': return typesTable[10][2]    # Si CHAR ** CHAR return ERROR ...
             if operator == '*': return typesTable[10][3]
@@ -209,6 +229,8 @@ def Semantics(left_Type, right_Type, operator):
             if operator == '=': return typesTable[10][13]
             if operator == '&&': return typesTable[10][14]
             if operator == '||': return typesTable[10][15]
+            if operator == '<=': return typesTable[10][16]
+            if operator == '>=': return typesTable[10][17]
         if right_Type == typesTable[11][1]:                 # Si CHAR operator BOOL
             if operator == '**': return typesTable[11][2]    # Si CHAR ** BOOL return ERROR ...
             if operator == '*': return typesTable[11][3]
@@ -224,6 +246,8 @@ def Semantics(left_Type, right_Type, operator):
             if operator == '=': return typesTable[11][13]
             if operator == '&&': return typesTable[11][14]
             if operator == '||': return typesTable[11][15]
+            if operator == '<=': return typesTable[11][16]
+            if operator == '>=': return typesTable[11][17]
 
 
     # ------------- BOOL operator OPERAND ------------- #
@@ -243,6 +267,8 @@ def Semantics(left_Type, right_Type, operator):
             if operator == '=': return typesTable[12][13]
             if operator == '&&': return typesTable[12][14]
             if operator == '||': return typesTable[12][15]
+            if operator == '<=': return typesTable[12][16]
+            if operator == '>=': return typesTable[12][17]
         if right_Type == typesTable[13][1]:                 # Si BOOL op FLOAT
             if operator == '**': return typesTable[13][2]    # Si BOOL ** FLOAT return ERROR ...
             if operator == '*': return typesTable[13][3]
@@ -258,6 +284,8 @@ def Semantics(left_Type, right_Type, operator):
             if operator == '=': return typesTable[13][13]
             if operator == '&&': return typesTable[13][14]
             if operator == '||': return typesTable[13][15]
+            if operator == '<=': return typesTable[13][16]
+            if operator == '>=': return typesTable[13][17]
         if right_Type == typesTable[14][1]:                 # Si BOOL operator CHAR
             if operator == '**': return typesTable[14][2]    # Si BOOL ** CHAR return ERROR ...
             if operator == '*': return typesTable[14][3]
@@ -273,6 +301,8 @@ def Semantics(left_Type, right_Type, operator):
             if operator == '=': return typesTable[14][13]
             if operator == '&&': return typesTable[14][14]
             if operator == '||': return typesTable[14][15]
+            if operator == '<=': return typesTable[14][16]
+            if operator == '>=': return typesTable[14][17]
         if right_Type == typesTable[15][1]:                 # Si BOOL operator BOOL
             if operator == '**': return typesTable[15][2]    # Si BOOL ** BOOL return ERROR ...
             if operator == '*': return typesTable[15][3]
@@ -288,6 +318,8 @@ def Semantics(left_Type, right_Type, operator):
             if operator == '=': return typesTable[15][13]
             if operator == '&&': return typesTable[15][14]
             if operator == '||': return typesTable[15][15]
+            if operator == '<=': return typesTable[15][16]
+            if operator == '>=': return typesTable[15][17]
 
     # ------------- ??? ??? ??? ------------- #
     else: return 'ERROR'
