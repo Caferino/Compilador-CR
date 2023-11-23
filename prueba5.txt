@@ -12,9 +12,9 @@
 # ================================================ #
 
 bool booleanoT = True, booleanoF = False;
-int x = 2;
+int x = 3;
 
-print(x ** x);
+print(x ** 2);
 
 if(booleanoT && booleanoT){
     print(100);

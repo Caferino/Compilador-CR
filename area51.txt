@@ -9,15 +9,8 @@
 int p;
 p = 2 + 3;
 
-int uno(int p) {
+void uno(int p) {
     int p;          // Esto está mal (mi contador de líneas tiene problema con newlines)
-    int res = 5;
-    res = res + p;
-    p = p + p;
-    print("p adentro de uno:", p);
-    print("res adentro de uno:", res);
-    return res;     // ARREGLAR, por alguna razón el return en este programa tiene problema, falta un .pop() somewhere...
 }
 
-p = uno(p);
-print("p afuera de uno:", p);
+uno(p);
