@@ -1,3 +1,15 @@
+# ================= Playground =================== #
+# DESCRIPCIÓN:					                   #
+# Código random para pruebas                       #
+# - - - - - - - - - - - - - - - - - - - - - - - - -#
+# OUTPUT ESPERADO:				                   #
+# cacao                                            #
+# Valor de p Antes: 4                              #
+# Valor de p Después: 4                            #
+# 50                                               #
+# Compilation Completed                            #
+# ================================================ #
+
 int result = 0;
 int x[3][3] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
 

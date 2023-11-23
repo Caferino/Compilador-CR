@@ -11,6 +11,7 @@
 
 import ply.lex as lex
 from Quadruples import quadsConstructor
+from Semantics import memory
 
 # ------ PALABRAS CLAVE ------ #
 keywords = {

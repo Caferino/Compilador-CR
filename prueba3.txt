@@ -1,3 +1,12 @@
+# ================== Prueba 3 ==================== #
+# DESCRIPCIÓN:					                   #
+# Código para probar ciclos while                  #
+# - - - - - - - - - - - - - - - - - - - - - - - - -#
+# OUTPUT ESPERADO:				                   #
+# ((Un 10, seguido del 0 al 99, luego del 9 al 1)) #
+# Compilation Completed                            #
+# ================================================ #
+
 int x = 5, y = 0;
 x = x + 2;
 x = x + 3;

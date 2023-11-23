@@ -1,11 +1,16 @@
+# =================== Area 51 ==================== #
+# DESCRIPCIÓN:					                   #
+# Playground para pruebas pequeñas de errores      #
+# - - - - - - - - - - - - - - - - - - - - - - - - -#
+# OUTPUT ESPERADO:				                   #
+# TypeError: Variable 'p' already exists! - line 5 #
+# ================================================ #
+
 int p;
-p = 3 + 3;
-print(p);
+p = 2 + 3;
 
 void uno(int p) {
-    int p;
-    int a;
-    print("test");
+    int p;          // Esto está mal (mi contador de líneas tiene problema con newlines)
 }
 
-uno(5);
+uno(p);

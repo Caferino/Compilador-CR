@@ -46,4 +46,8 @@ Dentro de: ~/.../Compilaor-CR
 
 > Limpieza de código general e implementación de '>=' y '<=' mas el chequeo de variables globales vs locales (según a la función a la que pertenecen).
 
+**Noviembre 21 2023:**
+
+> I'm in the matrix now.
+
 ~Óscar Antonio Hinojosa Salum A00821930
