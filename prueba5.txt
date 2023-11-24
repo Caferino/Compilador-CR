@@ -3,7 +3,7 @@
 # Código para probar condiciones y exponenciales   #
 # - - - - - - - - - - - - - - - - - - - - - - - - -#
 # OUTPUT ESPERADO:				                   #
-# 4                                                #
+# 9                                                #
 # 100                                              #
 # 100                                              #
 # 100                                              #
