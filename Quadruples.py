@@ -370,7 +370,7 @@ class Quadruples:
                 left_Type = self.PTypes.pop()
 
                 operator = self.POper.pop()
-                result_Type = SemanticCube.Semantics(left_Type, right_Type, operator)   # ! Creo no hace nada o no sirve, CUIDA result_Type al borar
+                result_Type = SemanticCube.Semantics(left_Type, right_Type, operator)   # ! Creo que esto sale sobrando, CUIDA result_Type al borrar
                 
                 if self.extraStringsForPrint > 1 :
                     words = ''

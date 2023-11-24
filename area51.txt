@@ -3,7 +3,7 @@
 # Playground para pruebas pequeñas de errores      #
 # - - - - - - - - - - - - - - - - - - - - - - - - -#
 # OUTPUT ESPERADO:				                   #
-# TypeError: Variable 'p' already exists - line 5 #
+# TypeError: Variable 'p' already exists - line 17 #
 # ================================================ #
 
 int p;
@@ -14,6 +14,7 @@ int uno(int p) {
     print("Adentro:", p);
     p = p + a;
     a = 100;
+    # int p;   # ESTO DEBE ROMPER EL PROGRAMA
     return p;
 }
 
