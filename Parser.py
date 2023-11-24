@@ -25,13 +25,8 @@ def p_program(p):
 
 
 def p_block(p):
-    '''block : addline statement block
+    '''block : statement block
              | empty'''
-    
-    
-def p_addline(p):
-    '''addline : empty'''
-    rules.p_addCodeLine()
              
       
 # ╭───────────────────────────╮
@@ -51,9 +46,10 @@ def p_statement(p):
                  | empty'''
 
 
-# ╭───────────────────────────╮
-# │            Vars           │
-# ╰───────────────────────────╯
+
+# *                         ╭───────────────────────────╮
+# * ======================= │            Vars           │ =======================
+# *                         ╰───────────────────────────╯
 def p_vars(p):
     '''vars : type id vars_equals semicolon
             | type id leftbracket var_ctei rightbracket vars_equals semicolon

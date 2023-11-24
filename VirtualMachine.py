@@ -9,7 +9,6 @@
 
 # ======================== Virtual Machine ======================== #
 
-from functools import reduce
 import pprint
 import copy
 import re
@@ -45,8 +44,7 @@ class VirtualMachine:
         """
   
         while self.program_counter < len(self.quadruples):
-            quadruple = self.quadruples[self.program_counter]
-            operator, operand1, operand2, target = quadruple
+            operator, operand1, operand2, target = copy.deepcopy(self.quadruples[self.program_counter])
 
             # Qué asco ya sé, una búsqueda lineal O(n) por cada operando que sea una variable...
             # Si nuestro resultado será un espacio temporal, lo "hacemos" índice (t1 = 1, t82 = 82, ...)

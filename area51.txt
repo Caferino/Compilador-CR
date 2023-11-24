@@ -3,14 +3,22 @@
 # Playground para pruebas pequeñas de errores      #
 # - - - - - - - - - - - - - - - - - - - - - - - - -#
 # OUTPUT ESPERADO:				                   #
-# TypeError: Variable 'p' already exists! - line 5 #
+# TypeError: Variable 'p' already exists - line 17 #
 # ================================================ #
 
 int p;
-p = 2 + 3;
+p = 25;
 
-void uno(int p) {
-    int p;          // Esto está mal (mi contador de líneas tiene problema con newlines)
+int uno(int p) {
+    int a = 5;
+    print("Adentro:", p);
+    p = p + a;
+    a = 100;
+    int p;   # ESTO DEBE ROMPER EL PROGRAMA
+    return p;
 }
 
-uno(p);
+p = uno(p);
+print("Afuera:", p);
+p = uno(p);
+print("Afuera 2:", p);
