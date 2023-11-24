@@ -9,7 +9,6 @@
 
 # ======================== Virtual Machine ======================== #
 
-from functools import reduce
 import pprint
 import copy
 import re

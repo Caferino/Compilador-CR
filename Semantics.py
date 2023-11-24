@@ -193,7 +193,6 @@ class Rules:
         for each_tuple in memory.symbolTable :
             if varName == each_tuple[1] and self.parentFunction == each_tuple[5]:
                 raise TypeError(f"Variable '{varName}' already exists! - line {memory.totalCodeLines}")
-                break
             
             
     # ------------------------------------- VERIFY MATRIX SIZE AND FILL EMPTY SPOTS
@@ -361,6 +360,7 @@ class Rules:
                 for tuple in memory.symbolTable :
                     if var == tuple[1] :
                         var = tuple[6][0]
+                        break
         
         new_value = var
         predicted_value = float(model.predict(np.array([[new_value]])))

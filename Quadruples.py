@@ -10,7 +10,6 @@
 # ======================== Código Intermedio ======================== #
 
 from VirtualMachine import VirtualMachine
-from functools import reduce
 import SemanticCube
 import shlex
 import re
@@ -112,6 +111,7 @@ class Quadruples:
                             num_rows = tuple[2][0]
                             num_columns = tuple[2][1]
                             valueAddress = (depth - 1) * (num_rows * num_columns) + (row - 1) * num_columns + (column - 1)
+                        break
 
             # Si no, lo buscamos como tal
             i = 0   # I missed you, baby
@@ -441,6 +441,7 @@ class Quadruples:
             if token == tuple[1] :
                 self.PilaO.append(tuple[1])
                 self.PTypes.append(tuple[0])
+                break
         
         
     def insertAssignmentSign(self, token):

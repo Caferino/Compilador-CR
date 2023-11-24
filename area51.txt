@@ -7,10 +7,15 @@
 # ================================================ #
 
 int p;
-p = 2 + 3;
+p = 25;
 
-void uno(int p) {
-    int p;          // Esto está mal (mi contador de líneas tiene problema con newlines)
+int uno(int p) {
+    // int p;          // Esto está mal (mi contador de líneas tiene problema con newlines)
+    int a = 5;
+    print("Adentro:", p);
+    p = p + a;
+    return p;
 }
 
-uno(p);
+p = uno(p);
+print("Afuera:", p);

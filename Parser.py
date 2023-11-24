@@ -51,9 +51,10 @@ def p_statement(p):
                  | empty'''
 
 
-# ╭───────────────────────────╮
-# │            Vars           │
-# ╰───────────────────────────╯
+
+# *                         ╭───────────────────────────╮
+# * ======================= │            Vars           │ =======================
+# *                         ╰───────────────────────────╯
 def p_vars(p):
     '''vars : type id vars_equals semicolon
             | type id leftbracket var_ctei rightbracket vars_equals semicolon
