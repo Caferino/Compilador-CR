@@ -3,15 +3,16 @@
 # Código para probar expresiones lineales          #
 # - - - - - - - - - - - - - - - - - - - - - - - - -#
 # OUTPUT ESPERADO:				                   #
-# 501.0                                            #
+# 505.0                                            #
 # Compilation Completed                            #
 # ================================================ #
 
 int x = 10, y = 0, z;
-z = ((x + x) + (((10 + 10) / 2) * 2 + (y + 10) + (25 + 25 + 1)));
+z = ((x + x) + (((10 + 10) / 2) * 2 + (y + 10) + (25 + 25 + 1 + 1 + 1+ 1 + 1)));
 z = z + 400;
 print(z);
 
-# Se transforma a FLOAT por la división, es regla de mi lenguaje, porque si vas a dividir algo, lo mejor sería
-# ya considerar esa variable como capaz de recibir decimales en algún momento. Es cuestionable, pero es algo que
-# tengo comentado o señalado en mi código para quitar o ponerlo en un minuto.
+# Se transforma a FLOAT por la división, es regla de mi lenguaje, porque si vas a dividir o multiplicar algo,
+# lo mejor sería ya considerar esa variable como capaz de tener decimales en algún momento. Es cuestionable,
+# pero es algo que tengo comentado en mi código para quitar o ponerlo en cualquier minuto (buscar "transform").
+# Fue solo para hacerlo más único, resaltar su modularidad y facilidad de editar.
