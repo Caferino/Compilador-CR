@@ -6,6 +6,11 @@
 # TypeError: Variable 'p' already exists - line 17 #
 # ================================================ #
 
+# - - - - - - - - - - - - - - - - - - - - - - - - -#
+# IDEAS POR AÑADIR: 			                   #
+# Checar que un ID nunca sea una palabra reservada #
+# ================================================ #
+
 int p;
 p = 25 * 2;
 

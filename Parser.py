@@ -543,7 +543,7 @@ def p_return(p):
 # │                           ERRORS                             │
 # ╰──────────────────────────────────────────────────────────────╯
 def p_error(p):
-    print(f"Syntax error in input! - {p} ")
+    print(f"Syntax error in input! - {p}")
 
 
 def p_empty(p):
