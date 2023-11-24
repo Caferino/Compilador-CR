@@ -192,7 +192,7 @@ class Rules:
     def verifyVariableExistence(self, varName):
         for each_tuple in memory.symbolTable :
             if varName == each_tuple[1] and self.parentFunction == each_tuple[5]:
-                raise TypeError(f"Variable '{varName}' already exists! - line {memory.totalCodeLines}")
+                raise TypeError(f"Variable '{varName}' already exists - line {memory.totalCodeLines}")
             
             
     # ------------------------------------- VERIFY MATRIX SIZE AND FILL EMPTY SPOTS

@@ -118,7 +118,8 @@ def t_CTEI(t):
 
 # Línea Nueva o Múltiples líneas nuevas (newlines)
 def t_newline(t):
-    r'\n+'
+    r'\n'
+    memory.totalCodeLines += 1
     t.lexer.lineno += len(t.value)
 
 
@@ -130,7 +131,7 @@ def t_comment(t):
 
 # Errores léxicos
 def t_error(t):
-    print("Error léxico ' {0} ' en la línea ' {1} ' ".format(t.value[0], t.lineno))
+    print(f"Lexical error '{t.value[0]}' - line {t.lineno}")
     t.lexer.skip(1)
 
 

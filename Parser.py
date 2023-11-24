@@ -25,13 +25,8 @@ def p_program(p):
 
 
 def p_block(p):
-    '''block : addline statement block
+    '''block : statement block
              | empty'''
-    
-    
-def p_addline(p):
-    '''addline : empty'''
-    rules.p_addCodeLine()
              
       
 # ╭───────────────────────────╮
