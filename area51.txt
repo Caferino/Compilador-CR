@@ -12,7 +12,7 @@
 # ================================================ #
 
 int p;
-p = 25 * 2;
+p = 25;
 
 int uno(int p) {
     int a = 5;
@@ -23,4 +23,7 @@ int uno(int p) {
     return p;
 }
 
-print(p * 0.5);
+p = uno(p);
+print("Afuera 1:", p);
+p = uno(p);
+print("Afuera 2:", p);
