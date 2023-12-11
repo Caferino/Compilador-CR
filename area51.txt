@@ -19,11 +19,15 @@ int uno(int p) {
     print("Adentro:", p);
     p = p + a;
     a = 100;
-    int p;   # ESTO DEBE ROMPER EL PROGRAMA
+    # int p;   # ESTO DEBE ROMPER EL PROGRAMA
     return p;
 }
+
+int dos(int p) {}
+
 
 p = uno(p);
 print("Afuera 1:", p);
 p = uno(p);
+p = media(p);
 print("Afuera 2:", p);

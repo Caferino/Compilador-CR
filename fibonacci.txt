@@ -9,7 +9,7 @@
 
 int result = 1;
 //                     11,12,13,21,22,23,31,32,33
-int matriz[3][3][1] = {1, 2, 3, 4, 5, 6, 10, 8, 9};
+int matriz[3][3][1] = {1, 2, 3, 4, 20, 6, 10, 8, 9};
 
 int fibonacci(int n) {
     # print(n); // DEBUG
@@ -19,7 +19,8 @@ int fibonacci(int n) {
         return fibonacci(n - 1) + fibonacci(n - 2);
     }
 }
+matriz[5 + 5];
+result = fibonacci();
 
-result = fibonacci(matriz[3][1]);
-
+result = mediana(matriz);
 print("Resultado:", result); # La prueba final
