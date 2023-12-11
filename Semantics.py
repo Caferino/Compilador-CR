@@ -31,7 +31,7 @@ class Rules:
         * - * - * - * - * - * - * - * - * - * - * - * - * - *
         ?     Set to True to turn it on, otherwise False    ?
         """
-        self.debugMode = False
+        self.debugMode = True
         
         ##### Variables
         self.type = ''

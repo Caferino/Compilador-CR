@@ -3,31 +3,21 @@
 # Playground para pruebas pequeñas de errores      #
 # - - - - - - - - - - - - - - - - - - - - - - - - -#
 # OUTPUT ESPERADO:				                   #
-# TypeError: Variable 'p' already exists - line 22 #
+# 0                                                #
 # ================================================ #
 
 # - - - - - - - - - - - - - - - - - - - - - - - - -#
 # IDEAS POR AÑADIR: 			                   #
-# Checar que un ID nunca sea una palabra reservada #
+# Checar que un ID nunca sea una palabra reservada 
+# Optimize
+# Fix Matrixes
+# FIX LINEAR EXPRESSIONS, they are RF instead of LF
+# Fix Embeded Methods
+# Advanced Optimizations
 # ================================================ #
 
-int p;
-p = 25;
+int res = 0;
 
-int uno(int p) {
-    int a = 5;
-    print("Adentro:", p);
-    p = p + a;
-    a = 100;
-    # int p;   # ESTO DEBE ROMPER EL PROGRAMA
-    return p;
-}
+res = (10 - 10 - 10 + 10);
 
-int dos(int p) {}
-
-
-p = uno(p);
-print("Afuera 1:", p);
-p = uno(p);
-p = media(p);
-print("Afuera 2:", p);
+print(res);

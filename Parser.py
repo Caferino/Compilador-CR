@@ -191,27 +191,35 @@ def p_expression(p):
     
     
 def p_comparation(p):
-    '''comparation : and expression
-                   | or expression
-                   | greater expression
-                   | less expression
-                   | notequal expression
-                   | notequalnum expression
-                   | islessorequal expression
-                   | isgreaterorequal expression
+    '''comparation : and vercomparation expression
+                   | or vercomparation expression
+                   | greater vercomparation expression
+                   | less vercomparation expression
+                   | notequal vercomparation expression
+                   | notequalnum vercomparation expression
+                   | islessorequal vercomparation expression
+                   | isgreaterorequal vercomparation expression
                    | empty'''
-    if len(p) > 2 : quadsConstructor.verifyConditionals()      # ? If POper.top == '<' or '>' ...
 
 
+def p_vercomparation(p):
+    '''vercomparation : empty'''
+    quadsConstructor.verifyConditionals()      # ? If POper.top == '<' or '>' ...
+    
+    
 def p_exp(p):
     '''exp : term operator'''
     
     
 def p_operator(p):
-    '''operator : plus exp
-                | minus exp
+    '''operator : plus veroperator exp
+                | minus veroperator exp
                 | empty'''
-    if len(p) > 2 : quadsConstructor.verifySignPlusOrMinus()   # ? If POper.top == '+' or '-' ...
+                
+                
+def p_veroperator(p):
+    '''veroperator : empty'''
+    quadsConstructor.verifySignPlusOrMinus()   # ? If POper.top == '+' or '-' ...
 
 
 def p_term(p):
@@ -219,12 +227,16 @@ def p_term(p):
     
     
 def p_term_operator(p):
-    '''term_operator : exponential term
-                     | times term
-                     | divide term
-                     | modulus term
+    '''term_operator : exponential verterm term
+                     | times verterm term
+                     | divide verterm term
+                     | modulus verterm term
                      | empty'''
-    if len(p) > 2 : quadsConstructor.verifySignTimesOrDivide() # ? If POper.top == '*' or '/' ...
+    
+    
+def p_verterm(p):
+    '''verterm : empty'''
+    quadsConstructor.verifySignTimesOrDivide() # ? If POper.top == '*' or '/' ...
 
 
 
